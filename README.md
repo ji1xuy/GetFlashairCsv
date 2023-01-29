@@ -22,7 +22,6 @@ NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機
 　Microsoft Excel 16.0 ObjectLibrary  
 ・Microsoft Edge WebDriverのダウンロード  
 　https://developer.microsoft.com/ja-jp/microsoft-edge/tools/webdriver/  
-　Stable チャネル バージョン:  108.0.1462.54: x64  
-  
+　  
 ■スクリーンショット  
   ![screenshot](https://user-images.githubusercontent.com/114241917/209545848-695872a3-73ca-4d4a-8c29-51de413dd6b2.jpg)
