@@ -10,7 +10,7 @@
 ・ファイルをExcelで開く  
   
 ■Visual Studioでの準備  
-NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機能をそれぞれの方法で記述し残してあります。MainForm.csの2125行～2871行のコードを削除すれば、NPOI, COM, ClosedXMLはインストール不要です。  
+NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機能をそれぞれの方法で記述し残してあります。MainForm.csの2053行～2801行のコードを削除すれば、NPOI, COM, ClosedXMLはインストール不要です。  
   
 ・Nuget パッケージのインストール  
 　DotNetCore.NPOI  
