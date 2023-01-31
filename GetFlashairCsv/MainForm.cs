@@ -59,8 +59,8 @@ namespace GetFlashairCsv
         private const string CAPTION_INFORMATION = "情報";
         private const string CAPTION_QUESTION = "確認";
         private const int ERROR_RETURN_VALUE = -1;
-        //EXCE_HEADER_IDENTIFIER: CSVファイル、Excelファイルのヘッダー(の1列目)の識別子
-        private const string EXCE_HEADER_IDENTIFIER = "yyyy/mm/dd";
+        //EXCEL_HEADER_IDENTIFIER: CSVファイル、Excelファイルのヘッダー(の1列目)の識別子
+        private const string EXCEL_HEADER_IDENTIFIER = "yyyy/mm/dd";
         //カスタム日時形式文字列
         //https://learn.microsoft.com/ja-jp/dotnet/standard/base-types/custom-date-and-time-format-strings#H_Specifier
         // Mは月、mは分、hは12時間形式の時間、Hは24時間形式の時間
@@ -1035,7 +1035,7 @@ namespace GetFlashairCsv
                         //R1C1形式でも可。ただし参照の際は作成した形式でしか参照できない
                         //Excelで一度保存し直せばA1形式に変換される様子
                         DataType = CellValues.String,
-                        CellValue = new OOXMLS.CellValue(EXCE_HEADER_IDENTIFIER),
+                        CellValue = new OOXMLS.CellValue(EXCEL_HEADER_IDENTIFIER),
                     };
                     row.Append(cell);
                     sheetData.Append(row);
@@ -1321,13 +1321,13 @@ namespace GetFlashairCsv
                 }
                 var cellValue = GetCellValue(_workbookPart, a1);
                 Debug.WriteLine("A1: " + cellValue);
-                if (cellValue != EXCE_HEADER_IDENTIFIER)
+                if (cellValue != EXCEL_HEADER_IDENTIFIER)
                 {
                     _document.Dispose();
                     File.Delete(_tempFileName);
                     _mainForm.ShowErrorMessageBox(
                         "30分値データが見つかりません\n" +
-                        "A1セル≠" + EXCE_HEADER_IDENTIFIER);
+                        "A1セル≠" + EXCEL_HEADER_IDENTIFIER);
                     return false;
                 }
 
@@ -2111,7 +2111,7 @@ namespace GetFlashairCsv
                 //1行目にヘッダーがあるかどうか確認
                 usedRows = worksheet!.Rows[1];
                 date = usedRows.Cells[1];
-                if (date.Text.Equals(EXCE_HEADER_IDENTIFIER) == true)
+                if (date.Text.Equals(EXCEL_HEADER_IDENTIFIER) == true)
                 {
                     worksheet.Activate();
 
@@ -2283,7 +2283,7 @@ namespace GetFlashairCsv
                 workbook = new XLWorkbook();
                 //1行目に仮のヘッダー作成
                 worksheet = workbook.Worksheets.Add(EXCEL_SHEETNAME);
-                worksheet.Cell("A1").Value = EXCE_HEADER_IDENTIFIER;
+                worksheet.Cell("A1").Value = EXCEL_HEADER_IDENTIFIER;
             }
 
             //Excelファイルを開く
@@ -2326,7 +2326,7 @@ namespace GetFlashairCsv
             }
 
             //1行目にヘッダーがあるかどうか確認
-            if (worksheet.Cell(1, 1).Value.Equals(EXCE_HEADER_IDENTIFIER) == false)
+            if (worksheet.Cell(1, 1).Value.Equals(EXCEL_HEADER_IDENTIFIER) == false)
             {
                 ShowErrorMessageBox("30分値データが見つかりません");
                 return ERROR_RETURN_VALUE;
@@ -2576,7 +2576,7 @@ namespace GetFlashairCsv
                 var row = worksheet.CreateRow(0);
                 var Cell = row.CreateCell(0);
                 Cell.SetCellType(NPOI.SS.UserModel.CellType.String);
-                Cell.SetCellValue(EXCE_HEADER_IDENTIFIER);
+                Cell.SetCellValue(EXCEL_HEADER_IDENTIFIER);
             }
 
             //Excelファイルを開く
@@ -2615,7 +2615,7 @@ namespace GetFlashairCsv
 
             //1行目にヘッダーがあるかどうか確認
             if (worksheet.GetRow(0).GetCell(0).StringCellValue.
-                Equals(EXCE_HEADER_IDENTIFIER) == false)
+                Equals(EXCEL_HEADER_IDENTIFIER) == false)
             {
                 ShowErrorMessageBox("30分値データが見つかりません");
                 return ERROR_RETURN_VALUE;
