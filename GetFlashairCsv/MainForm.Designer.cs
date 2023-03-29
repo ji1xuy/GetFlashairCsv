@@ -41,7 +41,7 @@ namespace GetFlashairCsv
             this.OpenExcelButton = new System.Windows.Forms.Button();
             this.CloseButton = new System.Windows.Forms.Button();
             this.ExcelLastDataLabel = new System.Windows.Forms.Label();
-            this.Clock = new System.Windows.Forms.Label();
+            this.ClockLabel = new System.Windows.Forms.Label();
             this.CsvFileNameLabel = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -149,13 +149,13 @@ namespace GetFlashairCsv
             this.ExcelLastDataLabel.Size = new System.Drawing.Size(237, 15);
             this.ExcelLastDataLabel.TabIndex = 2;
             // 
-            // Clock
+            // ClockLabel
             // 
-            this.Clock.Font = new System.Drawing.Font("Yu Gothic UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.Clock.Location = new System.Drawing.Point(19, 402);
-            this.Clock.Name = "Clock";
-            this.Clock.Size = new System.Drawing.Size(208, 23);
-            this.Clock.TabIndex = 3;
+            this.ClockLabel.Font = new System.Drawing.Font("Yu Gothic UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.ClockLabel.Location = new System.Drawing.Point(19, 402);
+            this.ClockLabel.Name = "ClockLabel";
+            this.ClockLabel.Size = new System.Drawing.Size(208, 23);
+            this.ClockLabel.TabIndex = 3;
             // 
             // CsvFileNameLabel
             // 
@@ -248,7 +248,7 @@ namespace GetFlashairCsv
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.Clock);
+            this.Controls.Add(this.ClockLabel);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.OpenExcelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -275,7 +275,7 @@ namespace GetFlashairCsv
         private Button OpenExcelButton;
         private Button CloseButton;
         private Label ExcelLastDataLabel;
-        private Label Clock;
+        private Label ClockLabel;
         private Label CsvFileNameLabel;
         private System.Windows.Forms.Timer timer1;
         private GroupBox groupBox1;

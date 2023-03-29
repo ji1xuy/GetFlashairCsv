@@ -34,7 +34,6 @@ using DocumentFormat.OpenXml.Packaging;
 //Microsoft Excel 16.0 ObjectLibrary
 using Microsoft.Office.Interop.Excel;
 using ExcelApplication = Microsoft.Office.Interop.Excel.Application;
-using OpenQA.Selenium.Support.UI;
 
 //Microsoft Edge WebDriverのダウンロード
 //https://developer.microsoft.com/ja-jp/microsoft-edge/tools/webdriver/
@@ -380,12 +379,20 @@ namespace GetFlashairCsv
 
         private void ShowErrorMessageBox(Exception e)
         {
-             CustomMessageBox.Show(this, e.ToString(), CAPTION_ERROR,
+            if (ExistsForm(progressForm!))
+            {
+                progressForm!.Close();
+            }
+            CustomMessageBox.Show(this, e.ToString(), CAPTION_ERROR,
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void ShowErrorMessageBox(string text)
         {
+            if (ExistsForm(progressForm!))
+            {
+                progressForm!.Close();
+            }
             CustomMessageBox.Show(this, text, CAPTION_ERROR,
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -394,6 +401,10 @@ namespace GetFlashairCsv
             string caption = CAPTION_INFORMATION,
             MessageBoxIcon icon = MessageBoxIcon.Information)
         {
+            if (ExistsForm(progressForm!))
+            {
+                progressForm!.Close();
+            }
             CustomMessageBox.Show(this, text, caption,
                 MessageBoxButtons.OK, icon);
         }
@@ -403,6 +414,10 @@ namespace GetFlashairCsv
             MessageBoxIcon icon = MessageBoxIcon.Warning,
             MessageBoxDefaultButton button = MessageBoxDefaultButton.Button1)
         {
+            if (ExistsForm(progressForm!))
+            {
+                progressForm!.Close();
+            }
             DialogResult result = CustomMessageBox.Show(mainForm, text, caption,
                 MessageBoxButtons.OKCancel, icon, button);
             return result;
@@ -415,20 +430,15 @@ namespace GetFlashairCsv
 
         private void UpdateCsvFileListButton_Click(object sender, EventArgs e)
         {
-            bool result;
-
             //処理中のフォームを表示
             progressForm = new ProgressForm(this.Location, "リスト更新中...");
-            
-            result = csvFileList.Update();
-            
-            //処理中のフォームを閉じる
-            progressForm.Close();
-            
-            if (result == false)
+            if (csvFileList.Update() == false)
             {
                 return;
             }
+
+            //処理中のフォームを閉じる
+            progressForm.Close();
         }
 
         private void CloseButton_Click(object sender, EventArgs e)
@@ -1909,8 +1919,6 @@ namespace GetFlashairCsv
 
         private async void WriteExcelButton_Click(object sender, EventArgs e)
         {
-            bool result;
-            
             if (WriteExcelButton.BackColor == System.Drawing.Color.LightGreen)
             {
                 if (ShowOKCancelMessageBox(
@@ -1925,22 +1933,20 @@ namespace GetFlashairCsv
             if (CsvFileListBox.Items.Count == 0)
             {
                 progressForm = new ProgressForm(this.Location, "リスト更新中...");
-                result = csvFileList.Update();
-                progressForm!.Close();
-                if (result == false)
+                if (csvFileList.Update() == false)
                 {
                     return;
                 }
+                progressForm!.Close();
             }
 
             //CSVファイルをダウンロード
             progressForm = new ProgressForm(this.Location, "ダウンロード中...");
-            result = await DownloadCSVFile();
-            progressForm!.Close();
-            if (result == false)
+            if (await DownloadCSVFile() == false)
             {
                 return;
             }
+            progressForm!.Close();
 
             progressForm = new ProgressForm(this.Location, "書き込み中...");
             int count;
@@ -1953,7 +1959,6 @@ namespace GetFlashairCsv
             //count = WriteExcelUsingClosedXML();
             //【3】OpenXMLで処理 ExcelFileUsingOpenXMLクラスで処理
             count = WriteExcelUsingOpenXML(this);
-            progressForm.Close();
 
             //ここから【1】【2】【3】共通
             if (count == ERROR_RETURN_VALUE)
@@ -1968,6 +1973,10 @@ namespace GetFlashairCsv
             else
             {
                 message = count.ToString() + " 行書き込みました";
+            }
+            if (ExistsForm(progressForm!))
+            {
+                progressForm.Close();
             }
             ShowOKMessageBox(message);
         }
