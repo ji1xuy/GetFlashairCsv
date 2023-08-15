@@ -49,7 +49,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230326";
+        private const string WINDOW_TITLE = APPNAME + "_20230815";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -1626,6 +1626,10 @@ namespace GetFlashairCsv
                 string[] cols = { "" };
                 while (reader.Peek() > 0)
                 {
+                    //時間がかかる処理での「応答なし」を回避するには？
+                    //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
+                    Application.DoEvents();
+
                     // 読み込んだ文字列をカンマ区切りで配列に格納
                     cols = reader.ReadLine()!.Split(',');
                     //continue;
