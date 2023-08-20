@@ -49,7 +49,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230815";
+        private const string WINDOW_TITLE = APPNAME + "_20230820";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -354,12 +354,13 @@ namespace GetFlashairCsv
         //partial修飾子を付けてProgressForm.csに書かずここに記述
         private partial class ProgressForm : GetFlashairCsv.ProgressForm
         {
-            public ProgressForm(System.Drawing.Point point, string text)
+             public ProgressForm(System.Drawing.Point point, string caption, bool progressBarVisible = false)
             {
                 //表示位置の設定
                 this.Bounds = new System.Drawing.Rectangle(
-                    point.X + 100, point.Y + 150, 240, 100);
-                this.Text = text;
+                    point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
+                this.Text = caption;
+                this.progressBar.Visible = progressBarVisible;
                 //処理中フォームを表示
                 //,Show()でモードレス、.ShowDialog()でモーダル
                 this.Show();
@@ -369,6 +370,21 @@ namespace GetFlashairCsv
                 //【2】クライアント領域全体を無効領域に設定し、再描画する
                 //progressForm.Update();
                 //【3】無効領域(画面更新が必要な領域)を再描画する
+                this.Update();
+            }
+
+            public void ProgressBarSetValue(long position, long length) {
+                int value = (int)(position * 100 / length);
+                if (value < this.progressBar.Minimum)
+                {
+                    return;
+                }
+                if (value > this.progressBar.Maximum)
+                {
+                    return;
+                }
+                this.progressBar.Value = value;
+                this.progressBar.DisplayText = position + " / " + length;
                 this.Update();
             }
         }
@@ -1624,7 +1640,8 @@ namespace GetFlashairCsv
                 Cell? wh = null;
                 Cell? cell = null;
                 string[] cols = { "" };
-                while (reader.Peek() > 0)
+                long streamLength = reader.BaseStream.Length;
+                while (reader.Peek() >= 0)
                 {
                     //時間がかかる処理での「応答なし」を回避するには？
                     //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
@@ -1632,7 +1649,10 @@ namespace GetFlashairCsv
 
                     // 読み込んだ文字列をカンマ区切りで配列に格納
                     cols = reader.ReadLine()!.Split(',');
-                    //continue;
+                    
+                    long streamPosition = reader.BaseStream.Position;
+                    _mainForm.progressForm!.ProgressBarSetValue(streamPosition, streamLength);
+                    //Debug.WriteLine("CSVファイル(バイト数): " + streamPosition + "  / " + streamLength);
 
                     _csvDateTime = cols[0] + " " + cols[1];
                     //読み込んだデータの日時がExcel最終行より後かどうか判定
@@ -1946,7 +1966,7 @@ namespace GetFlashairCsv
                 return;
             }
 
-            progressForm = new ProgressForm(this.Location, "書き込み中...");
+            progressForm = new ProgressForm(this.Location, "書き込み中...",  true);
             int count;
             //Excelファイルに書き込む　2つの方法
             //【1】NPOIで処理
