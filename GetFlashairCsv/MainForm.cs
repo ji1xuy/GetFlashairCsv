@@ -35,6 +35,7 @@ using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Office.Interop.Excel;
 using ExcelApplication = Microsoft.Office.Interop.Excel.Application;
 using OpenQA.Selenium.Support.UI;
+using System.Windows.Forms;
 
 //Microsoft Edge WebDriverのダウンロード
 //https://developer.microsoft.com/ja-jp/microsoft-edge/tools/webdriver/
@@ -49,7 +50,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230820";
+        private const string WINDOW_TITLE = APPNAME + "_20230826";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -132,9 +133,9 @@ namespace GetFlashairCsv
                 GetSystemDefaultLCID().ToString("x")));
         }
 
-        class Flashair
+        private class Flashair
         {
-            MainForm _mainForm;
+            private MainForm _mainForm;
 
             public Flashair(MainForm mainForm)
             {
@@ -181,9 +182,9 @@ namespace GetFlashairCsv
             }
         }
 
-        class CsvFileList
+        private class CsvFileList
         {
-            MainForm _mainForm;
+            private MainForm _mainForm;
 
             public CsvFileList(MainForm mainForm)
             {
@@ -208,159 +209,169 @@ namespace GetFlashairCsv
                 }
             }
 
-            public bool Update()
+            public async Task<bool> Update()
             {
-                var list = new List<string>();
-                IWebDriver? driver;
-                if (_mainForm.ChromeRadioButton.Checked)
+                return await Task.Run(() =>
                 {
-                    // Webドライバーのインスタンス化
-                    ChromeDriverService? chromeService;
-                    ChromeOptions chromeOptions = new();
-                    chromeService = ChromeDriverService.CreateDefaultService();
-                    //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
-                    //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
-                    chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
-                    chromeOptions.AddArgument("--headless");
-                    //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
-                    chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-
-                    try
+                    var list = new List<string>();
+                    IWebDriver? driver;
+                    if (_mainForm.ChromeRadioButton.Checked)
                     {
-                        using (driver = new ChromeDriver(chromeService, chromeOptions))
+                        // Webドライバーのインスタンス化
+                        ChromeDriverService? chromeService;
+                        ChromeOptions chromeOptions = new();
+                        chromeService = ChromeDriverService.CreateDefaultService();
+                        //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
+                        //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
+                        chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
+                        chromeOptions.AddArgument("--headless");
+                        //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
+                        chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
+
+                        try
                         {
-                            driver.Navigate().GoToUrl(_mainForm.flashair.Url);
-                            ReadOnlyCollection<IWebElement> elms =
-                                driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
-                            //30分値データのCSVファイル名のリストを取得
-                            // ReadOnlyCollection<IWebElement>型のリストから
-                            // List<IWebElement>型のリストを生成して
-                            // さらに ConvertAll() でList<string>型に変換する
-                            list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
+                            using (driver = new ChromeDriver(chromeService, chromeOptions))
+                            {
+                                driver.Navigate().GoToUrl(_mainForm.flashair.Url);
+                                ReadOnlyCollection<IWebElement> elms =
+                                    driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
+                                //30分値データのCSVファイル名のリストを取得
+                                // ReadOnlyCollection<IWebElement>型のリストから
+                                // List<IWebElement>型のリストを生成して
+                                // さらに ConvertAll() でList<string>型に変換する
+                                list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
+                            }
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
+                                "ChromeDriverとブラウザのバージョンが一致しているか確認してください");
+                            return false;
+                        }
+                        catch (Exception e)
+                            when ((e is WebDriverException) || (e is WebDriverArgumentException))
+                        {
+                            _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                            return false;
+                        }
+                        catch (Exception e)
+                        {
+                            _mainForm.ShowErrorMessageBox(e);
+                            return false;
                         }
                     }
-                    catch (InvalidOperationException)
+                    if (_mainForm.EdgeRadioButton.Checked)
                     {
-                        _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
-                            "ChromeDriverとブラウザのバージョンが一致しているか確認してください");
-                        return false;
-                    }
-                    catch (Exception e)
-                        when ((e is WebDriverException) || (e is WebDriverArgumentException))
-                    {
-                        _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
-                        return false;
-                    }
-                    catch (Exception e)
-                    {
-                        _mainForm.ShowErrorMessageBox(e);
-                        return false;
-                    }
-                }
-                if (_mainForm.EdgeRadioButton.Checked)
-                {
-                    EdgeDriverService? edgeService;
-                    EdgeOptions edgeOptions = new();
-                    edgeService = EdgeDriverService.CreateDefaultService();
+                        EdgeDriverService? edgeService;
+                        EdgeOptions edgeOptions = new();
+                        edgeService = EdgeDriverService.CreateDefaultService();
 
-                    edgeService.HideCommandPromptWindow = true;
-                    //上の HideCommandPromptWindow = true でも
-                    //コマンドプロンプトが一瞬表示されるため
-                    //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
-                    //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
-                    //edgeOptions.AddArgument("--window-position=-32000,-32000");
-                    //Microsoft Edge WebDriver を入れていなかったのが根本原因
-                    //Microsoft Edge WebDriver を入れて
-                    //HideCommandPromptWindow = true に戻した
+                        edgeService.HideCommandPromptWindow = true;
+                        //上の HideCommandPromptWindow = true でも
+                        //コマンドプロンプトが一瞬表示されるため
+                        //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
+                        //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
+                        //edgeOptions.AddArgument("--window-position=-32000,-32000");
+                        //Microsoft Edge WebDriver を入れていなかったのが根本原因
+                        //Microsoft Edge WebDriver を入れて
+                        //HideCommandPromptWindow = true に戻した
 
-                    edgeOptions.AddArgument("--headless");
-                    edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-                    //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
-                    //edgeOptions.AddArgument("--profile-directory=Default");
-                    try
-                    {
-                        using (driver = new EdgeDriver(edgeService, edgeOptions))
+                        edgeOptions.AddArgument("--headless");
+                        edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
+                        //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
+                        //edgeOptions.AddArgument("--profile-directory=Default");
+                        try
                         {
-                            driver.Navigate().GoToUrl(_mainForm.flashair.Url);
-                            var elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
-                            list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
+                            using (driver = new EdgeDriver(edgeService, edgeOptions))
+                            {
+                                driver.Navigate().GoToUrl(_mainForm.flashair.Url);
+                                var elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
+                                list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
+                            }
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
+                                "EdgeDriverとブラウザのバージョンが一致しているか確認してください");
+                            return false;
+                        }
+                        catch (Exception e)
+                            when ((e is WebDriverException) || (e is WebDriverArgumentException))
+                        {
+                            _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                            return false;
+                        }
+                        catch (Exception e)
+                        {
+                            _mainForm.ShowErrorMessageBox(e);
+                            return false;
                         }
                     }
-                    catch (InvalidOperationException)
+                    //リストを空にする
+                    _mainForm.Invoke((MethodInvoker)(() =>
                     {
-                        _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
-                            "EdgeDriverとブラウザのバージョンが一致しているか確認してください");
+                        _mainForm.CsvFileListBox.Items.Clear();
+                        _mainForm.CsvFileNameLabel.Text = ITEM_NOT_SELECTED;
+                    
+                    }));
+                    if (list.Count == 0)
+                    {
+                        _mainForm.ShowErrorMessageBox("CSVファイルが1つも見つかりませんでした\n" +
+                            "指定したURLはFlashAirではない可能性があります");
                         return false;
                     }
-                    catch (Exception e)
-                        when ((e is WebDriverException) || (e is WebDriverArgumentException))
-                    {
-                        _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
-                        return false;
-                    }
-                    catch (Exception e)
-                    {
-                        _mainForm.ShowErrorMessageBox(e);
-                        return false;
-                    }
-                }
-                //リストを空にする
-                _mainForm.CsvFileListBox.Items.Clear();
-                _mainForm.CsvFileNameLabel.Text = ITEM_NOT_SELECTED;
-                if (list.Count == 0)
-                {
-                    _mainForm.ShowErrorMessageBox("CSVファイルが1つも見つかりませんでした\n" +
-                        "指定したURLはFlashAirではない可能性があります");
-                    return false;
-                }
 
-                //list を条件で絞り込み　2つの方法
-                /*
-                //【1】for文で処理
-                string match;
-                foreach (IWebElement elm in elms)
-                {
-                    match = Regex.Match(elm.Text, @"[0-9]{6}.CSV").ToString();
-                    //Debug.WriteLine(match);
-                    if (match == String.Empty) //String.Emptyは""と同じ
+                    //list を条件で絞り込み　2つの方法
+                    /*
+                    //【1】for文で処理
+                    string match;
+                    foreach (IWebElement elm in elms)
                     {
-                        list.Add(match);
+                        match = Regex.Match(elm.Text, @"[0-9]{6}.CSV").ToString();
+                        //Debug.WriteLine(match);
+                        if (match == String.Empty) //String.Emptyは""と同じ
+                        {
+                            list.Add(match);
+                        }
                     }
-                }
-                */
-                //【2】RemoveAll() とラムダ式で処理
-                list.RemoveAll(s => !Regex.IsMatch(s, @"[0-9]{6}.CSV"));
+                    */
+                    //【2】RemoveAll() とラムダ式で処理
+                    list.RemoveAll(s => !Regex.IsMatch(s, @"[0-9]{6}.CSV"));
 
-                //list を降順ソート　3つの方法 
-                //【1】昇順ソートしてから逆順ソート
-                //list.Sort();
-                //list.Reverse();
-                //【2】ラムダ式で降順ソート
-                //list.Sort((s1, s2) => s2.CompareTo(s1));
-                //【3】LINQで降順ソート
-                list.OrderByDescending(s => s);
+                    //list を降順ソート　3つの方法 
+                    //【1】昇順ソートしてから逆順ソート
+                    //list.Sort();
+                    //list.Reverse();
+                    //【2】ラムダ式で降順ソート
+                    //list.Sort((s1, s2) => s2.CompareTo(s1));
+                    //【3】LINQで降順ソート
+                    list.OrderByDescending(s => s);
 
-                //リストに追加
-                if (list.Count > 0)
-                {
-                    _mainForm.CsvFileListBox.Items.AddRange(list.ToArray());
-                    _mainForm.CsvFileListBox.SelectedIndex = 0;
-                    _mainForm.CsvFileNameLabel.Text = _mainForm.CsvFileListBox.SelectedItem.ToString();
-                }
-                return true;
+                    //リストに追加
+                    if (list.Count > 0)
+                    {
+                        _mainForm.Invoke((MethodInvoker)(() =>
+                        {
+                            _mainForm.CsvFileListBox.Items.AddRange(list.ToArray());
+                            _mainForm.CsvFileListBox.SelectedIndex = 0;
+                            _mainForm.CsvFileNameLabel.Text = _mainForm.CsvFileListBox.SelectedItem.ToString();
+                        }));
+                    }
+                    return true;
+                });
             }
         }
 
         //partial修飾子を付けてProgressForm.csに書かずここに記述
         private partial class ProgressForm : GetFlashairCsv.ProgressForm
         {
-             public ProgressForm(System.Drawing.Point point, string caption, bool progressBarVisible = false)
+            public ProgressForm(System.Drawing.Point point, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee)
             {
                 //表示位置の設定
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
-                this.Text = caption;
-                this.progressBar.Visible = progressBarVisible;
+                this.Text= caption;
+                this.progressBar.Style = progressBarStyle;
                 //処理中フォームを表示
                 //,Show()でモードレス、.ShowDialog()でモーダル
                 this.Show();
@@ -373,7 +384,13 @@ namespace GetFlashairCsv
                 this.Update();
             }
 
-            public void ProgressBarSetValue(long position, long length) {
+            public void SetExcelLabelText(long row) {
+                this.ExcelLabel.Text = "[Excel最終行] " + row + "行";
+                this.Update();
+            }
+
+            public void SetProgressBarValue(long position, long length)
+            {
                 int value = (int)(position * 100 / length);
                 if (value < this.progressBar.Minimum)
                 {
@@ -384,7 +401,7 @@ namespace GetFlashairCsv
                     return;
                 }
                 this.progressBar.Value = value;
-                this.progressBar.DisplayText = position + " / " + length;
+                this.CsvLabel.Text = "[CSV] " + position + "バイト中、" + length + "バイト読込";
                 this.Update();
             }
         }
@@ -429,18 +446,20 @@ namespace GetFlashairCsv
             flashair.WriteUrlToInifile();
         }
 
-        private void UpdateCsvFileListButton_Click(object sender, EventArgs e)
+        private async void UpdateCsvFileListButton_Click(object sender, EventArgs e)
         {
             bool result;
 
+            UpdateCsvFileListButton.Enabled = false;
             //処理中のフォームを表示
-            progressForm = new ProgressForm(this.Location, "リスト更新中...");
-            
-            result = csvFileList.Update();
+            progressForm = new ProgressForm(this.Location, "リスト更新"); 
+
+            result = await csvFileList.Update();
             
             //処理中のフォームを閉じる
             progressForm.Close();
-            
+            UpdateCsvFileListButton.Enabled = true;
+
             if (result == false)
             {
                 return;
@@ -499,7 +518,7 @@ namespace GetFlashairCsv
             return true;
         }
 
-        private DialogResult ExistsFile(string fileName)
+        private DialogResult ShowCreateFileDialog(string fileName)
         {
             //Excelファイルの存在を確認
             var filePath = Path.GetFullPath(fileName);
@@ -539,7 +558,7 @@ namespace GetFlashairCsv
             //ShowOKCancelMessageBox()をstaticに変えれば動作はするが
             //staticは使いたくないのでこれは使わない
             /*
-            public DialogResult ExistsFile(string fileName)
+            public DialogResult ShowCreateFileDialog(string fileName)
             {
                 //Excelファイルの存在を確認
                 string filePath = System.IO.Path.GetFullPath(fileName);
@@ -553,18 +572,17 @@ namespace GetFlashairCsv
             }
             */
 
-            protected DialogResult ExistsFile(MainForm form, string fileName)
+            protected DialogResult ShowCreateFileDialog(MainForm form, string fileName)
             {
                 //Excelファイルの存在を確認
                 var filePath = Path.GetFullPath(fileName);
                 Debug.WriteLine("filePath: " + filePath);
                 if (File.Exists(filePath))
                 {
-                    //Excelファイルが見つかった場合は戻り値Noneを返す
                     return DialogResult.None;
                 }
                 //Excelファイルが見つからない場合
-                //新規作成するならOK、作成しないならCancelを返す
+                //新規作成するかどうか確認
                 return form.ShowOKCancelMessageBox(
                     EXCEL_FILENAME + " が見つかりません\n新規作成しますか？");
             }
@@ -572,7 +590,7 @@ namespace GetFlashairCsv
             public abstract bool Create(string fileName);
             public abstract bool Open(string fileName);
             public abstract StreamReader? OpenCsvFile(string fileName);
-            public abstract int Write(StreamReader reader);
+            public abstract Task<int> Write(StreamReader reader);
             public abstract bool ResizeTable();
             public abstract bool ShowInPane();
             public abstract bool ActivateLastCell();
@@ -772,9 +790,9 @@ namespace GetFlashairCsv
                 return table;
             }
 
-            public DialogResult ExistsFile(string fileName)
+            public DialogResult ShowCreateFileDialog(string fileName)
             {
-                return base.ExistsFile(_mainForm, fileName);
+                return base.ShowCreateFileDialog(_mainForm, fileName);
             }
 
             ////Dynamic comments in Excel using Open XML
@@ -1494,269 +1512,282 @@ namespace GetFlashairCsv
                 return reader;
             }
 
-            public override int Write(StreamReader reader)
+            public override async Task<int> Write(StreamReader reader)
             {
-                if ((_document == null) || (reader == null))
+                return await Task.Run(() =>
                 {
-                    return ERROR_RETURN_VALUE;
-                }
-                //Excelスタイルシートにセルフォーマット定義を追加
-                //Cellの書式を設定する(OpenXML編)
-                //https://www.cloverfield.co.jp/2020/02/28/cell%E3%81%AE%E6%9B%B8%E5%BC%8F%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8Bopenxml%E7%B7%A8/
-                var stylesPart = _workbookPart!.WorkbookStylesPart;
-                var cellFormats = stylesPart!.Stylesheet.CellFormats;
-
-                //日付のセル書式
-                ////NumberFormatId=14の組込み書式 [日付]種類 *2012/3/14
-                //セル書式が追加済か確認
-                object? dateStyleIndex = null;
-                UInt32Value index = 0;
-                foreach (OOXMLS.CellFormat f in cellFormats!)
-                {
-                    if (f.NumberFormatId! == 14)
+                    if ((_document == null) || (reader == null))
                     {
-                        dateStyleIndex = new UInt32Value(index);
-                        break;
+                        return ERROR_RETURN_VALUE;
                     }
-                    index++;
-                }
-                Debug.WriteLine("dateStyleIndex: " + dateStyleIndex);
-                //セル書式を追加
-                if (dateStyleIndex == null)
-                {
-                    stylesPart.Stylesheet.CellFormats!.AppendChild(new OOXMLS.CellFormat()
+                    //Excelスタイルシートにセルフォーマット定義を追加
+                    //Cellの書式を設定する(OpenXML編)
+                    //https://www.cloverfield.co.jp/2020/02/28/cell%E3%81%AE%E6%9B%B8%E5%BC%8F%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8Bopenxml%E7%B7%A8/
+                    var stylesPart = _workbookPart!.WorkbookStylesPart;
+                    var cellFormats = stylesPart!.Stylesheet.CellFormats;
+
+                    //日付のセル書式
+                    ////NumberFormatId=14の組込み書式 [日付]種類 *2012/3/14
+                    //セル書式が追加済か確認
+                    object? dateStyleIndex = null;
+                    UInt32Value index = 0;
+                    foreach (OOXMLS.CellFormat f in cellFormats!)
                     {
-                        FormatId = 0,
-                        NumberFormatId = 14, //mm-dd-yy
-                        FontId = (UInt32Value)0U,
-                        FillId = (UInt32Value)0U,
-                        BorderId = (UInt32Value)0U,
-                        ApplyNumberFormat = OOXML.BooleanValue.FromBoolean(true),
-                        ApplyAlignment = true,
-                        Alignment = new OOXMLS.Alignment
+                        if (f.NumberFormatId! == 14)
                         {
-                            Vertical = OOXMLS.VerticalAlignmentValues.Center
+                            dateStyleIndex = new UInt32Value(index);
+                            break;
                         }
-                    });
-                    stylesPart.Stylesheet.CellFormats.Count
-                      = new UInt32Value((uint)stylesPart.Stylesheet.CellFormats.Count());
-                    dateStyleIndex =
-                        new UInt32Value(stylesPart.Stylesheet.CellFormats.Count - 1);
-                }
-
-                //時刻のセル書式
-                //Apply OpenXML excel number formatcode to string value in C#
-                //https://stackoverflow.com/questions/25228471/apply-openxml-excel-number-formatcode-to-string-value-in-c-sharp
-                //https://learn.microsoft.com/ja-jp/dotnet/api/documentformat.openxml.spreadsheet.numberingformat?view=openxml-2.8.1
-                //NumberFormatId=20の組込み書式"h:mm"は、[時刻]種類13:30にできない
-                //FormatCode="h:mm;@"のユーザー定義を追加する必要がある
-                //ユーザー定義のNumberFormatIdは176以降らしい
-                //176を初期値にして順番で見ていって空いていたら発番することにした
-                //エラーは出ていないが、この方法で全く問題ないのか不明
-                //<NumberFormatIdの発番の仕組みを検証>
-                //セルに対して組込みの[時刻]種類13:30をExcelで操作して設定すると
-                //[時刻]種類13:30になるが、styles.xmlを覗くとユーザー定義になり
-                //FormatCodeは"h:mm;@"で,NumberFormatIdの発番は
-                //176は空いているのに176にならず、やる度に180,181と一定しない
-                // ファイルではなくExcelがグローバルに管理している?(PCが別なら管理は無理)
-                // ランダムに番号を作成してファイル内で未使用なら決定?
-                // 2つのファイル(同じIdでCodeの内容が違う)を1つにした時どうなるのか?
-
-                // "h:mm;@"のユーザー定義が登録済か確認
-                stylesPart.Stylesheet.NumberingFormats = new NumberingFormats();
-                var timeFormatCode =
-                    OOXML.StringValue.FromString(EXCEL_STYLE_TIME_FORMATCODE);
-                var numberingFormats = stylesPart.Stylesheet.NumberingFormats;
-                OOXMLS.NumberingFormat numberingFormat;
-                var tempTimeFormat =
-                    numberingFormats.Elements<OOXMLS.NumberingFormat>().FirstOrDefault(f => f.FormatCode == timeFormatCode);
-                if (tempTimeFormat != null)
-                {
-                    numberingFormat = tempTimeFormat;
-                }
-                else
-                {
-                    numberingFormat = new();
-                    var tempUserFormat = numberingFormats.
-                        Elements<OOXMLS.NumberingFormat>().
-                        Where(f => f.NumberFormatId! >= 176).LastOrDefault();
-                    if (tempUserFormat != null)
+                        index++;
+                    }
+                    Debug.WriteLine("dateStyleIndex: " + dateStyleIndex);
+                    //セル書式を追加
+                    if (dateStyleIndex == null)
                     {
-                        numberingFormat.NumberFormatId =
-                            tempUserFormat.NumberFormatId! + 1;
+                        stylesPart.Stylesheet.CellFormats!.AppendChild(new OOXMLS.CellFormat()
+                        {
+                            FormatId = 0,
+                            NumberFormatId = 14, //mm-dd-yy
+                            FontId = (UInt32Value)0U,
+                            FillId = (UInt32Value)0U,
+                            BorderId = (UInt32Value)0U,
+                            ApplyNumberFormat = OOXML.BooleanValue.FromBoolean(true),
+                            ApplyAlignment = true,
+                            Alignment = new OOXMLS.Alignment
+                            {
+                                Vertical = OOXMLS.VerticalAlignmentValues.Center
+                            }
+                        });
+                        stylesPart.Stylesheet.CellFormats.Count
+                          = new UInt32Value((uint)stylesPart.Stylesheet.CellFormats.Count());
+                        dateStyleIndex =
+                            new UInt32Value(stylesPart.Stylesheet.CellFormats.Count - 1);
+                    }
+
+                    //時刻のセル書式
+                    //Apply OpenXML excel number formatcode to string value in C#
+                    //https://stackoverflow.com/questions/25228471/apply-openxml-excel-number-formatcode-to-string-value-in-c-sharp
+                    //https://learn.microsoft.com/ja-jp/dotnet/api/documentformat.openxml.spreadsheet.numberingformat?view=openxml-2.8.1
+                    //NumberFormatId=20の組込み書式"h:mm"は、[時刻]種類13:30にできない
+                    //FormatCode="h:mm;@"のユーザー定義を追加する必要がある
+                    //ユーザー定義のNumberFormatIdは176以降らしい
+                    //176を初期値にして順番で見ていって空いていたら発番することにした
+                    //エラーは出ていないが、この方法で全く問題ないのか不明
+                    //<NumberFormatIdの発番の仕組みを検証>
+                    //セルに対して組込みの[時刻]種類13:30をExcelで操作して設定すると
+                    //[時刻]種類13:30になるが、styles.xmlを覗くとユーザー定義になり
+                    //FormatCodeは"h:mm;@"で,NumberFormatIdの発番は
+                    //176は空いているのに176にならず、やる度に180,181と一定しない
+                    // ファイルではなくExcelがグローバルに管理している?(PCが別なら管理は無理)
+                    // ランダムに番号を作成してファイル内で未使用なら決定?
+                    // 2つのファイル(同じIdでCodeの内容が違う)を1つにした時どうなるのか?
+
+                    // "h:mm;@"のユーザー定義が登録済か確認
+                    stylesPart.Stylesheet.NumberingFormats = new NumberingFormats();
+                    var timeFormatCode =
+                        OOXML.StringValue.FromString(EXCEL_STYLE_TIME_FORMATCODE);
+                    var numberingFormats = stylesPart.Stylesheet.NumberingFormats;
+                    OOXMLS.NumberingFormat numberingFormat;
+                    var tempTimeFormat =
+                        numberingFormats.Elements<OOXMLS.NumberingFormat>().FirstOrDefault(f => f.FormatCode == timeFormatCode);
+                    if (tempTimeFormat != null)
+                    {
+                        numberingFormat = tempTimeFormat;
                     }
                     else
                     {
-                        numberingFormat.NumberFormatId =
-                        UInt32Value.FromUInt32(176);
-                        //UInt32Value.FromUInt32(iExcelIndex++);
-                    }
-                    numberingFormat.FormatCode = timeFormatCode;
-                    stylesPart.Stylesheet.NumberingFormats.Append(numberingFormat);
-                }
-                Debug.WriteLine("numberingFormat.NumberFormatId: " + numberingFormat.NumberFormatId);
-
-                //セル書式が追加済か確認
-                object? timeStyleIndex = null;
-                index = 0;
-                foreach (OOXMLS.CellFormat f in cellFormats)
-                {
-                    if (f.NumberFormatId! == numberingFormat.NumberFormatId!)
-                    {
-                        timeStyleIndex = new UInt32Value(index);
-                        break;
-                    }
-                    index++;
-                }
-                Debug.WriteLine("timeStyleIndex: " + timeStyleIndex);
-
-                //セル書式を追加
-                if (timeStyleIndex! == null)
-                {
-                    //セル書式を作成
-                    stylesPart.Stylesheet.CellFormats!.AppendChild(new OOXMLS.CellFormat()
-                    {
-                        FormatId = (UInt32Value)0U,
-                        NumberFormatId = numberingFormat.NumberFormatId,
-                        FontId = (UInt32Value)0U,
-                        FillId = (UInt32Value)0U,
-                        BorderId = (UInt32Value)0U,
-                        ApplyNumberFormat = OOXML.BooleanValue.FromBoolean(true),
-                        ApplyAlignment = true,
-                        Alignment = new OOXMLS.Alignment
+                        numberingFormat = new();
+                        var tempUserFormat = numberingFormats.
+                            Elements<OOXMLS.NumberingFormat>().
+                            Where(f => f.NumberFormatId! >= 176).LastOrDefault();
+                        if (tempUserFormat != null)
                         {
-                            Vertical = OOXMLS.VerticalAlignmentValues.Center
+                            numberingFormat.NumberFormatId =
+                                tempUserFormat.NumberFormatId! + 1;
                         }
-                    });
-                    stylesPart.Stylesheet.CellFormats.Count
-                      = new UInt32Value((uint)stylesPart.Stylesheet.CellFormats.Count());
-                    timeStyleIndex = new UInt32Value(stylesPart.Stylesheet.CellFormats.Count - 1);
-                }
-
-                //Excelファイルに書き込み
-                OOXMLS.Row? row = null;
-                Cell? date = null;
-                Cell? time = null;
-                Cell? wh = null;
-                Cell? cell = null;
-                string[] cols = { "" };
-                long streamLength = reader.BaseStream.Length;
-                while (reader.Peek() >= 0)
-                {
-                    //時間がかかる処理での「応答なし」を回避するには？
-                    //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
-                    Application.DoEvents();
-
-                    // 読み込んだ文字列をカンマ区切りで配列に格納
-                    cols = reader.ReadLine()!.Split(',');
-                    
-                    long streamPosition = reader.BaseStream.Position;
-                    _mainForm.progressForm!.ProgressBarSetValue(streamPosition, streamLength);
-                    //Debug.WriteLine("CSVファイル(バイト数): " + streamPosition + "  / " + streamLength);
-
-                    _csvDateTime = cols[0] + " " + cols[1];
-                    //読み込んだデータの日時がExcel最終行より後かどうか判定
-                    if (string.Compare(_csvDateTime, _excelDateTime) != 1)
-                    {
-                        continue;
-                    }
-                    //Excelのセルオブジェクトの作成とデータ書き込み
-                    _excelRownum++;
-                    Debug.WriteLine(_excelRownum + "行: " + _csvDateTime);
-
-                    //行追加
-                    row = _worksheet!.Descendants<OOXMLS.Row>().FirstOrDefault(r => r.RowIndex! == _excelRownum);
-                    if (row == null)
-                    {
-                        row = new OOXMLS.Row()
+                        else
                         {
-                            RowIndex = Convert.ToUInt32(_excelRownum),
-                            //Spans = new ListValue<OOXML.StringValue>()
-                        };
-                        _sheetData = _worksheet.GetFirstChild<SheetData>();
-                        _sheetData!.Append(row);
+                            numberingFormat.NumberFormatId =
+                            UInt32Value.FromUInt32(176);
+                            //UInt32Value.FromUInt32(iExcelIndex++);
+                        }
+                        numberingFormat.FormatCode = timeFormatCode;
+                        stylesPart.Stylesheet.NumberingFormats.Append(numberingFormat);
                     }
+                    Debug.WriteLine("numberingFormat.NumberFormatId: " + numberingFormat.NumberFormatId);
 
-                    //1列目 日付
-                    date = GetCell(_worksheet, "A" + _excelRownum);
-                    if (date == null)
+                    //セル書式が追加済か確認
+                    object? timeStyleIndex = null;
+                    index = 0;
+                    foreach (OOXMLS.CellFormat f in cellFormats)
                     {
-                        date = new Cell()
+                        if (f.NumberFormatId! == numberingFormat.NumberFormatId!)
                         {
-                            CellReference = "A" + _excelRownum,
-                            DataType = CellValues.Number,
-                            StyleIndex = (UInt32Value)dateStyleIndex,
-                        };
-                        row.Append(date);
+                            timeStyleIndex = new UInt32Value(index);
+                            break;
+                        }
+                        index++;
                     }
-                    date.CellValue = new OOXMLS.CellValue(DateTime.Parse(cols[0]).ToOADate());
+                    Debug.WriteLine("timeStyleIndex: " + timeStyleIndex);
 
-                    //2列目 時刻
-                    // 自前でシリアル値に変換
-                    var hh = Int32.Parse(cols[1].Substring(0, 2));
-                    var mm = Int32.Parse(cols[1].Substring(3));
-                    var serialValue = (hh + mm / 60.0) / 24.0;
-                    time = GetCell(_worksheet, "B" + _excelRownum);
-                    if (time == null)
+                    //セル書式を追加
+                    if (timeStyleIndex! == null)
                     {
-                        time = new Cell()
+                        //セル書式を作成
+                        stylesPart.Stylesheet.CellFormats!.AppendChild(new OOXMLS.CellFormat()
                         {
-                            CellReference = "B" + _excelRownum,
-                            DataType = CellValues.Number,
-                            StyleIndex = (UInt32Value)timeStyleIndex,
-                        };
-                        row.Append(time);
-                    }
-                    time.CellValue = new OOXMLS.CellValue(serialValue);
-
-                    //3列目 数値
-                    wh = GetCell(_worksheet, "C" + _excelRownum);
-                    if (wh == null)
-                    {
-                        wh = new Cell()
-                        {
-                            CellReference = "C" + _excelRownum,
-                            DataType = CellValues.Number,
-                        };
-                        row.Append(wh);
-                    }
-                    wh.CellValue = new OOXMLS.CellValue(cols[2]);
-
-                    //4列目～最終(11列)目 数値
-                    for (int n = 3; n < cols.Length; n++)
-                    {
-                        cell = GetCell(_worksheet, ConvertR1C1ToA1(_excelRownum, n + 1));
-                        if (cell == null)
-                        {
-                            cell = new Cell()
+                            FormatId = (UInt32Value)0U,
+                            NumberFormatId = numberingFormat.NumberFormatId,
+                            FontId = (UInt32Value)0U,
+                            FillId = (UInt32Value)0U,
+                            BorderId = (UInt32Value)0U,
+                            ApplyNumberFormat = OOXML.BooleanValue.FromBoolean(true),
+                            ApplyAlignment = true,
+                            Alignment = new OOXMLS.Alignment
                             {
-                                CellReference = ConvertR1C1ToA1(_excelRownum, n + 1),
-                                DataType = CellValues.Number
-                            };
-                            row.Append(cell);
-                        }
-                        cell.CellValue = new OOXMLS.CellValue(cols[n]);
+                                Vertical = OOXMLS.VerticalAlignmentValues.Center
+                            }
+                        });
+                        stylesPart.Stylesheet.CellFormats.Count
+                          = new UInt32Value((uint)stylesPart.Stylesheet.CellFormats.Count());
+                        timeStyleIndex = new UInt32Value(stylesPart.Stylesheet.CellFormats.Count - 1);
                     }
-                    _count++;
-                }
-                _excelDateTime = _csvDateTime;
-                _excelWh = Convert.ToDouble(cols[2]);
-                reader.Close();
-                Debug.WriteLine("CSVファイル読み込み終了");
 
-                _mainForm.WriteExcelButton.BackColor = System.Drawing.Color.LightGreen;
-                _mainForm.ExcelLastDataLabel.Text = string.Format("{0}行 {1} {2}kWh",
-                    _excelRownum, _excelDateTime, (int)((_excelWh + 500) / 1000));
+                    //Excelファイルに書き込み
+                    OOXMLS.Row? row = null;
+                    Cell? date = null;
+                    Cell? time = null;
+                    Cell? wh = null;
+                    Cell? cell = null;
+                    string[] cols = { "" };
+                    long streamLength = reader.BaseStream.Length;
+                    while (reader.Peek() >= 0)
+                    {
+                        //時間がかかる処理での「応答なし」を回避するには？
+                        //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
+                        //Application.DoEvents();
 
-                //30分以上は30分、30分未満は0分、秒は0秒、ミリ秒は0ミリ秒に調整　2つの方法
-                var dateTime = DateTime.Parse(_excelDateTime!);
-                _mainForm.lastDateTime = new DateTime(
-                    dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour,
-                    (dateTime.Minute >= 30) ? 30 : 0, 0, 0);
-                Debug.WriteLine("lastDateTime: " + _mainForm.lastDateTime);
+                        // 読み込んだ文字列をカンマ区切りで配列に格納
+                        cols = reader.ReadLine()!.Split(',');
 
-                Debug.WriteLine("ExcelFileUsingOpenXML.Write() 成功");
-                return _count;
+                        _mainForm.Invoke((MethodInvoker)(() =>
+                        {
+                            long streamPosition = reader.BaseStream.Position;
+                            _mainForm.progressForm!.SetProgressBarValue(streamPosition, streamLength);
+                            //Debug.WriteLine("CSVファイル(バイト数): " + streamPosition + "  / " + streamLength);
+                        }));
+                        _csvDateTime = cols[0] + " " + cols[1];
+                        //読み込んだデータの日時がExcel最終行より後かどうか判定
+                        if (string.Compare(_csvDateTime, _excelDateTime) != 1)
+                        {
+                            continue;
+                        }
+                        //Excelのセルオブジェクトの作成とデータ書き込み
+                        _excelRownum++;
+                        
+                        _mainForm.Invoke((MethodInvoker)(() =>
+                        {
+                            _mainForm.progressForm!.SetExcelLabelText(_excelRownum);
+                            //Debug.WriteLine(_excelRownum + "行: " + _csvDateTime);
+                        }));
+
+                        //行追加
+                        row = _worksheet!.Descendants<OOXMLS.Row>().FirstOrDefault(r => r.RowIndex! == _excelRownum);
+                        if (row == null)
+                        {
+                            row = new OOXMLS.Row()
+                            {
+                                RowIndex = Convert.ToUInt32(_excelRownum),
+                                //Spans = new ListValue<OOXML.StringValue>()
+                            };
+                            _sheetData = _worksheet.GetFirstChild<SheetData>();
+                            _sheetData!.Append(row);
+                        }
+
+                        //1列目 日付
+                        date = GetCell(_worksheet, "A" + _excelRownum);
+                        if (date == null)
+                        {
+                            date = new Cell()
+                            {
+                                CellReference = "A" + _excelRownum,
+                                DataType = CellValues.Number,
+                                StyleIndex = (UInt32Value)dateStyleIndex,
+                            };
+                            row.Append(date);
+                        }
+                        date.CellValue = new OOXMLS.CellValue(DateTime.Parse(cols[0]).ToOADate());
+
+                        //2列目 時刻
+                        // 自前でシリアル値に変換
+                        var hh = Int32.Parse(cols[1].Substring(0, 2));
+                        var mm = Int32.Parse(cols[1].Substring(3));
+                        var serialValue = (hh + mm / 60.0) / 24.0;
+                        time = GetCell(_worksheet, "B" + _excelRownum);
+                        if (time == null)
+                        {
+                            time = new Cell()
+                            {
+                                CellReference = "B" + _excelRownum,
+                                DataType = CellValues.Number,
+                                StyleIndex = (UInt32Value)timeStyleIndex,
+                            };
+                            row.Append(time);
+                        }
+                        time.CellValue = new OOXMLS.CellValue(serialValue);
+
+                        //3列目 数値
+                        wh = GetCell(_worksheet, "C" + _excelRownum);
+                        if (wh == null)
+                        {
+                            wh = new Cell()
+                            {
+                                CellReference = "C" + _excelRownum,
+                                DataType = CellValues.Number,
+                            };
+                            row.Append(wh);
+                        }
+                        wh.CellValue = new OOXMLS.CellValue(cols[2]);
+
+                        //4列目～最終(11列)目 数値
+                        for (int n = 3; n < cols.Length; n++)
+                        {
+                            cell = GetCell(_worksheet, ConvertR1C1ToA1(_excelRownum, n + 1));
+                            if (cell == null)
+                            {
+                                cell = new Cell()
+                                {
+                                    CellReference = ConvertR1C1ToA1(_excelRownum, n + 1),
+                                    DataType = CellValues.Number
+                                };
+                                row.Append(cell);
+                            }
+                            cell.CellValue = new OOXMLS.CellValue(cols[n]);
+                        }
+                        _count++;
+                    }
+                    _excelDateTime = _csvDateTime;
+                    _excelWh = Convert.ToDouble(cols[2]);
+                    reader.Close();
+                    Debug.WriteLine("CSVファイル読み込み終了");
+
+                    _mainForm.Invoke((MethodInvoker)(() =>
+                    {
+                        _mainForm.WriteExcelButton.BackColor = System.Drawing.Color.LightGreen;
+                        _mainForm.ExcelLastDataLabel.Text = string.Format("{0}行 {1} {2}kWh",
+                            _excelRownum, _excelDateTime, (int)((_excelWh + 500) / 1000));
+
+                        //30分以上は30分、30分未満は0分、秒は0秒、ミリ秒は0ミリ秒に調整　2つの方法
+                        var dateTime = DateTime.Parse(_excelDateTime!);
+                        _mainForm.lastDateTime = new DateTime(
+                            dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour,
+                            (dateTime.Minute >= 30) ? 30 : 0, 0, 0);
+                    }));
+                    Debug.WriteLine("lastDateTime: " + _mainForm.lastDateTime);
+
+                    Debug.WriteLine("ExcelFileUsingOpenXML.Write() 成功");
+                    return _count;
+                });
             }
 
             public override bool ResizeTable()
@@ -1893,20 +1924,12 @@ namespace GetFlashairCsv
             }
         }
 
-        private int WriteExcelUsingOpenXML(MainForm mainForm)
+        private async Task<int> WriteExcelUsingOpenXML(MainForm mainForm)
         {
             var excelFile = new ExcelFileUsingOpenXML(mainForm);
-            var dialogResult = excelFile.ExistsFile(EXCEL_FILENAME);
-            if (dialogResult == DialogResult.Cancel)
+            if (excelFile.ShowCreateFileDialog(EXCEL_FILENAME) == DialogResult.Cancel) 
             {
                 return ERROR_RETURN_VALUE;
-            }
-            if (dialogResult == DialogResult.OK)
-            {
-                if (excelFile.Create(EXCEL_FILENAME) == false)
-                {
-                    return ERROR_RETURN_VALUE;
-                }
             }
             if (excelFile.Open(EXCEL_FILENAME) == false)
             {
@@ -1917,7 +1940,7 @@ namespace GetFlashairCsv
             {
                 return ERROR_RETURN_VALUE;
             }
-            if (excelFile.Write(reader) == ERROR_RETURN_VALUE)
+            if (await excelFile.Write(reader) == ERROR_RETURN_VALUE)
             {
                 return ERROR_RETURN_VALUE;
             }
@@ -1934,13 +1957,15 @@ namespace GetFlashairCsv
         private async void WriteExcelButton_Click(object sender, EventArgs e)
         {
             bool result;
-            
+
+            WriteExcelButton.Enabled = false;
             if (WriteExcelButton.BackColor == System.Drawing.Color.LightGreen)
             {
                 if (ShowOKCancelMessageBox(
                         "Excelファイルは最新です\n実行しますか？",
                         button: MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                 {
+                    WriteExcelButton.Enabled = true;
                     return;
                 }
             }
@@ -1948,25 +1973,32 @@ namespace GetFlashairCsv
             //CSVファイルリストが空ならリスト更新
             if (CsvFileListBox.Items.Count == 0)
             {
-                progressForm = new ProgressForm(this.Location, "リスト更新中...");
-                result = csvFileList.Update();
+                UpdateCsvFileListButton.Enabled = false;
+                progressForm = new ProgressForm(this.Location, "リスト更新");
+                result = await csvFileList.Update();
                 progressForm!.Close();
+                UpdateCsvFileListButton.Enabled = true;
                 if (result == false)
                 {
+                    WriteExcelButton.Enabled = true;
                     return;
                 }
             }
 
             //CSVファイルをダウンロード
-            progressForm = new ProgressForm(this.Location, "ダウンロード中...");
+            progressForm = new ProgressForm(this.Location, "CSVファイルダウンロード");
             result = await DownloadCSVFile();
             progressForm!.Close();
             if (result == false)
             {
+                WriteExcelButton.Enabled = true;
                 return;
             }
 
-            progressForm = new ProgressForm(this.Location, "書き込み中...",  true);
+            WriteExcelButton.Enabled = false;
+            progressForm = new ProgressForm(this.Location, "Excelファイル書込", ProgressBarStyle.Blocks);
+            //progressForm!.progressLabel.Text = "読込中";
+            progressForm.Update();
             int count;
             //Excelファイルに書き込む　2つの方法
             //【1】NPOIで処理
@@ -1976,8 +2008,9 @@ namespace GetFlashairCsv
             //最終行を画面内に表示する方法が見つからない
             //count = WriteExcelUsingClosedXML();
             //【3】OpenXMLで処理 ExcelFileUsingOpenXMLクラスで処理
-            count = WriteExcelUsingOpenXML(this);
+            count = await WriteExcelUsingOpenXML(this);
             progressForm.Close();
+            WriteExcelButton.Enabled = true;
 
             //ここから【1】【2】【3】共通
             if (count == ERROR_RETURN_VALUE)
@@ -2292,7 +2325,7 @@ namespace GetFlashairCsv
             IXLTable? table = null;
 
             //Excelファイルの存在を確認
-            var dialogResult = ExistsFile(EXCEL_FILENAME);
+            var dialogResult = ShowCreateFileDialog(EXCEL_FILENAME);
             if (dialogResult == DialogResult.Cancel)
             {
                 return ERROR_RETURN_VALUE;
@@ -2581,7 +2614,7 @@ namespace GetFlashairCsv
             ISheet worksheet;
 
             //Excelファイルの存在を確認
-            var dialogResult = ExistsFile(EXCEL_FILENAME);
+            var dialogResult = ShowCreateFileDialog(EXCEL_FILENAME);
             if (dialogResult == DialogResult.Cancel)
             {
                 return ERROR_RETURN_VALUE;

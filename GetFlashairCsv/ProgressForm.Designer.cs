@@ -28,66 +28,68 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProgressForm));
-            label1 = new Label();
-            pictureBox1 = new PictureBox();
-            progressBar = new PercentProgressBar();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            progressBar = new ProgressBar();
+            CsvLabel = new Label();
+            ExcelLabel = new Label();
+            textLabel = new Label();
             SuspendLayout();
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Yu Gothic UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(74, 30);
-            label1.Name = "label1";
-            label1.Size = new Size(90, 20);
-            label1.TabIndex = 0;
-            label1.Text = "お待ちください";
-            // 
-            // pictureBox1
-            // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(37, 25);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(32, 32);
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox1.TabIndex = 1;
-            pictureBox1.TabStop = false;
-            pictureBox1.UseWaitCursor = true;
             // 
             // progressBar
             // 
-            progressBar.DisplayText = "";
-            progressBar.Location = new Point(18, 66);
+            progressBar.Location = new Point(12, 82);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(186, 16);
+            progressBar.Size = new Size(215, 16);
             progressBar.TabIndex = 2;
+            // 
+            // CsvLabel
+            // 
+            CsvLabel.Location = new Point(12, 49);
+            CsvLabel.Name = "CsvLabel";
+            CsvLabel.Size = new Size(215, 16);
+            CsvLabel.TabIndex = 3;
+            // 
+            // ExcelLabel
+            // 
+            ExcelLabel.Location = new Point(12, 65);
+            ExcelLabel.Name = "ExcelLabel";
+            ExcelLabel.Size = new Size(215, 14);
+            ExcelLabel.TabIndex = 4;
+            // 
+            // textLabel
+            // 
+            textLabel.AutoSize = true;
+            textLabel.Font = new Font("Yu Gothic UI", 11F, FontStyle.Bold, GraphicsUnit.Point);
+            textLabel.Location = new Point(12, 25);
+            textLabel.Name = "textLabel";
+            textLabel.Size = new Size(92, 20);
+            textLabel.TabIndex = 5;
+            textLabel.Text = "お待ちください";
             // 
             // ProgressForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(224, 91);
+            ClientSize = new Size(246, 112);
+            Controls.Add(textLabel);
+            Controls.Add(ExcelLabel);
+            Controls.Add(CsvLabel);
             Controls.Add(progressBar);
-            Controls.Add(pictureBox1);
-            Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ProgressForm";
             StartPosition = FormStartPosition.Manual;
             Text = "処理中...";
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private Label label1;
-        private PictureBox pictureBox1;
-        //public ProgressBar progressBar;
-        public PercentProgressBar progressBar;
+        //public Label label1;
+        public ProgressBar progressBar;
+        public Label CsvLabel;
+        public Label ExcelLabel;
+        private Label textLabel;
     }
 }
