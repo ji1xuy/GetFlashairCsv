@@ -61,9 +61,9 @@
             textLabel.Font = new Font("Yu Gothic UI", 11F, FontStyle.Bold, GraphicsUnit.Point);
             textLabel.Location = new Point(12, 25);
             textLabel.Name = "textLabel";
-            textLabel.Size = new Size(92, 20);
+            textLabel.Size = new Size(66, 20);
             textLabel.TabIndex = 5;
-            textLabel.Text = "お待ちください";
+            textLabel.Text = "処理中...";
             // 
             // ProgressForm
             // 

@@ -2046,6 +2046,7 @@ namespace GetFlashairCsv
             {
                 message = count.ToString() + " s‘‚«‚İ‚Ü‚µ‚½";
             }
+            Debug.WriteLine(message);
             ShowOKMessageBox(message);
         }
 
