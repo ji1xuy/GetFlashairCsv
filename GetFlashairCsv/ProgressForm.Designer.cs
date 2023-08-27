@@ -79,7 +79,6 @@
             MinimizeBox = false;
             Name = "ProgressForm";
             StartPosition = FormStartPosition.Manual;
-            Text = "処理中...";
             ResumeLayout(false);
             PerformLayout();
         }

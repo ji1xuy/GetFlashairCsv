@@ -50,7 +50,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230826";
+        private const string WINDOW_TITLE = APPNAME + "_20230827";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -93,6 +93,11 @@ namespace GetFlashairCsv
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetWindowPos(IntPtr hWnd,
            int hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+        [DllImport("user32.dll")]
+        static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
         public MainForm()
         {
@@ -367,6 +372,13 @@ namespace GetFlashairCsv
         {
             public ProgressForm(System.Drawing.Point point, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee)
             {
+                const uint MF_BYPOSITION = 0x400;
+                const uint MF_BYCOMMAND = 0x0;
+                const uint SC_CLOSE = 0xF060;
+                IntPtr systemMenu = GetSystemMenu(this.Handle, false);
+                RemoveMenu(systemMenu, 5, MF_BYPOSITION);
+                RemoveMenu(systemMenu, SC_CLOSE, MF_BYCOMMAND);
+
                 //表示位置の設定
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
@@ -384,14 +396,25 @@ namespace GetFlashairCsv
                 this.Update();
             }
 
+            public long StartPos { get; set; } = -1;
+            public long EndPos { private get; set; }
+
             public void SetExcelLabelText(long row) {
                 this.ExcelLabel.Text = "[Excel最終行] " + row + "行";
                 this.Update();
             }
 
-            public void SetProgressBarValue(long position, long length)
+            public void SetProgressBarValue(long position)
             {
-                int value = (int)(position * 100 / length);
+                int value;
+                if (EndPos == StartPos)
+                {
+                    value = 100;
+                }
+                else
+                {
+                    value = (int)((position - StartPos) * 100 / (EndPos - StartPos));
+                }
                 if (value < this.progressBar.Minimum)
                 {
                     return;
@@ -401,14 +424,9 @@ namespace GetFlashairCsv
                     return;
                 }
                 this.progressBar.Value = value;
-                this.CsvLabel.Text = "[CSV] " + position + "バイト中、" + length + "バイト読込";
+                this.CsvLabel.Text = "[CSV] " + EndPos + "バイト中、" + position + "バイト読込";
                 this.Update();
             }
-        }
-
-        private bool ExistsForm(Form form)
-        {
-            return ((form != null) && (form.IsDisposed == false));
         }
 
         private void ShowErrorMessageBox(Exception e)
@@ -1660,7 +1678,6 @@ namespace GetFlashairCsv
                     Cell? wh = null;
                     Cell? cell = null;
                     string[] cols = { "" };
-                    long streamLength = reader.BaseStream.Length;
                     while (reader.Peek() >= 0)
                     {
                         //時間がかかる処理での「応答なし」を回避するには？
@@ -1669,27 +1686,30 @@ namespace GetFlashairCsv
 
                         // 読み込んだ文字列をカンマ区切りで配列に格納
                         cols = reader.ReadLine()!.Split(',');
-
-                        _mainForm.Invoke((MethodInvoker)(() =>
-                        {
-                            long streamPosition = reader.BaseStream.Position;
-                            _mainForm.progressForm!.SetProgressBarValue(streamPosition, streamLength);
-                            //Debug.WriteLine("CSVファイル(バイト数): " + streamPosition + "  / " + streamLength);
-                        }));
                         _csvDateTime = cols[0] + " " + cols[1];
                         //読み込んだデータの日時がExcel最終行より後かどうか判定
                         if (string.Compare(_csvDateTime, _excelDateTime) != 1)
                         {
                             continue;
                         }
+
                         //Excelのセルオブジェクトの作成とデータ書き込み
                         _excelRownum++;
-                        
                         _mainForm.Invoke((MethodInvoker)(() =>
                         {
-                            _mainForm.progressForm!.SetExcelLabelText(_excelRownum);
-                            //Debug.WriteLine(_excelRownum + "行: " + _csvDateTime);
+                            if (_mainForm.progressForm!.StartPos  < 0)
+                            {
+                                _mainForm.progressForm!.StartPos = reader.BaseStream.Position;
+                                _mainForm.progressForm!.EndPos = reader.BaseStream.Length;
+                            }
+                            else
+                            {
+                                _mainForm.progressForm!.SetProgressBarValue(reader.BaseStream.Position);
+                                _mainForm.progressForm!.SetExcelLabelText(_excelRownum);
+                            }
                         }));
+
+                        Debug.WriteLine(_excelRownum + "行: " + _csvDateTime);
 
                         //行追加
                         row = _worksheet!.Descendants<OOXMLS.Row>().FirstOrDefault(r => r.RowIndex! == _excelRownum);
