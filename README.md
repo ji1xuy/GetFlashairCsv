@@ -24,4 +24,5 @@ NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機
 　https://developer.microsoft.com/ja-jp/microsoft-edge/tools/webdriver/  
 　  
 ■スクリーンショット  
-  ![screenshot](https://github.com/ji1xuy/GetFlashairCsv/assets/114241917/c7050a02-a9c2-4e89-b2c3-1a87ae112edc)
+　
+　![screenshot](https://github.com/ji1xuy/GetFlashairCsv/assets/114241917/81635034-b4cc-46a0-9e60-92f44cb4c9db)
