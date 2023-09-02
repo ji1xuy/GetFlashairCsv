@@ -16,7 +16,7 @@ NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機
 　DotNetCore.NPOI  
 　Selenium.WebDriver  
 　Selenium.WebDriver.ChromeDriver　
-  WebDriverManager　
+　WebDriverManager　
 　ClosedXML  
 　DocumentFormat.OpenXml  
 ・COM参照の追加  
