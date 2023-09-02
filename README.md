@@ -17,7 +17,7 @@ NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機
 　Selenium.WebDriver  
 　Selenium.WebDriver.ChromeDriver  
 　WebDriverManager  
-　ClosedXML　
+　ClosedXML  
 　DocumentFormat.OpenXml  
 ・COM参照の追加  
 　Microsoft Excel 16.0 ObjectLibrary  
