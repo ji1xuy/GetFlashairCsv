@@ -26,6 +26,7 @@
     <PackageReference Include="DotNetCore.NPOI" Version="1.2.3" />
     <PackageReference Include="Selenium.WebDriver" Version="4.8.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="115.0.5790.10200" />
+    <PackageReference Include="WebDriverManager" Version="2.17.1" />
   </ItemGroup>
 
   <ItemGroup>

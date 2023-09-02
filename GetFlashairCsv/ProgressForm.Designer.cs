@@ -74,6 +74,7 @@
             Controls.Add(ExcelLabel);
             Controls.Add(CsvLabel);
             Controls.Add(progressBar);
+            Cursor = Cursors.WaitCursor;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;

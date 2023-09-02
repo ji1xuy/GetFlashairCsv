@@ -19,6 +19,12 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 
 //Nuget パッケージのインストール
+//WebDriverManager
+using WebDriverManager.DriverConfigs.Impl;
+using WebDriverManager.Helpers;
+using WebDriverManager;
+
+//Nuget パッケージのインストール
 //ClosedXML
 using ClosedXML.Excel;
 
@@ -50,7 +56,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230827";
+        private const string WINDOW_TITLE = APPNAME + "_20230902";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -136,6 +142,21 @@ namespace GetFlashairCsv
 
             Debug.WriteLine(String.Format("ロケール識別子: [$-{0}]",
                 GetSystemDefaultLCID().ToString("x")));
+
+            try {
+                Debug.WriteLine("driverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+            } catch (System.AggregateException) {
+                MessageBox.Show("Wi-Fiが接続されているか確認してください"
+                    , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Load += (s, e) => Close();
+                return;
+            } catch (Exception e) {
+                MessageBox.Show(e.ToString()
+                    , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Load += (s, e) => Close();
+                return;
+            }
+            new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
         }
 
         private class Flashair
@@ -249,19 +270,24 @@ namespace GetFlashairCsv
                         }
                         catch (InvalidOperationException)
                         {
-                            _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
-                                "ChromeDriverとブラウザのバージョンが一致しているか確認してください");
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
+                                    "ChromeDriverとブラウザのバージョンが一致しているか確認してください");
+                            }));
                             return false;
                         }
                         catch (Exception e)
                             when ((e is WebDriverException) || (e is WebDriverArgumentException))
                         {
-                            _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                            }));
                             return false;
-                        }
-                        catch (Exception e)
+                        } catch (Exception e)
                         {
-                            _mainForm.ShowErrorMessageBox(e);
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                _mainForm.ShowErrorMessageBox(e);
+                            }));
                             return false;
                         }
                     }
@@ -290,25 +316,31 @@ namespace GetFlashairCsv
                             using (driver = new EdgeDriver(edgeService, edgeOptions))
                             {
                                 driver.Navigate().GoToUrl(_mainForm.flashair.Url);
-                                var elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
+                                ReadOnlyCollection<IWebElement> elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
                         }
                         catch (InvalidOperationException)
                         {
-                            _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
-                                "EdgeDriverとブラウザのバージョンが一致しているか確認してください");
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
+                                    "EdgeDriverとブラウザのバージョンが一致しているか確認してください");
+                            }));
                             return false;
                         }
                         catch (Exception e)
                             when ((e is WebDriverException) || (e is WebDriverArgumentException))
                         {
-                            _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                            }));
                             return false;
                         }
                         catch (Exception e)
                         {
-                            _mainForm.ShowErrorMessageBox(e);
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                _mainForm.ShowErrorMessageBox(e);
+                            }));
                             return false;
                         }
                     }
@@ -317,26 +349,34 @@ namespace GetFlashairCsv
                     {
                         _mainForm.CsvFileListBox.Items.Clear();
                         _mainForm.CsvFileNameLabel.Text = ITEM_NOT_SELECTED;
-                    
                     }));
+                    
                     if (list.Count == 0)
                     {
-                        _mainForm.ShowErrorMessageBox("CSVファイルが1つも見つかりませんでした\n" +
-                            "指定したURLはFlashAirではない可能性があります");
+                        _mainForm.Invoke((MethodInvoker)(() => {
+                            _mainForm.ShowErrorMessageBox("CSVファイルが1つも見つかりませんでした\n" +
+                                "指定したURLはFlashAirではない可能性があります");
+                        }));
                         return false;
                     }
 
+                    //2023/9/1処理追加
+                    //ファイル数が多く(20個超過?)なると、
+                    //ブラウザではファイル日付毎にグループ化された表示になり
+                    //取得したlistの要素にはファイル日付が混在するようになる
+                    //(例) "20230901\r\n202309.CSV"
+                    //ファイル名とファイル日付を別要素に分割しておく
+                    string s = string.Join("\r\n", list);
+                    list = s.Split("\r\n", StringSplitOptions.None).ToList();
+
                     //list を条件で絞り込み　2つの方法
-                    /*
                     //【1】for文で処理
-                    string match;
-                    foreach (IWebElement elm in elms)
-                    {
-                        match = Regex.Match(elm.Text, @"[0-9]{6}.CSV").ToString();
-                        //Debug.WriteLine(match);
-                        if (match == String.Empty) //String.Emptyは""と同じ
-                        {
-                            list.Add(match);
+                    //C#でListの内の要素をforeach中に削除する
+                    //https://takap-tech.com/entry/2018/10/19/221313
+                    /*
+                    for (int i = list.Count - 1; i >= 0; i--) {
+                        if (Regex.IsMatch(list[i],@"[0-9]{6}.CSV") == false) {
+                            list.RemoveAt(i); // Remove(list[i])は使わない事。
                         }
                     }
                     */
@@ -352,7 +392,7 @@ namespace GetFlashairCsv
                     //【3】LINQで降順ソート
                     list.OrderByDescending(s => s);
 
-                    //リストに追加
+                    //リストボックスに追加
                     if (list.Count > 0)
                     {
                         _mainForm.Invoke((MethodInvoker)(() =>
@@ -466,22 +506,15 @@ namespace GetFlashairCsv
 
         private async void UpdateCsvFileListButton_Click(object sender, EventArgs e)
         {
-            bool result;
-
             UpdateCsvFileListButton.Enabled = false;
             //処理中のフォームを表示
             progressForm = new ProgressForm(this.Location, "リスト更新"); 
 
-            result = await csvFileList.Update();
+            await csvFileList.Update();
             
             //処理中のフォームを閉じる
             progressForm.Close();
             UpdateCsvFileListButton.Enabled = true;
-
-            if (result == false)
-            {
-                return;
-            }
         }
 
         private void CloseButton_Click(object sender, EventArgs e)
