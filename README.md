@@ -15,7 +15,8 @@ NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機
 ・Nuget パッケージのインストール  
 　DotNetCore.NPOI  
 　Selenium.WebDriver  
-　Selenium.WebDriver.ChromeDriver  
+　Selenium.WebDriver.ChromeDriver　
+  WebDriverManager　
 　ClosedXML  
 　DocumentFormat.OpenXml  
 ・COM参照の追加  
