@@ -10,12 +10,13 @@
 ・ファイルをExcelで開く  
   
 ■Visual Studioでの準備  
-NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機能をそれぞれの方法で記述し残してあります。MainForm.csの2130行から最終行までのコードを削除すれば、NPOI, COM, ClosedXMLはインストール不要です。  
+NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機能をそれぞれの方法で記述し残してあります。MainForm.csの2163行から最終行までのコードを削除すれば、NPOI, COM, ClosedXMLはインストール不要です。  
   
 ・Nuget パッケージのインストール  
 　DotNetCore.NPOI  
 　Selenium.WebDriver  
 　Selenium.WebDriver.ChromeDriver  
+　WebDriverManager  
 　ClosedXML  
 　DocumentFormat.OpenXml  
 ・COM参照の追加  
