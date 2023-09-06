@@ -56,7 +56,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230902";
+        private const string WINDOW_TITLE = APPNAME + "_20230906";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -146,7 +146,7 @@ namespace GetFlashairCsv
             try {
                 Debug.WriteLine("driverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
             } catch (System.AggregateException) {
-                MessageBox.Show("Wi-Fiが接続されているか確認してください"
+                MessageBox.Show("インターネットに接続されているか確認してください"
                     , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Load += (s, e) => Close();
                 return;
