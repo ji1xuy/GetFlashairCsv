@@ -56,7 +56,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230906";
+        private const string WINDOW_TITLE = APPNAME + "_20230907";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -144,7 +144,8 @@ namespace GetFlashairCsv
                 GetSystemDefaultLCID().ToString("x")));
 
             try {
-                Debug.WriteLine("driverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+                Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+                Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
             } catch (System.AggregateException) {
                 MessageBox.Show("インターネットに接続されているか確認してください"
                     , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -157,6 +158,7 @@ namespace GetFlashairCsv
                 return;
             }
             new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+            new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
         }
 
         private class Flashair
