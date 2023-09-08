@@ -10,7 +10,7 @@
 ・ファイルをExcelで開く  
   
 ■Visual Studioでの準備  
-・Nuget パッケージのインストール　 
+・Nuget パッケージのインストール  
 　DotNetCore.NPOI  
 　Selenium.WebDriver  
 　WebDriverManager  
