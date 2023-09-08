@@ -9,7 +9,7 @@
 ・Excelファイルがない場合は、新規作成(※)　　　　※Excel不要  
 ・ファイルをExcelで開く  
   
-■Visual Studioでの準備  ・Nuget パッケージのインストール  
+■Visual Studioでの準備  ・Nuget パッケージのインストール　 
 　DotNetCore.NPOI  
 　Selenium.WebDriver  
 　WebDriverManager  
