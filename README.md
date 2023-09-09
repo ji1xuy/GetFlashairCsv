@@ -10,20 +10,17 @@
 ・ファイルをExcelで開く  
   
 ■Visual Studioでの準備  
-NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機能をそれぞれの方法で記述し残してあります。MainForm.csの2163行から最終行までのコードを削除すれば、NPOI, COM, ClosedXMLはインストール不要です。  
-  
 ・Nuget パッケージのインストール  
 　DotNetCore.NPOI  
 　Selenium.WebDriver  
-　Selenium.WebDriver.ChromeDriver  
 　WebDriverManager  
 　ClosedXML  
 　DocumentFormat.OpenXml  
 ・COM参照の追加  
 　Microsoft Excel 16.0 ObjectLibrary  
-・Microsoft Edge WebDriverのダウンロード  
-　https://developer.microsoft.com/ja-jp/microsoft-edge/tools/webdriver/  
-　  
+
+NPOI, COM, ClosedXML, OpenXMLすべて必要ではありません。一つの機能をそれぞれの方法で記述し残してあります。MainForm.csの2154行から最終行までのコードを削除すれば、NPOI, COM, ClosedXMLはインストール不要です。それ以外にも、興味本位で作ったコード、後で使い回しするかもしれないと思って残したコードがあります。それらは機能的には不要な冗長なコードなので削っても支障はありません。
+
 ■スクリーンショット  
 　![screenshot](https://github.com/ji1xuy/GetFlashairCsv/assets/114241917/28f9f840-a5f0-4b0b-b3c3-b0e03731aba7)
 
