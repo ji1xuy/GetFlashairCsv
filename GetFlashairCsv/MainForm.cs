@@ -13,7 +13,6 @@ using NPOI.XSSF.UserModel;
 
 //Nuget パッケージのインストール
 //Selenium.WebDriver
-//Selenium.WebDriver.ChromeDriver
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -40,23 +39,13 @@ using DocumentFormat.OpenXml.Packaging;
 //Microsoft Excel 16.0 ObjectLibrary
 using Microsoft.Office.Interop.Excel;
 using ExcelApplication = Microsoft.Office.Interop.Excel.Application;
-using OpenQA.Selenium.Support.UI;
-using System.Windows.Forms;
-
-//Microsoft Edge WebDriverのダウンロード
-//https://developer.microsoft.com/ja-jp/microsoft-edge/tools/webdriver/
-//Stable チャネル バージョン:  108.0.1462.54: x64
-
-/*
-
-*/
 
 namespace GetFlashairCsv
 {
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230907";
+        private const string WINDOW_TITLE = APPNAME + "_20230909";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
