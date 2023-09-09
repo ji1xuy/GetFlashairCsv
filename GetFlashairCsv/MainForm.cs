@@ -133,8 +133,8 @@ namespace GetFlashairCsv
                 GetSystemDefaultLCID().ToString("x")));
 
             try {
-                Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
-                Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
+                new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+                new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
             } catch (System.AggregateException) {
                 MessageBox.Show("インターネットに接続されているか確認してください"
                     , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -146,8 +146,8 @@ namespace GetFlashairCsv
                 Load += (s, e) => Close();
                 return;
             }
-            new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
-            new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
+            Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+            Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
         }
 
         private class Flashair
