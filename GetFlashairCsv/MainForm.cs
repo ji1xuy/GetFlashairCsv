@@ -45,7 +45,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230909";
+        private const string WINDOW_TITLE = APPNAME + "_20230921";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -431,7 +431,7 @@ namespace GetFlashairCsv
             public long EndPos { private get; set; }
 
             public void SetExcelLabelText(long row) {
-                this.ExcelLabel.Text = "[Excel最終行] " + row + "行";
+                this.ExcelLabel.Text = "[Excel] " + row + "行目書込";
                 this.Update();
             }
 
