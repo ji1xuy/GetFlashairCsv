@@ -45,7 +45,7 @@ namespace GetFlashairCsv
     public partial class MainForm : Form
     {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20230921";
+        private const string WINDOW_TITLE = APPNAME + "_20230927";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -69,7 +69,7 @@ namespace GetFlashairCsv
         private const string CLOCK_FORMAT = "yyyy/MM/dd HH:mm:ss";
         //private static MainForm mainForm;
         private MainForm mainForm;
-        private Flashair flashair;
+        private IniFile iniFile;
         private CsvFileList csvFileList;
         private ProgressForm? progressForm;
         private DateTime lastDateTime;
@@ -99,8 +99,8 @@ namespace GetFlashairCsv
             InitializeComponent();
             mainForm = this;
             Debug.WriteLine("mainForm.Handle: " + mainForm.Handle);
-            flashair = new Flashair(this);
-            flashair.ReadUrlFromInifile();
+            iniFile = new IniFile(this);
+            iniFile.ReadUrlFromInifile();
             csvFileList = new CsvFileList(this);
 
             //タイトルバーの設定
@@ -150,11 +150,11 @@ namespace GetFlashairCsv
             Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
         }
 
-        private class Flashair
+        private class IniFile
         {
             private MainForm _mainForm;
 
-            public Flashair(MainForm mainForm)
+            public IniFile(MainForm mainForm)
             {
                 _mainForm = mainForm;
                 _mainForm.FlashairUrlTextBox.Text = "http://";
@@ -249,7 +249,7 @@ namespace GetFlashairCsv
                         {
                             using (driver = new ChromeDriver(chromeService, chromeOptions))
                             {
-                                driver.Navigate().GoToUrl(_mainForm.flashair.Url);
+                                driver.Navigate().GoToUrl(_mainForm.iniFile.Url);
                                 ReadOnlyCollection<IWebElement> elms =
                                     driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 //30分値データのCSVファイル名のリストを取得
@@ -306,7 +306,7 @@ namespace GetFlashairCsv
                         {
                             using (driver = new EdgeDriver(edgeService, edgeOptions))
                             {
-                                driver.Navigate().GoToUrl(_mainForm.flashair.Url);
+                                driver.Navigate().GoToUrl(_mainForm.iniFile.Url);
                                 ReadOnlyCollection<IWebElement> elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
@@ -492,7 +492,7 @@ namespace GetFlashairCsv
 
         private void WriteInifileButton_Click(object sender, EventArgs e)
         {
-            flashair.WriteUrlToInifile();
+            iniFile.WriteUrlToInifile();
         }
 
         private async void UpdateCsvFileListButton_Click(object sender, EventArgs e)
