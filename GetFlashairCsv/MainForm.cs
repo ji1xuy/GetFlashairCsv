@@ -98,13 +98,7 @@ namespace GetFlashairCsv {
             //lastDateTimeの初期値を設定
             var now = DateTime.Now;
             //30分以上は30分、30分未満は0分、秒は0秒、ミリ秒は0ミリ秒に調整　2つの方法
-            /* 【1】Add～を使用　※分かりにくい
-            lastDateTime = now.
-            AddMinutes(-now.Minute + ((now.Minute >= 30) ? 30 : 0)).
-            AddSeconds(-now.Second).
-            AddMilliseconds(-now.Millisecond);
-            */
-            //【2】new DateTime()で新たに作成
+            //new DateTime()で新たに作成
             lastDateTime = new DateTime(
                 now.Year, now.Month, now.Day, now.Hour,
                 (now.Minute >= 30) ? 30 : 0, 0, 0);
@@ -338,27 +332,12 @@ namespace GetFlashairCsv {
                     string s = string.Join("\r\n", list);
                     list = s.Split("\r\n", StringSplitOptions.None).ToList();
 
-                    //list を条件で絞り込み　2つの方法
-                    //【1】for文で処理
-                    //C#でListの内の要素をforeach中に削除する
-                    //https://takap-tech.com/entry/2018/10/19/221313
-                    /*
-                    for (int i = list.Count - 1; i >= 0; i--) {
-                        if (Regex.IsMatch(list[i],@"[0-9]{6}.CSV") == false) {
-                            list.RemoveAt(i); // Remove(list[i])は使わない事。
-                        }
-                    }
-                    */
-                    //【2】RemoveAll() とラムダ式で処理
+                    //list を条件で絞り込み
+                    //RemoveAll() とラムダ式で処理
                     list.RemoveAll(s => !Regex.IsMatch(s, @"[0-9]{6}.CSV"));
 
-                    //list を降順ソート　3つの方法 
-                    //【1】昇順ソートしてから逆順ソート
-                    //list.Sort();
-                    //list.Reverse();
-                    //【2】ラムダ式で降順ソート
-                    //list.Sort((s1, s2) => s2.CompareTo(s1));
-                    //【3】LINQで降順ソート
+                    //list を降順ソート
+                    //LINQで降順ソート
                     list.OrderByDescending(s => s);
 
                     //リストボックスに追加
@@ -392,12 +371,8 @@ namespace GetFlashairCsv {
                 //処理中フォームを表示
                 //,Show()でモードレス、.ShowDialog()でモーダル
                 this.Show();
-                //progressForm のラベルをすぐ表示する　3つの方法
-                //【1】メッセージキューに現在あるWindowsメッセージをすべて処理する
-                //Application.DoEvents();
-                //【2】クライアント領域全体を無効領域に設定し、再描画する
-                //progressForm.Update();
-                //【3】無効領域(画面更新が必要な領域)を再描画する
+                //progressForm のラベルをすぐ表示する
+                //無効領域(画面更新が必要な領域)を再描画する
                 this.Update();
             }
 
@@ -1759,22 +1734,13 @@ namespace GetFlashairCsv {
 
             WriteExcelButton.Enabled = false;
             progressForm = new ProgressForm(this.Location, "Excelファイル書込", ProgressBarStyle.Blocks);
-            //progressForm!.progressLabel.Text = "読込中";
             progressForm.Update();
             int count;
-            //Excelファイルに書き込む　2つの方法
-            //【1】NPOIで処理
-            //テーブルを操作する方法が見つからない
-            //count = WriteExcelUsingNPOI();
-            //【2】ClosedXMLで処理
-            //最終行を画面内に表示する方法が見つからない
-            //count = WriteExcelUsingClosedXML();
-            //【3】OpenXMLで処理 ExcelFileUsingOpenXMLクラスで処理
+            //Excelファイルに書き込む
             count = await WriteExcelUsingOpenXML(this);
             progressForm.Close();
             WriteExcelButton.Enabled = true;
 
-            //ここから【1】【2】【3】共通
             if (count == ERROR_RETURN_VALUE) {
                 return;
             }
@@ -1808,15 +1774,9 @@ namespace GetFlashairCsv {
                 return;
             }
 
-            //Excelを起動して開く　2つの方法
-
-            //【1】Process.Start() を使用
+            //Excelを起動して開く
+            //Process.Start() を使用
             OpenExcelUsingProcessStart(filePath);
-
-            //【2】COMオブジェクトを使用
-            //テーブル範囲の再設定をWriteExcelButton処理内でしたかったが
-            //NPOIにその機能が見つけられなかったためここで処理する
-            //OpenExcelUsingCOM(filePath);
         }
 
         private void timer1_Tick(object sender, EventArgs e) {
@@ -1833,19 +1793,8 @@ namespace GetFlashairCsv {
                 //WriteExcelButtonのボタンをオレンジ色に
                 WriteExcelButton.BackColor = System.Drawing.Color.Orange;
 
-                //アイコン化されていたらサイズを復元　2つの方法
-                /*
-                //【1】Win32 APIを使ってサイズを復元
-                const uint WM_SYSCOMMAND = 0x0112;
-                const int SC_RESTORE = 0xF120;
-
-                if (this.WindowState == FormWindowState.Minimized)
-                {
-                    SendMessage(this.Handle, WM_SYSCOMMAND,
-                        new IntPtr(SC_RESTORE), IntPtr.Zero);
-                }
-                */
-                //【2】WindowStateプロパティを使ってサイズを復元
+                //アイコン化されていたらサイズを復元
+                 //WindowStateプロパティを使ってサイズを復元
                 if (this.WindowState == FormWindowState.Minimized) {
                     this.WindowState = FormWindowState.Normal;
                 }
