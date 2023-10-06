@@ -7,11 +7,6 @@ using Application = System.Windows.Forms.Application;
 using System.Xml;
 
 //Nuget パッケージのインストール
-//DotNetCore.NPOI
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-
-//Nuget パッケージのインストール
 //Selenium.WebDriver
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -24,21 +19,12 @@ using WebDriverManager.Helpers;
 using WebDriverManager;
 
 //Nuget パッケージのインストール
-//ClosedXML
-using ClosedXML.Excel;
-
-//Nuget パッケージのインストール
 //DocumentFormat.OpenXml
 using DocumentFormat.OpenXml;
 using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-
-//COM参照の追加
-//Microsoft Excel 16.0 ObjectLibrary
-using Microsoft.Office.Interop.Excel;
-using ExcelApplication = Microsoft.Office.Interop.Excel.Application;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
