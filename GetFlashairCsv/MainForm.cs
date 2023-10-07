@@ -29,7 +29,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231006";
+        private const string WINDOW_TITLE = APPNAME + "_20231007";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -1448,13 +1448,20 @@ namespace GetFlashairCsv {
                     Cell? wh = null;
                     Cell? cell = null;
                     string[] cols = { "" };
+                    string line = "";
                     while (reader.Peek() >= 0) {
                         //時間がかかる処理での「応答なし」を回避するには？
                         //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
                         //Application.DoEvents();
 
-                        // 読み込んだ文字列をカンマ区切りで配列に格納
-                        cols = reader.ReadLine()!.Split(',');
+                        // 読み込んだ文字列から制御文字を除去
+                        // 空の行なら処理をスキップ
+                        line = string.Concat(reader.ReadLine()!.Where(c => !char.IsControl(c)));
+                        if (line == "") {
+                            continue;
+                        }
+                        // 文字列をカンマ区切りで配列に格納
+                        cols = line.Split(',');
                         _csvDateTime = cols[0] + " " + cols[1];
                         //読み込んだデータの日時がExcel最終行より後かどうか判定
                         if (string.Compare(_csvDateTime, _excelDateTime) != 1) {
