@@ -15,8 +15,6 @@
 　WebDriverManager  
 　DocumentFormat.OpenXml  
 
-一つの機能をそれぞれの方法で記述したコード、デバッグ用のコードを残してあります。それらは機能的には不要な冗長なコードなので削っても支障はありません。
-
 ■スクリーンショット  
 　![screenshot](https://github.com/ji1xuy/GetFlashairCsv/assets/114241917/28f9f840-a5f0-4b0b-b3c3-b0e03731aba7)
 
