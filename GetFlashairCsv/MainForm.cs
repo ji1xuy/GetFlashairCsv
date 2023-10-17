@@ -29,7 +29,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231007";
+        private const string WINDOW_TITLE = APPNAME + "_20231018";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -227,8 +227,12 @@ namespace GetFlashairCsv {
                         // Webドライバーのインスタンス化
                         ChromeDriverService? chromeService;
                         ChromeOptions chromeOptions = new();
-                        chromeService = ChromeDriverService.CreateDefaultService();
+                        //chromeService = ChromeDriverService.CreateDefaultService();
                         //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
+                        //ドライバの起動場所に自動保存された場所を指定
+                        var driverVersion = new ChromeConfig().GetMatchingBrowserVersion();
+                        var driverPath = $"./Chrome/{driverVersion}/X64/";
+                        chromeService = ChromeDriverService.CreateDefaultService(driverPath);
                         //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
                         chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
                         chromeOptions.AddArgument("--headless");
@@ -268,7 +272,11 @@ namespace GetFlashairCsv {
                     if (_mainForm.EdgeRadioButton.Checked) {
                         EdgeDriverService? edgeService;
                         EdgeOptions edgeOptions = new();
-                        edgeService = EdgeDriverService.CreateDefaultService();
+                        //edgeService = EdgeDriverService.CreateDefaultService();
+                        //ドライバの起動場所に自動保存された場所を指定
+                        var driverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                        var driverPath = $"./Edge/{driverVersion}/X64/";
+                        edgeService = EdgeDriverService.CreateDefaultService(driverPath);
 
                         edgeService.HideCommandPromptWindow = true;
                         //上の HideCommandPromptWindow = true でも
