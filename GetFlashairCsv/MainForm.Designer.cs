@@ -1,9 +1,7 @@
 ﻿using System.Text;
 
-namespace GetFlashairCsv
-{
-    partial class MainForm
-    {
+namespace GetFlashairCsv {
+    partial class MainForm {
         /// <summary>
         ///  Required designer variable.
         /// </summary>
@@ -13,10 +11,8 @@ namespace GetFlashairCsv
         ///  Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -28,240 +24,238 @@ namespace GetFlashairCsv
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
-            this.components = new System.ComponentModel.Container();
-            this.FlashairUrlTextBox = new System.Windows.Forms.TextBox();
-            this.WriteInifileButton = new System.Windows.Forms.Button();
-            this.CsvFileListBox = new System.Windows.Forms.ListBox();
-            this.UpdateCsvFileListButton = new System.Windows.Forms.Button();
-            this.WriteExcelButton = new System.Windows.Forms.Button();
-            this.ExcelFileNameLabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.OpenExcelButton = new System.Windows.Forms.Button();
-            this.CloseButton = new System.Windows.Forms.Button();
-            this.ExcelLastDataLabel = new System.Windows.Forms.Label();
-            this.ClockLabel = new System.Windows.Forms.Label();
-            this.CsvFileNameLabel = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.EdgeRadioButton = new System.Windows.Forms.RadioButton();
-            this.ChromeRadioButton = new System.Windows.Forms.RadioButton();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.SuspendLayout();
+        private void InitializeComponent() {
+            components = new System.ComponentModel.Container();
+            FlashairUrlTextBox = new TextBox();
+            WriteInifileButton = new Button();
+            CsvFileListBox = new ListBox();
+            UpdateCsvFileListButton = new Button();
+            WriteExcelButton = new Button();
+            ExcelFileNameLabel = new Label();
+            label1 = new Label();
+            OpenExcelButton = new Button();
+            CloseButton = new Button();
+            ExcelLastDataLabel = new Label();
+            ClockLabel = new Label();
+            CsvFileNameLabel = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
+            groupBox1 = new GroupBox();
+            groupBox2 = new GroupBox();
+            groupBox3 = new GroupBox();
+            EdgeRadioButton = new RadioButton();
+            ChromeRadioButton = new RadioButton();
+            groupBox4 = new GroupBox();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
+            SuspendLayout();
             // 
             // FlashairUrlTextBox
             // 
-            this.FlashairUrlTextBox.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.FlashairUrlTextBox.Location = new System.Drawing.Point(9, 22);
-            this.FlashairUrlTextBox.Name = "FlashairUrlTextBox";
-            this.FlashairUrlTextBox.Size = new System.Drawing.Size(230, 23);
-            this.FlashairUrlTextBox.TabIndex = 0;
+            FlashairUrlTextBox.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            FlashairUrlTextBox.Location = new Point(9, 22);
+            FlashairUrlTextBox.Name = "FlashairUrlTextBox";
+            FlashairUrlTextBox.Size = new Size(230, 23);
+            FlashairUrlTextBox.TabIndex = 0;
             // 
             // WriteInifileButton
             // 
-            this.WriteInifileButton.Location = new System.Drawing.Point(257, 11);
-            this.WriteInifileButton.Name = "WriteInifileButton";
-            this.WriteInifileButton.Size = new System.Drawing.Size(47, 43);
-            this.WriteInifileButton.TabIndex = 1;
-            this.WriteInifileButton.Text = "設定\r\n保存";
-            this.WriteInifileButton.UseVisualStyleBackColor = true;
-            this.WriteInifileButton.Click += new System.EventHandler(this.WriteInifileButton_Click);
+            WriteInifileButton.Location = new Point(257, 11);
+            WriteInifileButton.Name = "WriteInifileButton";
+            WriteInifileButton.Size = new Size(47, 43);
+            WriteInifileButton.TabIndex = 1;
+            WriteInifileButton.Text = "設定\r\n保存";
+            WriteInifileButton.UseVisualStyleBackColor = true;
+            WriteInifileButton.Click += WriteInifileButton_Click;
             // 
             // CsvFileListBox
             // 
-            this.CsvFileListBox.Font = new System.Drawing.Font("ＭＳ ゴシック", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.CsvFileListBox.FormattingEnabled = true;
-            this.CsvFileListBox.Location = new System.Drawing.Point(82, 27);
-            this.CsvFileListBox.Name = "CsvFileListBox";
-            this.CsvFileListBox.ScrollAlwaysVisible = true;
-            this.CsvFileListBox.Size = new System.Drawing.Size(216, 108);
-            this.CsvFileListBox.TabIndex = 3;
-            this.CsvFileListBox.SelectedIndexChanged += new System.EventHandler(this.CsvFileListBox_SelectedIndexChanged);
+            CsvFileListBox.Font = new Font("ＭＳ ゴシック", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            CsvFileListBox.FormattingEnabled = true;
+            CsvFileListBox.Location = new Point(82, 27);
+            CsvFileListBox.Name = "CsvFileListBox";
+            CsvFileListBox.ScrollAlwaysVisible = true;
+            CsvFileListBox.Size = new Size(216, 108);
+            CsvFileListBox.TabIndex = 3;
+            CsvFileListBox.SelectedIndexChanged += CsvFileListBox_SelectedIndexChanged;
             // 
             // UpdateCsvFileListButton
             // 
-            this.UpdateCsvFileListButton.Location = new System.Drawing.Point(14, 75);
-            this.UpdateCsvFileListButton.Name = "UpdateCsvFileListButton";
-            this.UpdateCsvFileListButton.Size = new System.Drawing.Size(49, 43);
-            this.UpdateCsvFileListButton.TabIndex = 2;
-            this.UpdateCsvFileListButton.Text = "リスト\r\n更新";
-            this.UpdateCsvFileListButton.UseVisualStyleBackColor = true;
-            this.UpdateCsvFileListButton.Click += new System.EventHandler(this.UpdateCsvFileListButton_Click);
+            UpdateCsvFileListButton.Location = new Point(14, 75);
+            UpdateCsvFileListButton.Name = "UpdateCsvFileListButton";
+            UpdateCsvFileListButton.Size = new Size(49, 43);
+            UpdateCsvFileListButton.TabIndex = 2;
+            UpdateCsvFileListButton.Text = "リスト\r\n更新";
+            UpdateCsvFileListButton.UseVisualStyleBackColor = true;
+            UpdateCsvFileListButton.Click += UpdateCsvFileListButton_Click;
             // 
             // WriteExcelButton
             // 
-            this.WriteExcelButton.Location = new System.Drawing.Point(130, 14);
-            this.WriteExcelButton.Name = "WriteExcelButton";
-            this.WriteExcelButton.Size = new System.Drawing.Size(172, 43);
-            this.WriteExcelButton.TabIndex = 0;
-            this.WriteExcelButton.Text = "CSVファイルをダウンロードして\r\nExcelファイルに書き込む";
-            this.WriteExcelButton.UseVisualStyleBackColor = true;
-            this.WriteExcelButton.Click += new System.EventHandler(this.WriteExcelButton_Click);
+            WriteExcelButton.Location = new Point(130, 14);
+            WriteExcelButton.Name = "WriteExcelButton";
+            WriteExcelButton.Size = new Size(172, 43);
+            WriteExcelButton.TabIndex = 0;
+            WriteExcelButton.Text = "CSVファイルをダウンロードして\r\nExcelファイルに書き込む";
+            WriteExcelButton.UseVisualStyleBackColor = true;
+            WriteExcelButton.Click += WriteExcelButton_Click;
             // 
             // ExcelFileNameLabel
             // 
-            this.ExcelFileNameLabel.Location = new System.Drawing.Point(11, 17);
-            this.ExcelFileNameLabel.Name = "ExcelFileNameLabel";
-            this.ExcelFileNameLabel.Size = new System.Drawing.Size(285, 49);
-            this.ExcelFileNameLabel.TabIndex = 0;
+            ExcelFileNameLabel.Location = new Point(11, 17);
+            ExcelFileNameLabel.Name = "ExcelFileNameLabel";
+            ExcelFileNameLabel.Size = new Size(285, 49);
+            ExcelFileNameLabel.TabIndex = 0;
             // 
             // label1
             // 
-            this.label1.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(12, 66);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(46, 15);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "最終行:";
+            label1.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.Location = new Point(12, 66);
+            label1.Name = "label1";
+            label1.Size = new Size(46, 15);
+            label1.TabIndex = 1;
+            label1.Text = "最終行:";
             // 
             // OpenExcelButton
             // 
-            this.OpenExcelButton.Location = new System.Drawing.Point(19, 365);
-            this.OpenExcelButton.Name = "OpenExcelButton";
-            this.OpenExcelButton.Size = new System.Drawing.Size(152, 34);
-            this.OpenExcelButton.TabIndex = 1;
-            this.OpenExcelButton.Text = "Excelファイルを開く";
-            this.OpenExcelButton.UseVisualStyleBackColor = true;
-            this.OpenExcelButton.Click += new System.EventHandler(this.OpenExcelButton_Click);
+            OpenExcelButton.Location = new Point(19, 365);
+            OpenExcelButton.Name = "OpenExcelButton";
+            OpenExcelButton.Size = new Size(152, 34);
+            OpenExcelButton.TabIndex = 1;
+            OpenExcelButton.Text = "Excelファイルを開く";
+            OpenExcelButton.UseVisualStyleBackColor = true;
+            OpenExcelButton.Click += OpenExcelButton_Click;
             // 
             // CloseButton
             // 
-            this.CloseButton.Location = new System.Drawing.Point(247, 365);
-            this.CloseButton.Name = "CloseButton";
-            this.CloseButton.Size = new System.Drawing.Size(66, 34);
-            this.CloseButton.TabIndex = 2;
-            this.CloseButton.Text = "終了";
-            this.CloseButton.UseVisualStyleBackColor = true;
-            this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
+            CloseButton.Location = new Point(247, 365);
+            CloseButton.Name = "CloseButton";
+            CloseButton.Size = new Size(66, 34);
+            CloseButton.TabIndex = 2;
+            CloseButton.Text = "終了";
+            CloseButton.UseVisualStyleBackColor = true;
+            CloseButton.Click += CloseButton_Click;
             // 
             // ExcelLastDataLabel
             // 
-            this.ExcelLastDataLabel.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ExcelLastDataLabel.Location = new System.Drawing.Point(59, 66);
-            this.ExcelLastDataLabel.Name = "ExcelLastDataLabel";
-            this.ExcelLastDataLabel.Size = new System.Drawing.Size(237, 15);
-            this.ExcelLastDataLabel.TabIndex = 2;
+            ExcelLastDataLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            ExcelLastDataLabel.Location = new Point(59, 66);
+            ExcelLastDataLabel.Name = "ExcelLastDataLabel";
+            ExcelLastDataLabel.Size = new Size(237, 15);
+            ExcelLastDataLabel.TabIndex = 2;
             // 
             // ClockLabel
             // 
-            this.ClockLabel.Font = new System.Drawing.Font("Yu Gothic UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ClockLabel.Location = new System.Drawing.Point(19, 402);
-            this.ClockLabel.Name = "ClockLabel";
-            this.ClockLabel.Size = new System.Drawing.Size(208, 23);
-            this.ClockLabel.TabIndex = 3;
+            ClockLabel.Font = new Font("Yu Gothic UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            ClockLabel.Location = new Point(19, 402);
+            ClockLabel.Name = "ClockLabel";
+            ClockLabel.Size = new Size(208, 23);
+            ClockLabel.TabIndex = 3;
             // 
             // CsvFileNameLabel
             // 
-            this.CsvFileNameLabel.Location = new System.Drawing.Point(12, 29);
-            this.CsvFileNameLabel.Name = "CsvFileNameLabel";
-            this.CsvFileNameLabel.Size = new System.Drawing.Size(113, 15);
-            this.CsvFileNameLabel.TabIndex = 1;
+            CsvFileNameLabel.Location = new Point(12, 29);
+            CsvFileNameLabel.Name = "CsvFileNameLabel";
+            CsvFileNameLabel.Size = new Size(113, 15);
+            CsvFileNameLabel.TabIndex = 1;
             // 
             // timer1
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            timer1.Enabled = true;
+            timer1.Interval = 1000;
+            timer1.Tick += timer1_Tick;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.CsvFileNameLabel);
-            this.groupBox1.Controls.Add(this.WriteExcelButton);
-            this.groupBox1.Location = new System.Drawing.Point(11, 212);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(309, 60);
-            this.groupBox1.TabIndex = 6;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "CSVファイル";
+            groupBox1.Controls.Add(CsvFileNameLabel);
+            groupBox1.Controls.Add(WriteExcelButton);
+            groupBox1.Location = new Point(11, 212);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(309, 60);
+            groupBox1.TabIndex = 6;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "CSVファイル";
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.ExcelFileNameLabel);
-            this.groupBox2.Controls.Add(this.ExcelLastDataLabel);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(11, 275);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(309, 84);
-            this.groupBox2.TabIndex = 0;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Excelファイル";
+            groupBox2.Controls.Add(ExcelFileNameLabel);
+            groupBox2.Controls.Add(ExcelLastDataLabel);
+            groupBox2.Controls.Add(label1);
+            groupBox2.Location = new Point(11, 275);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(309, 84);
+            groupBox2.TabIndex = 0;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Excelファイル";
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.EdgeRadioButton);
-            this.groupBox3.Controls.Add(this.ChromeRadioButton);
-            this.groupBox3.Controls.Add(this.UpdateCsvFileListButton);
-            this.groupBox3.Controls.Add(this.CsvFileListBox);
-            this.groupBox3.Location = new System.Drawing.Point(9, 63);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(310, 143);
-            this.groupBox3.TabIndex = 5;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "FlashAirに格納されているCSVファイル";
+            groupBox3.Controls.Add(EdgeRadioButton);
+            groupBox3.Controls.Add(ChromeRadioButton);
+            groupBox3.Controls.Add(UpdateCsvFileListButton);
+            groupBox3.Controls.Add(CsvFileListBox);
+            groupBox3.Location = new Point(9, 63);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(310, 143);
+            groupBox3.TabIndex = 5;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "FlashAirに格納されているCSVファイル";
             // 
             // EdgeRadioButton
             // 
-            this.EdgeRadioButton.AutoSize = true;
-            this.EdgeRadioButton.Location = new System.Drawing.Point(10, 43);
-            this.EdgeRadioButton.Name = "EdgeRadioButton";
-            this.EdgeRadioButton.Size = new System.Drawing.Size(51, 19);
-            this.EdgeRadioButton.TabIndex = 1;
-            this.EdgeRadioButton.Text = "Edge";
-            this.EdgeRadioButton.UseVisualStyleBackColor = true;
+            EdgeRadioButton.AutoSize = true;
+            EdgeRadioButton.Location = new Point(10, 43);
+            EdgeRadioButton.Name = "EdgeRadioButton";
+            EdgeRadioButton.Size = new Size(51, 19);
+            EdgeRadioButton.TabIndex = 1;
+            EdgeRadioButton.Text = "Edge";
+            EdgeRadioButton.UseVisualStyleBackColor = true;
             // 
             // ChromeRadioButton
             // 
-            this.ChromeRadioButton.AutoSize = true;
-            this.ChromeRadioButton.Checked = true;
-            this.ChromeRadioButton.Location = new System.Drawing.Point(10, 25);
-            this.ChromeRadioButton.Name = "ChromeRadioButton";
-            this.ChromeRadioButton.Size = new System.Drawing.Size(66, 19);
-            this.ChromeRadioButton.TabIndex = 0;
-            this.ChromeRadioButton.TabStop = true;
-            this.ChromeRadioButton.Text = "Chrome";
-            this.ChromeRadioButton.UseVisualStyleBackColor = true;
+            ChromeRadioButton.AutoSize = true;
+            ChromeRadioButton.Checked = true;
+            ChromeRadioButton.Location = new Point(10, 25);
+            ChromeRadioButton.Name = "ChromeRadioButton";
+            ChromeRadioButton.Size = new Size(66, 19);
+            ChromeRadioButton.TabIndex = 0;
+            ChromeRadioButton.TabStop = true;
+            ChromeRadioButton.Text = "Chrome";
+            ChromeRadioButton.UseVisualStyleBackColor = true;
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.WriteInifileButton);
-            this.groupBox4.Controls.Add(this.FlashairUrlTextBox);
-            this.groupBox4.Location = new System.Drawing.Point(9, 3);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(311, 58);
-            this.groupBox4.TabIndex = 4;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "FlashAirのURL";
+            groupBox4.Controls.Add(WriteInifileButton);
+            groupBox4.Controls.Add(FlashairUrlTextBox);
+            groupBox4.Location = new Point(9, 3);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new Size(311, 58);
+            groupBox4.TabIndex = 4;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "FlashAirのURL";
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(330, 425);
-            this.Controls.Add(this.groupBox4);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.ClockLabel);
-            this.Controls.Add(this.CloseButton);
-            this.Controls.Add(this.OpenExcelButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.Name = "MainForm";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(330, 425);
+            Controls.Add(groupBox4);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox1);
+            Controls.Add(ClockLabel);
+            Controls.Add(CloseButton);
+            Controls.Add(OpenExcelButton);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            Name = "MainForm";
+            groupBox1.ResumeLayout(false);
+            groupBox2.ResumeLayout(false);
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
+            groupBox4.ResumeLayout(false);
+            groupBox4.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion

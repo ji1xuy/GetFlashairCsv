@@ -29,7 +29,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231018";
+        private const string WINDOW_TITLE = APPNAME + "_20231031";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -107,21 +107,43 @@ namespace GetFlashairCsv {
             timer1_Tick(Type.Missing, EventArgs.Empty); //引数はダミー
 
             try {
+                string chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
                 new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
-                new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
-            } catch (System.AggregateException) {
+            } catch (AggregateException) {
                 MessageBox.Show("インターネットに接続されているか確認してください"
                     , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Load += (s, e) => Close();
+                this.Load += (s, e) => Close();
                 return;
-            } catch (Exception e) {
-                MessageBox.Show(e.ToString()
+            } catch (Exception) {
+                MessageBox.Show("Chromeブラウザのバージョンが確認できないかインストールされていません"
                     , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Load += (s, e) => Close();
-                return;
+                //this.Load += (s, e) => Close();
+                //return;
+                ChromeRadioButton.Enabled = false;
+                EdgeRadioButton.Checked = true;
             }
-            Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
-            Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
+            try {
+                string edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
+            } catch (Exception) {
+                MessageBox.Show("Edgeブラウザのバージョンが確認できないかインストールされていません"
+                    , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //this.Load += (s, e) => Close();
+                //return;
+                EdgeRadioButton.Enabled = false;
+            }
+            if (ChromeRadioButton.Enabled == true) {
+                Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+            }
+            if (EdgeRadioButton.Enabled == true) {
+                Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
+            }
+            if ((ChromeRadioButton.Enabled == false) && (EdgeRadioButton.Enabled == false)) {
+                ChromeRadioButton.Checked = false;
+                EdgeRadioButton.Checked = false;
+                UpdateCsvFileListButton.Enabled = false;
+                WriteExcelButton.Enabled = false;
+            }
         }
 
         private class Flashair {
@@ -1809,7 +1831,7 @@ namespace GetFlashairCsv {
                 WriteExcelButton.BackColor = System.Drawing.Color.Orange;
 
                 //アイコン化されていたらサイズを復元
-                 //WindowStateプロパティを使ってサイズを復元
+                //WindowStateプロパティを使ってサイズを復元
                 if (this.WindowState == FormWindowState.Minimized) {
                     this.WindowState = FormWindowState.Normal;
                 }
