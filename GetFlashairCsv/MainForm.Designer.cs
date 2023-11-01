@@ -107,15 +107,6 @@ namespace GetFlashairCsv {
             ExcelFileNameLabel.Size = new Size(285, 49);
             ExcelFileNameLabel.TabIndex = 0;
             // 
-            // label1
-            // 
-            label1.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(12, 66);
-            label1.Name = "label1";
-            label1.Size = new Size(46, 15);
-            label1.TabIndex = 1;
-            label1.Text = "最終行:";
-            // 
             // OpenExcelButton
             // 
             OpenExcelButton.Location = new Point(19, 365);

@@ -29,7 +29,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_202311101";
+        private const string WINDOW_TITLE = APPNAME + "_202311102";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -51,7 +51,6 @@ namespace GetFlashairCsv {
         private const string EXCEL_STYLE_DATE_FORMATCODE = "yyyy/M/d";
         private const string EXCEL_STYLE_TIME_FORMATCODE = "H:mm;@";
         private const string CLOCK_FORMAT = "yyyy/MM/dd HH:mm:ss";
-        //private static MainForm mainForm;
         private MainForm mainForm;
         private Flashair flashair;
         private CsvFileList csvFileList;
@@ -74,9 +73,9 @@ namespace GetFlashairCsv {
            int hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
 
         [DllImport("user32.dll")]
-        static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+        private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         [DllImport("user32.dll")]
-        static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
+        private static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
         public MainForm() {
             InitializeComponent();
