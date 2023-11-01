@@ -170,7 +170,6 @@ namespace GetFlashairCsv {
             // 
             groupBox2.Controls.Add(ExcelFileNameLabel);
             groupBox2.Controls.Add(ExcelLastDataLabel);
-            groupBox2.Controls.Add(label1);
             groupBox2.Location = new Point(11, 275);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(309, 84);
@@ -252,16 +251,15 @@ namespace GetFlashairCsv {
         #endregion
         private TextBox FlashairUrlTextBox;
         private Button WriteInifileButton;
-        private ListBox CsvFileListBox;
         private Button UpdateCsvFileListButton;
         private Button WriteExcelButton;
-        private Label ExcelFileNameLabel;
-        private Label label1;
         private Button OpenExcelButton;
         private Button CloseButton;
+        private Label ExcelFileNameLabel;
         private Label ExcelLastDataLabel;
         private Label ClockLabel;
         private Label CsvFileNameLabel;
+        private ListBox CsvFileListBox;
         private System.Windows.Forms.Timer timer1;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
