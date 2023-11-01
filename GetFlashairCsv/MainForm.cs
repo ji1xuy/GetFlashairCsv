@@ -29,7 +29,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231031";
+        private const string WINDOW_TITLE = APPNAME + "_202311101";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -105,45 +105,6 @@ namespace GetFlashairCsv {
             Debug.WriteLine("lastDateTime: " + lastDateTime);
 
             timer1_Tick(Type.Missing, EventArgs.Empty); //引数はダミー
-
-            try {
-                string chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
-                new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
-            } catch (AggregateException) {
-                MessageBox.Show("インターネットに接続されているか確認してください"
-                    , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Load += (s, e) => Close();
-                return;
-            } catch (Exception) {
-                MessageBox.Show("Chromeブラウザのバージョンが確認できないかインストールされていません"
-                    , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //this.Load += (s, e) => Close();
-                //return;
-                ChromeRadioButton.Enabled = false;
-                EdgeRadioButton.Checked = true;
-            }
-            try {
-                string edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
-                new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
-            } catch (Exception) {
-                MessageBox.Show("Edgeブラウザのバージョンが確認できないかインストールされていません"
-                    , APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //this.Load += (s, e) => Close();
-                //return;
-                EdgeRadioButton.Enabled = false;
-            }
-            if (ChromeRadioButton.Enabled == true) {
-                Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
-            }
-            if (EdgeRadioButton.Enabled == true) {
-                Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
-            }
-            if ((ChromeRadioButton.Enabled == false) && (EdgeRadioButton.Enabled == false)) {
-                ChromeRadioButton.Checked = false;
-                EdgeRadioButton.Checked = false;
-                UpdateCsvFileListButton.Enabled = false;
-                WriteExcelButton.Enabled = false;
-            }
         }
 
         private class Flashair {
@@ -1839,6 +1800,41 @@ namespace GetFlashairCsv {
                 //最前面に
                 this.TopMost = true;
                 this.TopMost = false;
+            }
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e) {
+            Refresh(); 
+            try {
+                string chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
+                new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+            } catch (AggregateException) {
+                ShowErrorMessageBox("インターネットに接続されているか確認してください");
+                this.Load += (s, e) => Close();
+                return;
+            } catch (Exception) {
+                ShowErrorMessageBox("Chromeブラウザのバージョンが確認できないかインストールされていません");
+                ChromeRadioButton.Enabled = false;
+                EdgeRadioButton.Checked = true;
+            }
+            try {
+                string edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
+            } catch (Exception) {
+                ShowErrorMessageBox("Edgeブラウザのバージョンが確認できないかインストールされていません");
+                EdgeRadioButton.Enabled = false;
+            }
+            if (ChromeRadioButton.Enabled == true) {
+                Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+            }
+            if (EdgeRadioButton.Enabled == true) {
+                Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
+            }
+            if ((ChromeRadioButton.Enabled == false) && (EdgeRadioButton.Enabled == false)) {
+                ChromeRadioButton.Checked = false;
+                EdgeRadioButton.Checked = false;
+                UpdateCsvFileListButton.Enabled = false;
+                WriteExcelButton.Enabled = false;
             }
         }
     }
