@@ -444,33 +444,13 @@ namespace GetFlashairCsv {
             csvFileList.FileName = CsvFileListBox.SelectedItem.ToString()!;
         }
 
-        private DialogResult ShowCreateFileDialog(string fileName) {
-            //Excelファイルの存在を確認
-            var filePath = Path.GetFullPath(fileName);
-            Debug.WriteLine("filePath: " + filePath);
-            if (File.Exists(filePath)) {
-                return DialogResult.None;
-            }
-            //Excelファイルが見つからない場合
-            //新規作成するかどうか確認
-            return ShowOKCancelMessageBox(
-                EXCEL_FILENAME + " が見つかりません\n新規作成しますか？");
-
-        }
-
-        private string ConvertDateTimeToString(DateTime date, DateTime time) {
-            return String.Format("{0} {1}",
-                date.ToString(EXCEL_DATE_FORMAT),
-                time.ToString(EXCEL_TIME_FORMAT));
-        }
-
         private abstract class ExcelFile {
             public static int GetBottomRownum(string range) {
                 var rownumPart = new Regex(@"[0-9]+$");
                 return Int32.Parse(rownumPart.Match(range).ToString());
 
             }
-
+            
             //Excelファイルの存在を確認
             //見つかった場合は戻り値Noneを返す
             //見つからない場合、新規作成するならOK、作成しないならCancelを返す
@@ -1672,8 +1652,15 @@ namespace GetFlashairCsv {
 
         private async Task<int> WriteExcelUsingOpenXML(MainForm mainForm) {
             var excelFile = new ExcelFileUsingOpenXML(mainForm);
-            if (excelFile.ShowCreateFileDialog(EXCEL_FILENAME) == DialogResult.Cancel) {
+            DialogResult dialogResult = excelFile.ShowCreateFileDialog(EXCEL_FILENAME);
+            if (dialogResult == DialogResult.Cancel) {
                 return ERROR_RETURN_VALUE;
+            }
+            if (dialogResult == DialogResult.OK) {
+                if (excelFile.Create(EXCEL_FILENAME) == false) {
+                    ShowErrorMessageBox(EXCEL_FILENAME + " を新規作成できませんでした");
+                    return ERROR_RETURN_VALUE;
+                }
             }
             if (excelFile.Open(EXCEL_FILENAME) == false) {
                 return ERROR_RETURN_VALUE;
