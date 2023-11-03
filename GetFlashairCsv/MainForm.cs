@@ -25,11 +25,12 @@ using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
+using System;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_202311102";
+        private const string WINDOW_TITLE = APPNAME + "_202311103";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -414,9 +415,9 @@ namespace GetFlashairCsv {
             string caption = CAPTION_QUESTION,
             MessageBoxIcon icon = MessageBoxIcon.Warning,
             MessageBoxDefaultButton button = MessageBoxDefaultButton.Button1) {
-            DialogResult result = CustomMessageBox.Show(mainForm, text, caption,
+            var dialogResult = CustomMessageBox.Show(mainForm, text, caption,
                 MessageBoxButtons.OKCancel, icon, button);
-            return result;
+            return dialogResult;
         }
 
         private void WriteInifileButton_Click(object sender, EventArgs e) {
@@ -450,7 +451,7 @@ namespace GetFlashairCsv {
                 return Int32.Parse(rownumPart.Match(range).ToString());
 
             }
-            
+
             //Excelファイルの存在を確認
             //見つかった場合は戻り値Noneを返す
             //見つからない場合、新規作成するならOK、作成しないならCancelを返す
@@ -1092,6 +1093,7 @@ namespace GetFlashairCsv {
                     return true;
                 } catch (Exception e) {
                     Debug.WriteLine(e);
+                    _mainForm.ShowErrorMessageBox(fileName + " を新規作成できませんでした");
                     return false;
                 }
             }
@@ -1419,6 +1421,7 @@ namespace GetFlashairCsv {
                     Cell? cell = null;
                     string[] cols = { "" };
                     string line = "";
+                    string _prevCsvDateTime = _excelDateTime!;
                     while (reader.Peek() >= 0) {
                         //時間がかかる処理での「応答なし」を回避するには？
                         //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
@@ -1433,10 +1436,21 @@ namespace GetFlashairCsv {
                         // 文字列をカンマ区切りで配列に格納
                         cols = line.Split(',');
                         _csvDateTime = cols[0] + " " + cols[1];
-                        //読み込んだデータの日時がExcel最終行より後かどうか判定
-                        if (string.Compare(_csvDateTime, _excelDateTime) != 1) {
+                        //ループ1回目: 読み込んだCSVデータの日時がExcel最終行より前ならスキップ
+                        //ループ2回目以降: 読み込んだデータの日時が1行前より前ならスキップ
+                        var timeSpanMinutes = (DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime!)).TotalMinutes;
+                        if (timeSpanMinutes < 0) {
                             continue;
                         }
+                        //読み込んだデータの日時の1行前との差が30分より大きければ警告
+                        if (timeSpanMinutes > 30) {
+                            var dialogResult = _mainForm.ShowOKCancelMessageBox(
+                                "データの欠落の可能性があります\n続行しますか？");
+                            if (dialogResult == DialogResult.Cancel) {
+                                return ERROR_RETURN_VALUE;
+                            }
+                        }
+                        _prevCsvDateTime = _csvDateTime;
 
                         //Excelのセルオブジェクトの作成とデータ書き込み
                         _excelRownum++;
@@ -1658,7 +1672,6 @@ namespace GetFlashairCsv {
             }
             if (dialogResult == DialogResult.OK) {
                 if (excelFile.Create(EXCEL_FILENAME) == false) {
-                    ShowErrorMessageBox(EXCEL_FILENAME + " を新規作成できませんでした");
                     return ERROR_RETURN_VALUE;
                 }
             }
@@ -1686,9 +1699,10 @@ namespace GetFlashairCsv {
 
             WriteExcelButton.Enabled = false;
             if (WriteExcelButton.BackColor == System.Drawing.Color.LightGreen) {
-                if (ShowOKCancelMessageBox(
-                        "Excelファイルは最新です\n実行しますか？",
-                        button: MessageBoxDefaultButton.Button2) == DialogResult.Cancel) {
+                var dialogResult = ShowOKCancelMessageBox(
+                    "Excelファイルは最新です\n実行しますか？",
+                    button: MessageBoxDefaultButton.Button2);
+                if (dialogResult == DialogResult.Cancel) {
                     WriteExcelButton.Enabled = true;
                     return;
                 }
@@ -1790,7 +1804,7 @@ namespace GetFlashairCsv {
         }
 
         private void MainForm_Shown(object sender, EventArgs e) {
-            Refresh(); 
+            Refresh();
             try {
                 string chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
                 new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);

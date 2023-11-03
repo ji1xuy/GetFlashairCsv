@@ -42,6 +42,7 @@ namespace GetFlashairCsv {
             timer1 = new System.Windows.Forms.Timer(components);
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            label1 = new Label();
             groupBox3 = new GroupBox();
             groupBox4 = new GroupBox();
             groupBox1.SuspendLayout();
@@ -149,6 +150,28 @@ namespace GetFlashairCsv {
             CsvFileNameLabel.Size = new Size(113, 15);
             CsvFileNameLabel.TabIndex = 1;
             // 
+            // ChromeRadioButton
+            // 
+            ChromeRadioButton.AutoSize = true;
+            ChromeRadioButton.Checked = true;
+            ChromeRadioButton.Location = new Point(10, 25);
+            ChromeRadioButton.Name = "ChromeRadioButton";
+            ChromeRadioButton.Size = new Size(66, 19);
+            ChromeRadioButton.TabIndex = 0;
+            ChromeRadioButton.TabStop = true;
+            ChromeRadioButton.Text = "Chrome";
+            ChromeRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // EdgeRadioButton
+            // 
+            EdgeRadioButton.AutoSize = true;
+            EdgeRadioButton.Location = new Point(10, 43);
+            EdgeRadioButton.Name = "EdgeRadioButton";
+            EdgeRadioButton.Size = new Size(51, 19);
+            EdgeRadioButton.TabIndex = 1;
+            EdgeRadioButton.Text = "Edge";
+            EdgeRadioButton.UseVisualStyleBackColor = true;
+            // 
             // timer1
             // 
             timer1.Enabled = true;
@@ -168,6 +191,7 @@ namespace GetFlashairCsv {
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(label1);
             groupBox2.Controls.Add(ExcelFileNameLabel);
             groupBox2.Controls.Add(ExcelLastDataLabel);
             groupBox2.Location = new Point(11, 275);
@@ -176,6 +200,15 @@ namespace GetFlashairCsv {
             groupBox2.TabIndex = 0;
             groupBox2.TabStop = false;
             groupBox2.Text = "Excelファイル";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(7, 66);
+            label1.Name = "label1";
+            label1.Size = new Size(46, 15);
+            label1.TabIndex = 3;
+            label1.Text = "最終行:";
             // 
             // groupBox3
             // 
@@ -189,28 +222,6 @@ namespace GetFlashairCsv {
             groupBox3.TabIndex = 5;
             groupBox3.TabStop = false;
             groupBox3.Text = "FlashAirに格納されているCSVファイル";
-            // 
-            // EdgeRadioButton
-            // 
-            EdgeRadioButton.AutoSize = true;
-            EdgeRadioButton.Location = new Point(10, 43);
-            EdgeRadioButton.Name = "EdgeRadioButton";
-            EdgeRadioButton.Size = new Size(51, 19);
-            EdgeRadioButton.TabIndex = 1;
-            EdgeRadioButton.Text = "Edge";
-            EdgeRadioButton.UseVisualStyleBackColor = true;
-            // 
-            // ChromeRadioButton
-            // 
-            ChromeRadioButton.AutoSize = true;
-            ChromeRadioButton.Checked = true;
-            ChromeRadioButton.Location = new Point(10, 25);
-            ChromeRadioButton.Name = "ChromeRadioButton";
-            ChromeRadioButton.Size = new Size(66, 19);
-            ChromeRadioButton.TabIndex = 0;
-            ChromeRadioButton.TabStop = true;
-            ChromeRadioButton.Text = "Chrome";
-            ChromeRadioButton.UseVisualStyleBackColor = true;
             // 
             // groupBox4
             // 
@@ -241,6 +252,7 @@ namespace GetFlashairCsv {
             Shown += MainForm_Shown;
             groupBox1.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             groupBox4.ResumeLayout(false);
@@ -267,5 +279,6 @@ namespace GetFlashairCsv {
         private GroupBox groupBox4;
         private RadioButton EdgeRadioButton;
         private RadioButton ChromeRadioButton;
+        private Label label1;
     }
 }
