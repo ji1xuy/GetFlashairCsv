@@ -1445,7 +1445,7 @@ namespace GetFlashairCsv {
                         //読み込んだデータの日時の1行前との差が30分より大きければ警告
                         if (timeSpanMinutes > 30) {
                             var dialogResult = _mainForm.ShowOKCancelMessageBox(
-                                "データの欠落の可能性があります\n続行しますか？");
+                                "CSVデータの欠落の可能性があります\n続行しますか？");
                             if (dialogResult == DialogResult.Cancel) {
                                 return ERROR_RETURN_VALUE;
                             }
