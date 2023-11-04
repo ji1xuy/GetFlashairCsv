@@ -30,7 +30,7 @@ using System;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_202311104";
+        private const string WINDOW_TITLE = APPNAME + "_202311105";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -454,25 +454,6 @@ namespace GetFlashairCsv {
             //Excelファイルの存在を確認
             //見つかった場合は戻り値Noneを返す
             //見つからない場合、新規作成するならOK、作成しないならCancelを返す
-            //
-            //MainFormクラスのメンバ変数mainFormをstaticに変えて
-            //ShowOKCancelMessageBox()をstaticに変えれば動作はするが
-            //staticは使いたくないのでこれは使わない
-            /*
-            public DialogResult ShowCreateFileDialog(string fileName)
-            {
-                //Excelファイルの存在を確認
-                string filePath = System.IO.Path.GetFullPath(fileName);
-                Debug.WriteLine("filePath: " + filePath);
-                if (File.Exists(filePath))
-                {
-                    return DialogResult.None;
-                }
-                return ShowOKCancelMessageBox(
-                    EXCEL_FILENAME + " が見つかりません\n新規作成しますか？");
-            }
-            */
-
             protected DialogResult ShowCreateFileDialog(MainForm form, string fileName) {
                 //Excelファイルの存在を確認
                 var filePath = Path.GetFullPath(fileName);
@@ -1435,14 +1416,12 @@ namespace GetFlashairCsv {
                         // 文字列をカンマ区切りで配列に格納
                         cols = line.Split(',');
                         _csvDateTime = cols[0] + " " + cols[1];
-                        //ループ1回目: Excel最終行の日時より日時が前ならスキップ
-                        //ループ2回目以降: 前回のループで処理したデータの日時よりも日時が前ならスキップ
-                        var timeSpanMinutes = (DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime!)).TotalMinutes;
-                        if (timeSpanMinutes < 0) {
+                        //Excel最終行の日時より日時が同じか前ならスキップ
+                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_excelDateTime!)).TotalMinutes <= 0) {
                             continue;
                         }
                         //前回のループで処理したデータの日時との差が30分より大きければ警告
-                        if (timeSpanMinutes > 30) {
+                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime!)).TotalMinutes > 30) {
                             var dialogResult = _mainForm.ShowOKCancelMessageBox(
                                 "CSVファイルにデータ欠落の可能性があります\n続行しますか？",
                                 button: MessageBoxDefaultButton.Button2);
