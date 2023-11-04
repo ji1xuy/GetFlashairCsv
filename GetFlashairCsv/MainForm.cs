@@ -30,7 +30,7 @@ using System;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_202311103";
+        private const string WINDOW_TITLE = APPNAME + "_202311104";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -106,7 +106,6 @@ namespace GetFlashairCsv {
 
             timer1_Tick(Type.Missing, EventArgs.Empty); //引数はダミー
         }
-
         private class Flashair {
             private MainForm _mainForm;
 
@@ -114,7 +113,7 @@ namespace GetFlashairCsv {
                 _mainForm = mainForm;
                 _mainForm.FlashairUrlTextBox.Text = "http://";
             }
-
+            
             public string? Url {
                 get { return _mainForm.FlashairUrlTextBox.Text; }
                 private set { _mainForm.FlashairUrlTextBox.Text = value; }
@@ -1445,7 +1444,8 @@ namespace GetFlashairCsv {
                         //前回のループで処理したデータの日時との差が30分より大きければ警告
                         if (timeSpanMinutes > 30) {
                             var dialogResult = _mainForm.ShowOKCancelMessageBox(
-                                "CSVファイルにデータ欠落の可能性があります\n続行しますか？");
+                                "CSVファイルにデータ欠落の可能性があります\n続行しますか？",
+                                button: MessageBoxDefaultButton.Button2);
                             if (dialogResult == DialogResult.Cancel) {
                                 return ERROR_RETURN_VALUE;
                             }
