@@ -1416,12 +1416,13 @@ namespace GetFlashairCsv {
                         // 文字列をカンマ区切りで配列に格納
                         cols = line.Split(',');
                         _csvDateTime = cols[0] + " " + cols[1];
+                        //_csvDateTimeの書式: yyyy/mm/dd hh:mm
                         //Excel最終行の日時より日時が同じか前ならスキップ
                         if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_excelDateTime!)).TotalMinutes <= 0) {
                             continue;
                         }
                         //前回のループで処理したデータの日時との差が30分より大きければ警告
-                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime!)).TotalMinutes > 30) {
+                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime)).TotalMinutes > 30) {
                             var dialogResult = _mainForm.ShowOKCancelMessageBox(
                                 "CSVファイルにデータ欠落の可能性があります\n続行しますか？",
                                 button: MessageBoxDefaultButton.Button2);
