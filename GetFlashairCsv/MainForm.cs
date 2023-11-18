@@ -1433,10 +1433,13 @@ namespace GetFlashairCsv {
                             DialogResult dialogResult = DialogResult.None;
                             _mainForm.Invoke((MethodInvoker)(() => {
                                 dialogResult = _mainForm.ShowOKCancelMessageBox(
-                                text: "CSVファイルにデータ欠落の可能性があります\n続行しますか？",
-                                button: MessageBoxDefaultButton.Button2,
-                                owner: _mainForm.progressForm!);
-                            }));
+                                    owner: _mainForm.progressForm!,
+                                    text: "CSVファイルにデータ欠落の可能性があります\n" +
+                                        _excelRownum + "行目: " + _prevCsvDateTime + "\n" +
+                                        (_excelRownum + 1) + "行目: " + _csvDateTime + "\n" +
+                                        "続行しますか？",
+                                    button: MessageBoxDefaultButton.Button2);
+                        }));
                             if (dialogResult == DialogResult.Cancel) {
                                 return ERROR_RETURN_VALUE;
                             }
