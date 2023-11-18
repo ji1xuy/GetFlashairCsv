@@ -30,7 +30,7 @@ using System;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231105";
+        private const string WINDOW_TITLE = APPNAME + "_20231118";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -410,11 +410,11 @@ namespace GetFlashairCsv {
                 MessageBoxButtons.OK, icon);
         }
 
-        private DialogResult ShowOKCancelMessageBox(string text,
+        private DialogResult ShowOKCancelMessageBox(IWin32Window owner, string text,
             string caption = CAPTION_QUESTION,
             MessageBoxIcon icon = MessageBoxIcon.Warning,
             MessageBoxDefaultButton button = MessageBoxDefaultButton.Button1) {
-            var dialogResult = CustomMessageBox.Show(mainForm, text, caption,
+            var dialogResult = CustomMessageBox.Show(owner, text, caption,
                 MessageBoxButtons.OKCancel, icon, button);
             return dialogResult;
         }
@@ -464,7 +464,8 @@ namespace GetFlashairCsv {
                 //Excelファイルが見つからない場合
                 //新規作成するかどうか確認
                 return form.ShowOKCancelMessageBox(
-                    EXCEL_FILENAME + " が見つかりません\n新規作成しますか？");
+                    owner: form,
+                    text: EXCEL_FILENAME + " が見つかりません\n新規作成しますか？");
             }
 
             public abstract bool Create(string fileName);
@@ -1223,7 +1224,13 @@ namespace GetFlashairCsv {
                 }
 
                 //CSVファイルのヘッダーを読み込み
-                string[] cols = reader.ReadLine()!.Split(',');
+                string line = reader.ReadLine()!;
+                if (line == null) {
+                    _document.Dispose();
+                    _mainForm.ShowErrorMessageBox("CSVファイルの中身が空です");
+                    return null;
+                }
+                string[] cols = line.Split(',');
                 //Excelファイルのヘッダーが仮ヘッダーだったら
                 var b1 = GetCell(_worksheet!, "B1");
                 if (b1 == null) {
@@ -1423,9 +1430,13 @@ namespace GetFlashairCsv {
                         }
                         //前回のループで処理したデータの日時との差が30分より大きければ警告
                         if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime)).TotalMinutes > 30) {
-                            var dialogResult = _mainForm.ShowOKCancelMessageBox(
-                                "CSVファイルにデータ欠落の可能性があります\n続行しますか？",
-                                button: MessageBoxDefaultButton.Button2);
+                            DialogResult dialogResult = DialogResult.None;
+                            _mainForm.Invoke((MethodInvoker)(() => {
+                                dialogResult = _mainForm.ShowOKCancelMessageBox(
+                                text: "CSVファイルにデータ欠落の可能性があります\n続行しますか？",
+                                button: MessageBoxDefaultButton.Button2,
+                                owner: _mainForm.progressForm!);
+                            }));
                             if (dialogResult == DialogResult.Cancel) {
                                 return ERROR_RETURN_VALUE;
                             }
@@ -1680,7 +1691,8 @@ namespace GetFlashairCsv {
             WriteExcelButton.Enabled = false;
             if (WriteExcelButton.BackColor == System.Drawing.Color.LightGreen) {
                 var dialogResult = ShowOKCancelMessageBox(
-                    "Excelファイルは最新です\n実行しますか？",
+                    owner: mainForm,
+                    text: "Excelファイルは最新です\n実行しますか？",
                     button: MessageBoxDefaultButton.Button2);
                 if (dialogResult == DialogResult.Cancel) {
                     WriteExcelButton.Enabled = true;
