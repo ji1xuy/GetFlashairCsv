@@ -1408,7 +1408,7 @@ namespace GetFlashairCsv {
                     Cell? cell = null;
                     string[] cols = { "" };
                     string line = "";
-                    string _prevCsvDateTime = _excelDateTime!;
+                    string prevCsvDateTime = _excelDateTime!;
                     while (reader.Peek() >= 0) {
                         //時間がかかる処理での「応答なし」を回避するには？
                         //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
@@ -1428,23 +1428,25 @@ namespace GetFlashairCsv {
                         if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_excelDateTime!)).TotalMinutes <= 0) {
                             continue;
                         }
-                        //前回のループで処理したデータの日時との差が30分より大きければ警告
-                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_prevCsvDateTime)).TotalMinutes > 30) {
+                        //前回のループで処理したデータの日時との差が30分より大きければ確認
+                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(prevCsvDateTime)).TotalMinutes > 30) {
                             DialogResult dialogResult = DialogResult.None;
                             _mainForm.Invoke((MethodInvoker)(() => {
                                 dialogResult = _mainForm.ShowOKCancelMessageBox(
                                     owner: _mainForm.progressForm!,
                                     text: "CSVファイルにデータ欠落の可能性があります\n" +
-                                        _excelRownum + "行目: " + _prevCsvDateTime + "\n" +
-                                        (_excelRownum + 1) + "行目: " + _csvDateTime + "\n" +
-                                        "続行しますか？",
+                                        "[Excel]" + _excelRownum + "行目: " + prevCsvDateTime + "\n" +
+                                        "[Excel]" + (_excelRownum + 1) + "行目: " + _csvDateTime + "\n\n" +
+                                        "書込を続行しますか？",
                                     button: MessageBoxDefaultButton.Button2);
                         }));
                             if (dialogResult == DialogResult.Cancel) {
+                                _document.Dispose();
+                                File.Delete(_tempFileName!);
                                 return ERROR_RETURN_VALUE;
                             }
                         }
-                        _prevCsvDateTime = _csvDateTime;
+                        prevCsvDateTime = _csvDateTime;
 
                         //Excelのセルオブジェクトの作成とデータ書き込み
                         _excelRownum++;
