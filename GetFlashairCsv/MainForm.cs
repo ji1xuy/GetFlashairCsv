@@ -1435,12 +1435,13 @@ namespace GetFlashairCsv {
                                 dialogResult = _mainForm.ShowOKCancelMessageBox(
                                     owner: _mainForm.progressForm!,
                                     text: "CSVファイルにデータ欠落の可能性があります\n" +
-                                        "[Excel]" + _excelRownum + "行目: " + prevCsvDateTime + "\n" +
-                                        "[Excel]" + (_excelRownum + 1) + "行目: " + _csvDateTime + "\n\n" +
+                                        "[Excel] " + _excelRownum + "行目: " + prevCsvDateTime + "\n" +
+                                        "[Excel] " + (_excelRownum + 1) + "行目: " + _csvDateTime + "\n\n" +
                                         "書込を続行しますか？",
                                     button: MessageBoxDefaultButton.Button2);
-                        }));
+                            }));
                             if (dialogResult == DialogResult.Cancel) {
+                                reader.Close();
                                 _document.Dispose();
                                 File.Delete(_tempFileName!);
                                 return ERROR_RETURN_VALUE;
