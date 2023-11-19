@@ -26,11 +26,12 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using System;
+using static ClosedXML.Excel.XLPredefinedFormat;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231118";
+        private const string WINDOW_TITLE = APPNAME + "_20231119";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -56,7 +57,7 @@ namespace GetFlashairCsv {
         private Flashair flashair;
         private CsvFileList csvFileList;
         private ProgressForm? progressForm;
-        private DateTime lastDateTime;
+        private System.DateTime lastDateTime;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault,
@@ -96,10 +97,10 @@ namespace GetFlashairCsv {
             WriteExcelButton.BackColor = System.Drawing.Color.Yellow;
 
             //lastDateTimeの初期値を設定
-            var now = DateTime.Now;
+            var now = System.DateTime.Now;
             //30分以上は30分、30分未満は0分、秒は0秒、ミリ秒は0ミリ秒に調整　2つの方法
             //new DateTime()で新たに作成
-            lastDateTime = new DateTime(
+            lastDateTime = new System.DateTime(
                 now.Year, now.Month, now.Day, now.Hour,
                 (now.Minute >= 30) ? 30 : 0, 0, 0);
             Debug.WriteLine("lastDateTime: " + lastDateTime);
@@ -509,7 +510,7 @@ namespace GetFlashairCsv {
                 return _count;
             }
 
-            public string ConvertDateTimeToString(DateTime date, DateTime time) {
+            public string ConvertDateTimeToString(System.DateTime date, System.DateTime time) {
                 return String.Format("{0} {1}",
                     date.ToString(EXCEL_DATE_FORMAT),
                     time.ToString(EXCEL_TIME_FORMAT));
@@ -1179,9 +1180,34 @@ namespace GetFlashairCsv {
                         if (date!.InnerText == "") {
                             _excelRownum = 1;
                         } else {
+                            var dateSerial = double.Parse(date.InnerText);
+                            var timeSerial = double.Parse(time!.InnerText);
                             _excelDateTime = ConvertDateTimeToString(
-                                DateTime.FromOADate(double.Parse(date.InnerText)),
-                                DateTime.FromOADate(double.Parse(time!.InnerText)));
+                                System.DateTime.FromOADate(dateSerial),
+                                System.DateTime.FromOADate(timeSerial));
+                            // 月末の最後のデータまで書込がされていないのに次の月を書込みしようとした場合に確認
+                            var dateTime = System.DateTime.FromOADate(dateSerial + timeSerial);
+                            dateTime = dateTime.AddMinutes(30);
+                            if ((dateTime.Day != 1) || (dateTime.Hour != 1) || (dateTime.Minute != 1)) {
+                                var csvFileName = _mainForm.CsvFileNameLabel.Text;
+                                if ((dateTime.Year != int.Parse(csvFileName[..4])) ||
+                                    (dateTime.Month != int.Parse(csvFileName[4..6]))) {
+                                    DialogResult dialogResult = DialogResult.None;
+                                    _mainForm.Invoke((MethodInvoker)(() => {
+                                         dialogResult = _mainForm.ShowOKCancelMessageBox(
+                                            owner: _mainForm.progressForm!,
+                                            text: string.Format(
+                                                "{0}年{1}月分が最後まて書込みされていません\n\n" +
+                                                "書込を続行しますか？", dateTime.Year, dateTime.Month),
+                                            button: MessageBoxDefaultButton.Button2);
+                                    }));
+                                    if (dialogResult == DialogResult.Cancel) {
+                                        _document.Dispose();
+                                        File.Delete(_tempFileName!);
+                                        return false;
+                                    }
+                                }
+                            }
                             _excelWh = Convert.ToDouble(wh!.InnerText);
                             Debug.WriteLine("ExcelFileUsingOpenXML._excelDateTime: " + _excelDateTime);
                         }
@@ -1425,19 +1451,21 @@ namespace GetFlashairCsv {
                         _csvDateTime = cols[0] + " " + cols[1];
                         //_csvDateTimeの書式: yyyy/mm/dd hh:mm
                         //Excel最終行の日時より日時が同じか前ならスキップ
-                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(_excelDateTime!)).TotalMinutes <= 0) {
+                        if ((System.DateTime.Parse(_csvDateTime) - System.DateTime.Parse(_excelDateTime!)).TotalMinutes <= 0) {
                             continue;
                         }
                         //前回のループで処理したデータの日時との差が30分より大きければ確認
-                        if ((DateTime.Parse(_csvDateTime) - DateTime.Parse(prevCsvDateTime)).TotalMinutes > 30) {
+                        if ((System.DateTime.Parse(_csvDateTime) - System.DateTime.Parse(prevCsvDateTime)).TotalMinutes > 30) {
                             DialogResult dialogResult = DialogResult.None;
                             _mainForm.Invoke((MethodInvoker)(() => {
                                 dialogResult = _mainForm.ShowOKCancelMessageBox(
                                     owner: _mainForm.progressForm!,
-                                    text: "CSVファイルにデータ欠落の可能性があります\n" +
-                                        "[Excel] " + _excelRownum + "行目: " + prevCsvDateTime + "\n" +
-                                        "[Excel] " + (_excelRownum + 1) + "行目: " + _csvDateTime + "\n\n" +
-                                        "書込を続行しますか？",
+                                    text: string.Format(
+                                        "CSVファイルにデータ欠落の可能性があります\n" +
+                                        "[Excel] {0}行目: {1}\n" +
+                                        "[Excel] {2}行目: {3}\n\n" +
+                                        "書込を続行しますか？", 
+                                        _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime),
                                     button: MessageBoxDefaultButton.Button2);
                             }));
                             if (dialogResult == DialogResult.Cancel) {
@@ -1484,7 +1512,7 @@ namespace GetFlashairCsv {
                             };
                             row.Append(date);
                         }
-                        date.CellValue = new OOXMLS.CellValue(DateTime.Parse(cols[0]).ToOADate());
+                        date.CellValue = new OOXMLS.CellValue(System.DateTime.Parse(cols[0]).ToOADate());
 
                         //2列目 時刻
                         // 自前でシリアル値に変換
@@ -1538,8 +1566,8 @@ namespace GetFlashairCsv {
                             _excelRownum, _excelDateTime, (int)((_excelWh + 500) / 1000));
 
                         //30分以上は30分、30分未満は0分、秒は0秒、ミリ秒は0ミリ秒に調整　2つの方法
-                        var dateTime = DateTime.Parse(_excelDateTime!);
-                        _mainForm.lastDateTime = new DateTime(
+                        var dateTime = System.DateTime.Parse(_excelDateTime!);
+                        _mainForm.lastDateTime = new System.DateTime(
                             dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour,
                             (dateTime.Minute >= 30) ? 30 : 0, 0, 0);
                     }));
@@ -1776,7 +1804,7 @@ namespace GetFlashairCsv {
         }
 
         private void timer1_Tick(object sender, EventArgs e) {
-            var nowDateTime = DateTime.Now;
+            var nowDateTime = System.DateTime.Now;
             //1秒毎に時計の日時を更新
             ClockLabel.Text = nowDateTime.ToString(CLOCK_FORMAT);
 
