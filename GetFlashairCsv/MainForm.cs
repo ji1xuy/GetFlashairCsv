@@ -31,7 +31,7 @@ using static ClosedXML.Excel.XLPredefinedFormat;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231119";
+        private const string WINDOW_TITLE = APPNAME + "_20231213";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -1680,6 +1680,7 @@ namespace GetFlashairCsv {
                             "<対処方法> 手動で一時ファイル\n" +
                             "(" + _tempFileName + ")を\n" +
                             "Excelファイルに上書きしてから一時ファイルを削除してください");
+                        Clipboard.SetText(_tempFileName);
                         return false;
                     }
                 }
