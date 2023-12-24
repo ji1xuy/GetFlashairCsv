@@ -31,7 +31,7 @@ using static ClosedXML.Excel.XLPredefinedFormat;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231213";
+        private const string WINDOW_TITLE = APPNAME + "_20231222";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -360,7 +360,7 @@ namespace GetFlashairCsv {
                 this.Text = caption;
                 this.progressBar.Style = progressBarStyle;
                 //処理中フォームを表示
-                //,Show()でモードレス、.ShowDialog()でモーダル
+                //.Show()でモードレス、.ShowDialog()でモーダル
                 this.Show();
                 //progressForm のラベルをすぐ表示する
                 //無効領域(画面更新が必要な領域)を再描画する
