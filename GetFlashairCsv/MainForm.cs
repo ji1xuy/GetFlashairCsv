@@ -31,7 +31,7 @@ using static ClosedXML.Excel.XLPredefinedFormat;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20231222";
+        private const string WINDOW_TITLE = APPNAME + "_20240101";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -1197,8 +1197,8 @@ namespace GetFlashairCsv {
                                          dialogResult = _mainForm.ShowOKCancelMessageBox(
                                             owner: _mainForm.progressForm!,
                                             text: string.Format(
-                                                "{0}年{1}月分が最後まて書込みされていません\n\n" +
-                                                "書込を続行しますか？", dateTime.Year, dateTime.Month),
+                                                "{0}年{1}月分が最後まで書き込みされていません\n\n" +
+                                                "書き込みを続行しますか？", dateTime.Year, dateTime.Month),
                                             button: MessageBoxDefaultButton.Button2);
                                     }));
                                     if (dialogResult == DialogResult.Cancel) {
