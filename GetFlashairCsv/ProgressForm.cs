@@ -8,12 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace GetFlashairCsv
-{
-    public partial class ProgressForm : Form
-    {
-        public ProgressForm()
-        {
+namespace GetFlashairCsv {
+    public partial class ProgressForm : Form {
+        public ProgressForm() {
             InitializeComponent();
         }
     }

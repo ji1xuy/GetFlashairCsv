@@ -1,5 +1,6 @@
 //メッセージボックスをオーナーフォームの中央に表示
 //https://qiita.com/Apeworks/items/263645a599f3ed73567e
+// メッセージボックスをオーナーウィンドウの中央位置に移動するコードを追加
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
