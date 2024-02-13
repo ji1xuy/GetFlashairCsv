@@ -31,7 +31,7 @@ using static ClosedXML.Excel.XLPredefinedFormat;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240126";
+        private const string WINDOW_TITLE = APPNAME + "_20240213";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -165,6 +165,9 @@ namespace GetFlashairCsv {
                 HttpResponseMessage? response = null;
                 try {
                     response = await client.GetAsync(filepath);
+                } catch (System.Threading.Tasks.TaskCanceledException) {
+                    _mainForm.ShowErrorMessageBox("タイムアウトにより処理が中止されました");
+                    return false;
                 } catch (Exception e) {
                     _mainForm.ShowErrorMessageBox(e);
                     return false;
@@ -1736,6 +1739,9 @@ namespace GetFlashairCsv {
             }
 
             //CSVファイルリストが空ならリスト更新
+            if (UpdateCsvFileListButton.Enabled == false) {
+                return;
+            }
             if (CsvFileListBox.Items.Count == 0) {
                 UpdateCsvFileListButton.Enabled = false;
                 progressForm = new ProgressForm(this.Location, "リスト更新");
