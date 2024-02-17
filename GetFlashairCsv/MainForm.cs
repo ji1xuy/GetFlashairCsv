@@ -31,7 +31,7 @@ using static ClosedXML.Excel.XLPredefinedFormat;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240213";
+        private const string WINDOW_TITLE = APPNAME + "_20240217";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -166,7 +166,8 @@ namespace GetFlashairCsv {
                 try {
                     response = await client.GetAsync(filepath);
                 } catch (System.Threading.Tasks.TaskCanceledException) {
-                    _mainForm.ShowErrorMessageBox("タイムアウトにより処理が中止されました");
+                    _mainForm.ShowErrorMessageBox(
+                        "FlashAirとの通信がタイムアウトのため中止されました");
                     return false;
                 } catch (Exception e) {
                     _mainForm.ShowErrorMessageBox(e);
@@ -238,14 +239,17 @@ namespace GetFlashairCsv {
                             }
                         } catch (InvalidOperationException) {
                             _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
+                                _mainForm.ShowErrorMessageBox(
+                                    "ブラウザを操作できませんでした\n" +
                                     "ChromeDriverとブラウザのバージョンが一致しているか確認してください");
                             }));
                             return false;
                         } catch (Exception e)
                               when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
                             _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                                _mainForm.ShowErrorMessageBox(
+                                    "FlashAirと通信できませんでした\n" +
+                                    "FlashAirのURLが正しいか確認してください");
                             }));
                             return false;
                         } catch (Exception e) {
@@ -286,14 +290,17 @@ namespace GetFlashairCsv {
                             }
                         } catch (InvalidOperationException) {
                             _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox("ブラウザを操作できませんでした\n" +
+                                _mainForm.ShowErrorMessageBox(
+                                    "ブラウザを操作できませんでした\n" +
                                     "EdgeDriverとブラウザのバージョンが一致しているか確認してください");
                             }));
                             return false;
                         } catch (Exception e)
                               when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
                             _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox("FlashAirのURLが正しいか確認してください");
+                                _mainForm.ShowErrorMessageBox(
+                                    "FlashAirと通信できませんでした\n" +
+                                    "FlashAirのURLが正しいか確認してください");
                             }));
                             return false;
                         } catch (Exception e) {
