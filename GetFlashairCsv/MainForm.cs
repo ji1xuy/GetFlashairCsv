@@ -25,13 +25,13 @@ using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-using System;
-using static ClosedXML.Excel.XLPredefinedFormat;
+using DocumentFormat.OpenXml.Office.CustomUI;
+using NPOI.SS.Formula.Functions;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240217";
+        private const string WINDOW_TITLE = APPNAME + "_20240316";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -206,7 +206,7 @@ namespace GetFlashairCsv {
                 }
             }
 
-            public async Task<bool> Update() {
+            public async Task<bool> Update(ProgressForm progressForm) {
                 return await Task.Run(() => {
                     var list = new List<string>();
                     IWebDriver? driver;
@@ -214,6 +214,7 @@ namespace GetFlashairCsv {
                         // Webドライバーのインスタンス化
                         ChromeDriverService? chromeService;
                         ChromeOptions chromeOptions = new();
+                        chromeOptions.AddArgument("--window-position=-32000,-32000");
                         //chromeService = ChromeDriverService.CreateDefaultService();
                         //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
                         //ドライバの起動場所に自動保存された場所を指定
@@ -222,12 +223,15 @@ namespace GetFlashairCsv {
                         chromeService = ChromeDriverService.CreateDefaultService(driverPath);
                         //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
                         chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
-                        chromeOptions.AddArgument("--headless");
+                        //chromeOptions.AddArgument("--headless");
                         //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
                         chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-
+                        
                         try {
                             using (driver = new ChromeDriver(chromeService, chromeOptions)) {
+                                progressForm.Invoke((MethodInvoker)(() => {
+                                    progressForm.abortButton.Enabled = true;
+                                }));
                                 driver.Navigate().GoToUrl(_mainForm.flashair.Url);
                                 ReadOnlyCollection<IWebElement> elms =
                                     driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
@@ -245,7 +249,7 @@ namespace GetFlashairCsv {
                             }));
                             return false;
                         } catch (Exception e)
-                              when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
+                            when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
                             _mainForm.Invoke((MethodInvoker)(() => {
                                 _mainForm.ShowErrorMessageBox(
                                     "FlashAirと通信できませんでした\n" +
@@ -273,17 +277,20 @@ namespace GetFlashairCsv {
                         //コマンドプロンプトが一瞬表示されるため
                         //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
                         //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
-                        //edgeOptions.AddArgument("--window-position=-32000,-32000");
+                        edgeOptions.AddArgument("--window-position=-32000,-32000");
                         //Microsoft Edge WebDriver を入れていなかったのが根本原因
                         //Microsoft Edge WebDriver を入れて
                         //HideCommandPromptWindow = true に戻した
 
-                        edgeOptions.AddArgument("--headless");
+                        //edgeOptions.AddArgument("--headless");
                         edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
                         //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
                         //edgeOptions.AddArgument("--profile-directory=Default");
                         try {
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
+                                progressForm.Invoke((MethodInvoker)(() => {
+                                    progressForm.abortButton.Enabled = true;
+                                }));
                                 driver.Navigate().GoToUrl(_mainForm.flashair.Url);
                                 ReadOnlyCollection<IWebElement> elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
@@ -296,7 +303,7 @@ namespace GetFlashairCsv {
                             }));
                             return false;
                         } catch (Exception e)
-                              when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
+                            when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
                             _mainForm.Invoke((MethodInvoker)(() => {
                                 _mainForm.ShowErrorMessageBox(
                                     "FlashAirと通信できませんでした\n" +
@@ -356,14 +363,20 @@ namespace GetFlashairCsv {
 
         //partial修飾子を付けてProgressForm.csに書かずここに記述
         private partial class ProgressForm : GetFlashairCsv.ProgressForm {
-            public ProgressForm(System.Drawing.Point point, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee) {
-                const uint MF_BYPOSITION = 0x400;
-                const uint MF_BYCOMMAND = 0x0;
-                const uint SC_CLOSE = 0xF060;
-                IntPtr systemMenu = GetSystemMenu(this.Handle, false);
-                RemoveMenu(systemMenu, 5, MF_BYPOSITION);
-                RemoveMenu(systemMenu, SC_CLOSE, MF_BYCOMMAND);
+            string _caption;
+            const uint MF_BYPOSITION = 0x400;
+            const uint MF_BYCOMMAND = 0x0;
+            const uint SC_CLOSE = 0xF060;
 
+            public ProgressForm(System.Drawing.Point point, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee) {
+                IntPtr systemMenu = GetSystemMenu(this.Handle, false);
+                //_mainForm = mainForm;
+                _caption = caption;
+
+                RemoveMenu(systemMenu, 5, MF_BYPOSITION);
+                //閉じるボタンを無効化
+                RemoveMenu(systemMenu, SC_CLOSE, MF_BYCOMMAND);
+                this.abortButton.Click += abortButton_Click;
                 //表示位置の設定
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
@@ -375,6 +388,24 @@ namespace GetFlashairCsv {
                 //progressForm のラベルをすぐ表示する
                 //無効領域(画面更新が必要な領域)を再描画する
                 this.Update();
+            }
+
+            private void abortButton_Click(object? sender, EventArgs e) {
+                if (this.Text != "リスト更新") {
+                    return;
+                }
+                Debug.WriteLine("GoToUrl()処理中断中...");
+                this.textLabel.Text = "中断中...";
+                System.Collections.ArrayList list = new System.Collections.ArrayList();
+                //すべてのプロセスを列挙する
+                foreach (System.Diagnostics.Process p
+                    in System.Diagnostics.Process.GetProcesses()) {
+                    //指定された文字列がメインウィンドウのタイトルに含まれているか調べる
+                    if (0 <= p.MainWindowTitle.IndexOf("data:,")) {
+                        p.Kill();
+                        return;
+                    }
+                }
             }
 
             public long StartPos { get; set; } = -1;
@@ -439,7 +470,7 @@ namespace GetFlashairCsv {
             //処理中のフォームを表示
             progressForm = new ProgressForm(this.Location, "リスト更新");
 
-            await csvFileList.Update();
+            await csvFileList.Update(progressForm);
 
             //処理中のフォームを閉じる
             progressForm.Close();
@@ -1752,7 +1783,7 @@ namespace GetFlashairCsv {
             if (CsvFileListBox.Items.Count == 0) {
                 UpdateCsvFileListButton.Enabled = false;
                 progressForm = new ProgressForm(this.Location, "リスト更新");
-                result = await csvFileList.Update();
+                result = await csvFileList.Update(progressForm);
                 progressForm!.Close();
                 UpdateCsvFileListButton.Enabled = true;
                 if (result == false) {

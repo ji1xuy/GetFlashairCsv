@@ -27,13 +27,14 @@
             CsvLabel = new Label();
             ExcelLabel = new Label();
             textLabel = new Label();
+            abortButton = new Button();
             SuspendLayout();
             // 
             // progressBar
             // 
             progressBar.Location = new Point(12, 82);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(215, 16);
+            progressBar.Size = new Size(272, 18);
             progressBar.TabIndex = 2;
             // 
             // CsvLabel
@@ -60,11 +61,22 @@
             textLabel.TabIndex = 5;
             textLabel.Text = "処理中...";
             // 
+            // abortButton
+            // 
+            abortButton.Enabled = false;
+            abortButton.Location = new Point(221, 23);
+            abortButton.Name = "abortButton";
+            abortButton.Size = new Size(63, 28);
+            abortButton.TabIndex = 6;
+            abortButton.Text = "中断";
+            abortButton.UseVisualStyleBackColor = true;
+            // 
             // ProgressForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(246, 112);
+            ClientSize = new Size(296, 112);
+            Controls.Add(abortButton);
             Controls.Add(textLabel);
             Controls.Add(ExcelLabel);
             Controls.Add(CsvLabel);
@@ -85,6 +97,7 @@
         public ProgressBar progressBar;
         public Label CsvLabel;
         public Label ExcelLabel;
-        private Label textLabel;
+        public Label textLabel;
+        public Button abortButton;
     }
 }
