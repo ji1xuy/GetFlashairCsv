@@ -63,6 +63,7 @@
             // 
             // abortButton
             // 
+            abortButton.Cursor = Cursors.Arrow;
             abortButton.Enabled = false;
             abortButton.Location = new Point(221, 23);
             abortButton.Name = "abortButton";

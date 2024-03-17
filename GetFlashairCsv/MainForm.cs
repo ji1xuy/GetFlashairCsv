@@ -33,7 +33,9 @@ namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
         private const string WINDOW_TITLE = APPNAME + "_20240317";
-        private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
+        private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
+        private const string INIFILE_KEY_URL = "url";
+        private const string INIFILE_KEY_BROWSER = "browser";
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
         private const string EXCEL_TABLENAME = "テーブル1";
@@ -134,8 +136,8 @@ namespace GetFlashairCsv {
             }
 
             public void WriteUrlToInifile() {
-                if (WritePrivateProfileString(APPNAME, "url",
-                    _mainForm.FlashairUrlTextBox.Text, INI_FILENAME)) {
+                if (WritePrivateProfileString(APPNAME, INIFILE_KEY_URL,
+                    _mainForm.FlashairUrlTextBox.Text, INIFILE_FILENAME)) {
                     _mainForm.ShowOKMessageBox("保存しました");
                 } else {
                     _mainForm.ShowOKMessageBox("保存できませんでした", CAPTION_ERROR,
@@ -151,8 +153,8 @@ namespace GetFlashairCsv {
                 //オブジェクトの内容が変更されるだけで新しいオブジェクトを作成しません
                 var sb = new StringBuilder(capacitySize);
                 var stringLength = GetPrivateProfileString(
-                    APPNAME, "url", "", sb, Convert.ToUInt32(sb.Capacity),
-                    INI_FILENAME);
+                    APPNAME, INIFILE_KEY_URL, "", sb, Convert.ToUInt32(sb.Capacity),
+                    INIFILE_FILENAME);
                 //FLashAirのURL をラベルに表示
                 if (stringLength > 0) {
                     _mainForm.FlashairUrlTextBox.Text = sb.ToString();
@@ -389,7 +391,7 @@ namespace GetFlashairCsv {
                 RemoveMenu(systemMenu, 5, MF_BYPOSITION);
                 //閉じるボタンを無効化
                 RemoveMenu(systemMenu, SC_CLOSE, MF_BYCOMMAND);
-                this.abortButton.Click += abortButton_Click;
+                this.abortButton.Click += AbortButton_Click;
                 this.FormClosing += ProgressForm_FormClosing;
                 //表示位置の設定
                 this.Bounds = new System.Drawing.Rectangle(
@@ -405,6 +407,7 @@ namespace GetFlashairCsv {
             }
 
             private void ProgressForm_FormClosing(object? sender, FormClosingEventArgs e) {
+                //ブラウザのタイトルが"FlashAir"のまま残る場合があるため終了させる
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("FlashAir") >= 0) {
                         RECT rect;
@@ -417,10 +420,8 @@ namespace GetFlashairCsv {
                 }
             }
 
-            private void abortButton_Click(object? sender, EventArgs e) {
-                if (this.Text != "リスト更新") {
-                    return;
-                }
+            private void AbortButton_Click(object? sender, EventArgs e) {
+                //ブラウザを終了しGoToUrl()処理でエラーを発生させることで中断する
                 Debug.WriteLine("GoToUrl()処理中断中...");
                 this.textLabel.Text = "中断中...";
                 foreach (Process p in Process.GetProcesses()) {
@@ -1941,24 +1942,24 @@ namespace GetFlashairCsv {
             int capacitySize = 256;
             var sb = new StringBuilder(capacitySize);
             var stringLength = GetPrivateProfileString(
-                APPNAME, "browser", "", sb, Convert.ToUInt32(sb.Capacity),
-                INI_FILENAME);
-            if (sb.ToString() == "Chrome") {
+                APPNAME, INIFILE_KEY_BROWSER, "", sb, Convert.ToUInt32(sb.Capacity),
+                INIFILE_FILENAME);
+            if (sb.ToString() == ChromeRadioButton.Text) {
                 ChromeRadioButton.Checked = true;
             }
-            if (sb.ToString() == "Edge") {
+            if (sb.ToString() == EdgeRadioButton.Text) {
                 EdgeRadioButton.Checked = true;
             }
         }
 
         public void WriteBrowserToInifile() {
             if (ChromeRadioButton.Checked == true) {
-                WritePrivateProfileString(APPNAME, "browser",
-                    "Chrome", INI_FILENAME);
+                WritePrivateProfileString(APPNAME, INIFILE_KEY_BROWSER,
+                    ChromeRadioButton.Text, INIFILE_FILENAME);
             }
             if (EdgeRadioButton.Checked == true) {
-                WritePrivateProfileString(APPNAME, "browser",
-                    "Edge", INI_FILENAME);
+                WritePrivateProfileString(APPNAME, INIFILE_KEY_BROWSER,
+                    EdgeRadioButton.Text, INIFILE_FILENAME);
             }
         }
     }
