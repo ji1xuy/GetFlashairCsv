@@ -197,6 +197,10 @@ namespace GetFlashairCsv {
                     _mainForm.ShowErrorMessageBox(
                         "FlashAirとの通信がタイムアウトのため中止されました");
                     return false;
+                } catch (System.Net.Http.HttpRequestException) {
+                    _mainForm.ShowErrorMessageBox(
+                        "FlashAirとの通信がタイムアウトのため中止されました");
+                    return false;
                 } catch (Exception e) {
                     _mainForm.ShowErrorMessageBox(e);
                     return false;
@@ -260,7 +264,7 @@ namespace GetFlashairCsv {
                                 //Minimize()だとブラウザが一瞬表示されてしまう
                                 //driver.Manage().Window.Minimize();
                                 //headlessモードではハンドルを取得できない
-                                GetBrowserHandle();
+                                _mainForm.browserHandle = GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.abortButton.Enabled = true;
                                 }));
@@ -274,7 +278,7 @@ namespace GetFlashairCsv {
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
                         } catch (Exception e) {
-                            HandleException(e);
+                            HandleException(progressForm, e);
                             return false;
                         }
                     }
@@ -303,7 +307,7 @@ namespace GetFlashairCsv {
                         //edgeOptions.AddArgument("--profile-directory=Default");
                         try {
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
-                                GetBrowserHandle();
+                                _mainForm.browserHandle = GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.abortButton.Enabled = true;
                                 }));
@@ -312,7 +316,7 @@ namespace GetFlashairCsv {
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
                         } catch (Exception e) {
-                            HandleException(e);
+                            HandleException(progressForm, e);
                             return false;
                         }
 
@@ -360,21 +364,21 @@ namespace GetFlashairCsv {
                 });
             }
 
-            private bool GetBrowserHandle() {
+            private IntPtr? GetBrowserHandle() {
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
-                        _mainForm.browserHandle = p.MainWindowHandle;
-                        return true;
+                        return p.MainWindowHandle;
                     }
                 }
-                return false;
+                return null;
             }
 
-            private void HandleException(Exception e) {
+            private void HandleException(ProgressForm progressForm, Exception e) {
                 switch (e) {
                     case InvalidOperationException:
                         _mainForm.Invoke((MethodInvoker)(() => {
                         _mainForm.ShowErrorMessageBox(
+                            progressForm,
                             "ブラウザを操作できませんでした\n" +
                             "Selenium.WebDriverとブラウザのバージョンが一致しているか確認してください");
                         }));
@@ -383,13 +387,14 @@ namespace GetFlashairCsv {
                     case WebDriverException:
                         _mainForm.Invoke((MethodInvoker)(() => {
                         _mainForm.ShowErrorMessageBox(
+                            progressForm,
                             "FlashAirと通信できませんでした\n" +
                             "FlashAirのURLが正しいか確認してください");
                         }));
                         break;
                     default:
                         _mainForm.Invoke((MethodInvoker)(() => {
-                            _mainForm.ShowErrorMessageBox(e);
+                            _mainForm.ShowErrorMessageBox(progressForm, e);
                         }));
                         break;
                 }
@@ -489,12 +494,18 @@ namespace GetFlashairCsv {
         }
 
         private void ShowErrorMessageBox(Exception e) {
-            CustomMessageBox.Show(this, e.ToString(), CAPTION_ERROR,
+            ShowErrorMessageBox(this, e);
+        }
+        private void ShowErrorMessageBox(Form form, Exception e) {
+            CustomMessageBox.Show(form, e.ToString(), CAPTION_ERROR,
                MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void ShowErrorMessageBox(string text) {
-            CustomMessageBox.Show(this, text, CAPTION_ERROR,
+            ShowErrorMessageBox(this, text);
+        }
+        private void ShowErrorMessageBox(Form form, string text) {
+            CustomMessageBox.Show(form, text, CAPTION_ERROR,
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
