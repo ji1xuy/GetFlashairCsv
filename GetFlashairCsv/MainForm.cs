@@ -27,11 +27,12 @@ using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using NPOI.SS.Formula.Functions;
+using System.Reflection.Metadata;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240316";
+        private const string WINDOW_TITLE = APPNAME + "_20240317";
         private const string INI_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
@@ -79,12 +80,24 @@ namespace GetFlashairCsv {
         [DllImport("user32.dll")]
         private static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
+        [DllImport("user32.dll")]
+        private static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
         public MainForm() {
             InitializeComponent();
             mainForm = this;
             Debug.WriteLine("mainForm.Handle: " + mainForm.Handle);
             flashair = new Flashair(this);
             flashair.ReadUrlFromInifile();
+            ReadBrowserFromInifile();
             csvFileList = new CsvFileList(this);
 
             //タイトルバーの設定
@@ -114,7 +127,7 @@ namespace GetFlashairCsv {
                 _mainForm = mainForm;
                 _mainForm.FlashairUrlTextBox.Text = "http://";
             }
-            
+
             public string? Url {
                 get { return _mainForm.FlashairUrlTextBox.Text; }
                 private set { _mainForm.FlashairUrlTextBox.Text = value; }
@@ -226,7 +239,7 @@ namespace GetFlashairCsv {
                         //chromeOptions.AddArgument("--headless");
                         //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
                         chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-                        
+
                         try {
                             using (driver = new ChromeDriver(chromeService, chromeOptions)) {
                                 progressForm.Invoke((MethodInvoker)(() => {
@@ -377,6 +390,7 @@ namespace GetFlashairCsv {
                 //閉じるボタンを無効化
                 RemoveMenu(systemMenu, SC_CLOSE, MF_BYCOMMAND);
                 this.abortButton.Click += abortButton_Click;
+                this.FormClosing += ProgressForm_FormClosing;
                 //表示位置の設定
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
@@ -390,20 +404,33 @@ namespace GetFlashairCsv {
                 this.Update();
             }
 
+            private void ProgressForm_FormClosing(object? sender, FormClosingEventArgs e) {
+                foreach (Process p in Process.GetProcesses()) {
+                    if (p.MainWindowTitle.IndexOf("FlashAir") >= 0) {
+                        RECT rect;
+                        GetWindowRect(p.MainWindowHandle, out rect);
+                        if (rect.left == -32000 && rect.top == -32000) {
+                            p.CloseMainWindow();
+                            return;
+                        }
+                    }
+                }
+            }
+
             private void abortButton_Click(object? sender, EventArgs e) {
                 if (this.Text != "リスト更新") {
                     return;
                 }
                 Debug.WriteLine("GoToUrl()処理中断中...");
                 this.textLabel.Text = "中断中...";
-                System.Collections.ArrayList list = new System.Collections.ArrayList();
-                //すべてのプロセスを列挙する
-                foreach (System.Diagnostics.Process p
-                    in System.Diagnostics.Process.GetProcesses()) {
-                    //指定された文字列がメインウィンドウのタイトルに含まれているか調べる
-                    if (0 <= p.MainWindowTitle.IndexOf("data:,")) {
-                        p.Kill();
-                        return;
+                foreach (Process p in Process.GetProcesses()) {
+                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
+                        RECT rect;
+                        GetWindowRect(p.MainWindowHandle, out rect);
+                        if (rect.left == -32000 && rect.top == -32000) {
+                            p.CloseMainWindow();
+                            return;
+                        }
                     }
                 }
             }
@@ -463,6 +490,7 @@ namespace GetFlashairCsv {
 
         private void WriteInifileButton_Click(object sender, EventArgs e) {
             flashair.WriteUrlToInifile();
+            WriteBrowserToInifile();
         }
 
         private async void UpdateCsvFileListButton_Click(object sender, EventArgs e) {
@@ -1235,12 +1263,12 @@ namespace GetFlashairCsv {
                                     (dateTime.Month != int.Parse(csvFileName[4..6]))) {
                                     DialogResult dialogResult = DialogResult.None;
                                     _mainForm.Invoke((MethodInvoker)(() => {
-                                         dialogResult = _mainForm.ShowOKCancelMessageBox(
-                                            owner: _mainForm.progressForm!,
-                                            text: string.Format(
-                                                "{0}年{1}月分が最後まで書き込みされていません\n\n" +
-                                                "書き込みを続行しますか？", dateTime.Year, dateTime.Month),
-                                            button: MessageBoxDefaultButton.Button2);
+                                        dialogResult = _mainForm.ShowOKCancelMessageBox(
+                                           owner: _mainForm.progressForm!,
+                                           text: string.Format(
+                                               "{0}年{1}月分が最後まで書き込みされていません\n\n" +
+                                               "書き込みを続行しますか？", dateTime.Year, dateTime.Month),
+                                           button: MessageBoxDefaultButton.Button2);
                                     }));
                                     if (dialogResult == DialogResult.Cancel) {
                                         _document.Dispose();
@@ -1505,7 +1533,7 @@ namespace GetFlashairCsv {
                                         "CSVファイルにデータ欠落の可能性があります\n" +
                                         "[Excel] {0}行目: {1}\n" +
                                         "[Excel] {2}行目: {3}\n\n" +
-                                        "書込を続行しますか？", 
+                                        "書込を続行しますか？",
                                         _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime),
                                     button: MessageBoxDefaultButton.Button2);
                             }));
@@ -1906,6 +1934,31 @@ namespace GetFlashairCsv {
                 EdgeRadioButton.Checked = false;
                 UpdateCsvFileListButton.Enabled = false;
                 WriteExcelButton.Enabled = false;
+            }
+        }
+
+        public void ReadBrowserFromInifile() {
+            int capacitySize = 256;
+            var sb = new StringBuilder(capacitySize);
+            var stringLength = GetPrivateProfileString(
+                APPNAME, "browser", "", sb, Convert.ToUInt32(sb.Capacity),
+                INI_FILENAME);
+            if (sb.ToString() == "Chrome") {
+                ChromeRadioButton.Checked = true;
+            }
+            if (sb.ToString() == "Edge") {
+                EdgeRadioButton.Checked = true;
+            }
+        }
+
+        public void WriteBrowserToInifile() {
+            if (ChromeRadioButton.Checked == true) {
+                WritePrivateProfileString(APPNAME, "browser",
+                    "Chrome", INI_FILENAME);
+            }
+            if (EdgeRadioButton.Checked == true) {
+                WritePrivateProfileString(APPNAME, "browser",
+                    "Edge", INI_FILENAME);
             }
         }
     }
