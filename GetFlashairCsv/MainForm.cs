@@ -28,6 +28,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using NPOI.SS.Formula.Functions;
 using System.Reflection.Metadata;
+using AngleSharp.Text;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
@@ -56,11 +57,13 @@ namespace GetFlashairCsv {
         private const string EXCEL_STYLE_DATE_FORMATCODE = "yyyy/M/d";
         private const string EXCEL_STYLE_TIME_FORMATCODE = "H:mm;@";
         private const string CLOCK_FORMAT = "yyyy/MM/dd HH:mm:ss";
+        private const int OUT_OF_SCREEN = -32000;
         private MainForm mainForm;
         private Flashair flashair;
         private CsvFileList csvFileList;
         private ProgressForm? progressForm;
         private System.DateTime lastDateTime;
+        private IntPtr? browserHandle = null;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault,
@@ -83,6 +86,13 @@ namespace GetFlashairCsv {
         private static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
         [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hwnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowThreadProcessId(
+           IntPtr hWnd, out int lpdwProcessId);
+
+        [DllImport("user32.dll")]
         private static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -92,6 +102,9 @@ namespace GetFlashairCsv {
             public int right;
             public int bottom;
         }
+
+        [DllImport("user32.dll", EntryPoint = "SendMessageA")]
+        extern static int SendMessage(IntPtr hwnd, int msg, int wParam, int lParam);
 
         public MainForm() {
             InitializeComponent();
@@ -229,7 +242,7 @@ namespace GetFlashairCsv {
                         // Webドライバーのインスタンス化
                         ChromeDriverService? chromeService;
                         ChromeOptions chromeOptions = new();
-                        chromeOptions.AddArgument("--window-position=-32000,-32000");
+                        chromeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
                         //chromeService = ChromeDriverService.CreateDefaultService();
                         //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
                         //ドライバの起動場所に自動保存された場所を指定
@@ -244,6 +257,14 @@ namespace GetFlashairCsv {
 
                         try {
                             using (driver = new ChromeDriver(chromeService, chromeOptions)) {
+                                //driver.Manage().Window.Minimize();
+                                //headlessモードではハンドルを取得できない
+                                foreach (Process p in Process.GetProcesses()) {
+                                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
+                                        _mainForm.browserHandle = p.MainWindowHandle;
+                                        break;
+                                    }
+                                }
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.abortButton.Enabled = true;
                                 }));
@@ -292,7 +313,7 @@ namespace GetFlashairCsv {
                         //コマンドプロンプトが一瞬表示されるため
                         //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
                         //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
-                        edgeOptions.AddArgument("--window-position=-32000,-32000");
+                        edgeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
                         //Microsoft Edge WebDriver を入れていなかったのが根本原因
                         //Microsoft Edge WebDriver を入れて
                         //HideCommandPromptWindow = true に戻した
@@ -303,6 +324,14 @@ namespace GetFlashairCsv {
                         //edgeOptions.AddArgument("--profile-directory=Default");
                         try {
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
+                                //driver.Manage().Window.Minimize();
+                                //headlessモードではハンドルを取得できない
+                                foreach (Process p in Process.GetProcesses()) {
+                                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
+                                        _mainForm.browserHandle = p.MainWindowHandle;
+                                        break;
+                                    }
+                                }
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.abortButton.Enabled = true;
                                 }));
@@ -378,14 +407,16 @@ namespace GetFlashairCsv {
 
         //partial修飾子を付けてProgressForm.csに書かずここに記述
         private partial class ProgressForm : GetFlashairCsv.ProgressForm {
+            MainForm _mainForm;
             string _caption;
             const uint MF_BYPOSITION = 0x400;
             const uint MF_BYCOMMAND = 0x0;
             const uint SC_CLOSE = 0xF060;
+            const int WM_CLOSE = 0x0010;
 
-            public ProgressForm(System.Drawing.Point point, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee) {
+            public ProgressForm(MainForm mainForm, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee) {
                 IntPtr systemMenu = GetSystemMenu(this.Handle, false);
-                //_mainForm = mainForm;
+                _mainForm = mainForm;
                 _caption = caption;
 
                 RemoveMenu(systemMenu, 5, MF_BYPOSITION);
@@ -394,6 +425,7 @@ namespace GetFlashairCsv {
                 this.abortButton.Click += AbortButton_Click;
                 this.FormClosing += ProgressForm_FormClosing;
                 //表示位置の設定
+                Point point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
                 this.Text = caption;
@@ -407,15 +439,9 @@ namespace GetFlashairCsv {
             }
 
             private void ProgressForm_FormClosing(object? sender, FormClosingEventArgs e) {
-                //ブラウザのタイトルが"FlashAir"のまま残る場合があるため終了させる
-                foreach (Process p in Process.GetProcesses()) {
-                    if (p.MainWindowTitle.IndexOf("FlashAir") >= 0) {
-                        GetWindowRect(p.MainWindowHandle, out RECT rect);
-                        if (rect.left == -32000 && rect.top == -32000) {
-                            p.CloseMainWindow();
-                            return;
-                        }
-                    }
+                //ブラウザが"FlashAir"のタイトルのまま残る場合があるため終了させる
+                if (_mainForm.browserHandle != null) {
+                    SendMessage((IntPtr)_mainForm.browserHandle, WM_CLOSE, 0, 0);
                 }
             }
 
@@ -423,14 +449,24 @@ namespace GetFlashairCsv {
                 //ブラウザを終了しGoToUrl()処理でエラーを発生させることで中断する
                 Debug.WriteLine("GoToUrl()処理中断中...");
                 this.textLabel.Text = "中断中...";
+                /*
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
-                        GetWindowRect(p.MainWindowHandle, out RECT rect);
-                        if (rect.left == -32000 && rect.top == -32000) {
+                        //GetWindowRect(p.MainWindowHandle, out RECT rect);
+                        //if (rect.left == OUT_OF_SCREEN && rect.top == OUT_OF_SCREEN) {
+                        //    p.CloseMainWindow();
+                        //    return;
+                        //}
+                        if (IsIconic(p.MainWindowHandle)) {
                             p.CloseMainWindow();
                             return;
                         }
                     }
+                }
+                */
+                if (_mainForm.browserHandle != null) {
+                    Debug.WriteLine("SendMessage()実行");
+                    SendMessage((IntPtr)_mainForm.browserHandle, WM_CLOSE, 0, 0);
                 }
             }
 
@@ -495,7 +531,7 @@ namespace GetFlashairCsv {
         private async void UpdateCsvFileListButton_Click(object sender, EventArgs e) {
             UpdateCsvFileListButton.Enabled = false;
             //処理中のフォームを表示
-            progressForm = new ProgressForm(this.Location, "リスト更新");
+            progressForm = new ProgressForm(this, "リスト更新");
 
             await csvFileList.Update(progressForm);
 
@@ -1809,7 +1845,7 @@ namespace GetFlashairCsv {
             }
             if (CsvFileListBox.Items.Count == 0) {
                 UpdateCsvFileListButton.Enabled = false;
-                progressForm = new ProgressForm(this.Location, "リスト更新");
+                progressForm = new ProgressForm(this, "リスト更新");
                 result = await csvFileList.Update(progressForm);
                 progressForm!.Close();
                 UpdateCsvFileListButton.Enabled = true;
@@ -1820,7 +1856,7 @@ namespace GetFlashairCsv {
             }
 
             //CSVファイルをダウンロード
-            progressForm = new ProgressForm(this.Location, "CSVファイルダウンロード");
+            progressForm = new ProgressForm(this, "CSVファイルダウンロード");
             result = await flashair.DownloadCSVFile();
             progressForm!.Close();
             if (result == false) {
@@ -1829,7 +1865,7 @@ namespace GetFlashairCsv {
             }
 
             WriteExcelButton.Enabled = false;
-            progressForm = new ProgressForm(this.Location, "Excelファイル書込", ProgressBarStyle.Blocks);
+            progressForm = new ProgressForm(this, "Excelファイル書込", ProgressBarStyle.Blocks);
             progressForm.Update();
             int count;
             //Excelファイルに書き込む
