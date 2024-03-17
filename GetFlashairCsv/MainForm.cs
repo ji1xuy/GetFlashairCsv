@@ -257,6 +257,7 @@ namespace GetFlashairCsv {
 
                         try {
                             using (driver = new ChromeDriver(chromeService, chromeOptions)) {
+                                //Minimize()だとブラウザが一瞬表示されてしまう
                                 //driver.Manage().Window.Minimize();
                                 //headlessモードではハンドルを取得できない
                                 foreach (Process p in Process.GetProcesses()) {
