@@ -260,12 +260,7 @@ namespace GetFlashairCsv {
                                 //Minimize()だとブラウザが一瞬表示されてしまう
                                 //driver.Manage().Window.Minimize();
                                 //headlessモードではハンドルを取得できない
-                                foreach (Process p in Process.GetProcesses()) {
-                                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
-                                        _mainForm.browserHandle = p.MainWindowHandle;
-                                        break;
-                                    }
-                                }
+                                GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.abortButton.Enabled = true;
                                 }));
@@ -278,25 +273,8 @@ namespace GetFlashairCsv {
                                 // さらに ConvertAll() でList<string>型に変換する
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
-                        } catch (InvalidOperationException) {
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox(
-                                    "ブラウザを操作できませんでした\n" +
-                                    "ChromeDriverとブラウザのバージョンが一致しているか確認してください");
-                            }));
-                            return false;
-                        } catch (Exception e)
-                            when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox(
-                                    "FlashAirと通信できませんでした\n" +
-                                    "FlashAirのURLが正しいか確認してください");
-                            }));
-                            return false;
                         } catch (Exception e) {
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox(e);
-                            }));
+                            HandleException(e);
                             return false;
                         }
                     }
@@ -325,14 +303,7 @@ namespace GetFlashairCsv {
                         //edgeOptions.AddArgument("--profile-directory=Default");
                         try {
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
-                                //driver.Manage().Window.Minimize();
-                                //headlessモードではハンドルを取得できない
-                                foreach (Process p in Process.GetProcesses()) {
-                                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
-                                        _mainForm.browserHandle = p.MainWindowHandle;
-                                        break;
-                                    }
-                                }
+                                GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.abortButton.Enabled = true;
                                 }));
@@ -340,27 +311,11 @@ namespace GetFlashairCsv {
                                 ReadOnlyCollection<IWebElement> elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
-                        } catch (InvalidOperationException) {
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox(
-                                    "ブラウザを操作できませんでした\n" +
-                                    "EdgeDriverとブラウザのバージョンが一致しているか確認してください");
-                            }));
-                            return false;
-                        } catch (Exception e)
-                            when ((e is WebDriverException) || (e is WebDriverArgumentException)) {
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox(
-                                    "FlashAirと通信できませんでした\n" +
-                                    "FlashAirのURLが正しいか確認してください");
-                            }));
-                            return false;
                         } catch (Exception e) {
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                _mainForm.ShowErrorMessageBox(e);
-                            }));
+                            HandleException(e);
                             return false;
                         }
+
                     }
                     //リストを空にする
                     _mainForm.Invoke((MethodInvoker)(() => {
@@ -403,6 +358,41 @@ namespace GetFlashairCsv {
                     }
                     return true;
                 });
+            }
+
+            private bool GetBrowserHandle() {
+                foreach (Process p in Process.GetProcesses()) {
+                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
+                        _mainForm.browserHandle = p.MainWindowHandle;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            private void HandleException(Exception e) {
+                switch (e) {
+                    case InvalidOperationException:
+                        _mainForm.Invoke((MethodInvoker)(() => {
+                        _mainForm.ShowErrorMessageBox(
+                            "ブラウザを操作できませんでした\n" +
+                            "Selenium.WebDriverとブラウザのバージョンが一致しているか確認してください");
+                        }));
+                        break;
+                    case WebDriverArgumentException:
+                    case WebDriverException:
+                        _mainForm.Invoke((MethodInvoker)(() => {
+                        _mainForm.ShowErrorMessageBox(
+                            "FlashAirと通信できませんでした\n" +
+                            "FlashAirのURLが正しいか確認してください");
+                        }));
+                        break;
+                    default:
+                        _mainForm.Invoke((MethodInvoker)(() => {
+                            _mainForm.ShowErrorMessageBox(e);
+                        }));
+                        break;
+                }
             }
         }
 
