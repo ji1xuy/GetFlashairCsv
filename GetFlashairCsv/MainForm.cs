@@ -190,6 +190,7 @@ namespace GetFlashairCsv {
 
                 //CSVファイルをダウンロード
                 var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(30);
                 HttpResponseMessage? response = null;
                 try {
                     response = await client.GetAsync(filepath);
