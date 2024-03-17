@@ -410,8 +410,7 @@ namespace GetFlashairCsv {
                 //ブラウザのタイトルが"FlashAir"のまま残る場合があるため終了させる
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("FlashAir") >= 0) {
-                        RECT rect;
-                        GetWindowRect(p.MainWindowHandle, out rect);
+                        GetWindowRect(p.MainWindowHandle, out RECT rect);
                         if (rect.left == -32000 && rect.top == -32000) {
                             p.CloseMainWindow();
                             return;
@@ -426,8 +425,7 @@ namespace GetFlashairCsv {
                 this.textLabel.Text = "中断中...";
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
-                        RECT rect;
-                        GetWindowRect(p.MainWindowHandle, out rect);
+                        GetWindowRect(p.MainWindowHandle, out RECT rect);
                         if (rect.left == -32000 && rect.top == -32000) {
                             p.CloseMainWindow();
                             return;
