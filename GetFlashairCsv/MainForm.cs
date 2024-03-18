@@ -33,7 +33,7 @@ using AngleSharp.Text;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240317";
+        private const string WINDOW_TITLE = APPNAME + "_20240318";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -194,11 +194,7 @@ namespace GetFlashairCsv {
                 HttpResponseMessage? response = null;
                 try {
                     response = await client.GetAsync(filepath);
-                } catch (System.Threading.Tasks.TaskCanceledException) {
-                    _mainForm.ShowErrorMessageBox(
-                        "FlashAirとの通信がタイムアウトのため中止されました");
-                    return false;
-                } catch (System.Net.Http.HttpRequestException) {
+                } catch (Exception e) when (e is TaskCanceledException || e is HttpRequestException) {
                     _mainForm.ShowErrorMessageBox(
                         "FlashAirとの通信がタイムアウトのため中止されました");
                     return false;
@@ -384,13 +380,19 @@ namespace GetFlashairCsv {
                             "Selenium.WebDriverとブラウザのバージョンが一致しているか確認してください");
                         }));
                         break;
-                    case WebDriverArgumentException:
+                    case NoSuchWindowException:
+                        _mainForm.Invoke((MethodInvoker)(() => {
+                            _mainForm.ShowErrorMessageBox(
+                                progressForm, "処理を中断しました");
+                        }));
+                        break;
+                    //case WebDriverArgumentException:
                     case WebDriverException:
                         _mainForm.Invoke((MethodInvoker)(() => {
-                        _mainForm.ShowErrorMessageBox(
-                            progressForm,
-                            "FlashAirと通信できませんでした\n" +
-                            "FlashAirのURLが正しいか確認してください");
+                            _mainForm.ShowErrorMessageBox(
+                                progressForm,
+                                "FlashAirと通信できませんでした\n" +
+                                "FlashAirのURLが正しいか確認してください");
                         }));
                         break;
                     default:
