@@ -196,7 +196,7 @@ namespace GetFlashairCsv {
                     response = await client.GetAsync(filepath);
                 } catch (Exception e) when (e is TaskCanceledException || e is HttpRequestException) {
                     _mainForm.ShowErrorMessageBox(
-                        "FlashAirとの通信がタイムアウトのため中止されました");
+                        "通信中にタイムアウトが発生したためダウンロードを中止しました");
                     return false;
                 } catch (Exception e) {
                     _mainForm.ShowErrorMessageBox(e);
