@@ -174,7 +174,7 @@ namespace GetFlashairCsv {
                 }
             }
 
-            public async Task<bool> DownloadCSVFile() {
+            public async Task<bool> DownloadCSVFile(ProgressForm progressform) {
                 //CSVファイル名を取得
                 if (_mainForm.CsvFileNameLabel.Text == ITEM_NOT_SELECTED) {
                     _mainForm.ShowErrorMessageBox("CSVファイルが選択されていません");
@@ -198,15 +198,15 @@ namespace GetFlashairCsv {
                 } catch (Exception e) when (e is TaskCanceledException || e is HttpRequestException) {
                     //TaskCanceledException: client.Timeoutで設定したタイムアウトが発生した
                     //HttpRequestException: 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかった
-                    _mainForm.ShowErrorMessageBox(
+                    _mainForm.ShowErrorMessageBox(progressform,
                         "通信中にタイムアウトが発生したためダウンロードを中止しました");
                     return false;
                 } catch (Exception e) {
-                    _mainForm.ShowErrorMessageBox(e);
+                    _mainForm.ShowErrorMessageBox(progressform, e);
                     return false;
                 }
                 if (response!.StatusCode != System.Net.HttpStatusCode.OK) {
-                    _mainForm.ShowErrorMessageBox("CSVファイルをダウンロードでません");
+                    _mainForm.ShowErrorMessageBox(progressform, "CSVファイルをダウンロードでません");
                     return false;
                 }
                 //保存
@@ -1865,7 +1865,7 @@ namespace GetFlashairCsv {
 
             //CSVファイルをダウンロード
             progressForm = new ProgressForm(this, "CSVファイルダウンロード");
-            result = await flashair.DownloadCSVFile();
+            result = await flashair.DownloadCSVFile(progressForm);
             progressForm!.Close();
             if (result == false) {
                 WriteExcelButton.Enabled = true;
