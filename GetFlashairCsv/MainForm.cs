@@ -190,11 +190,14 @@ namespace GetFlashairCsv {
 
                 //CSVファイルをダウンロード
                 var client = new HttpClient();
+                //タイムアウト時間の設定（デフォルトは100秒）
                 client.Timeout = TimeSpan.FromSeconds(30);
                 HttpResponseMessage? response = null;
                 try {
                     response = await client.GetAsync(filepath);
                 } catch (Exception e) when (e is TaskCanceledException || e is HttpRequestException) {
+                    //TaskCanceledException: client.Timeoutで設定したタイムアウトが発生した
+                    //HttpRequestException: 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかった
                     _mainForm.ShowErrorMessageBox(
                         "通信中にタイムアウトが発生したためダウンロードを中止しました");
                     return false;
