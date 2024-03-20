@@ -61,7 +61,7 @@ namespace GetFlashairCsv {
         private MainForm mainForm;
         private Flashair flashair;
         private CsvFileList csvFileList;
-        private ProgressForm? progressForm;
+        private ProgressForm? progressForm = null;
         private System.DateTime lastDateTime;
         private IntPtr? browserHandle = null;
 
@@ -365,12 +365,15 @@ namespace GetFlashairCsv {
             }
 
             private IntPtr? GetBrowserHandle() {
+                IntPtr? browserHandle = null;
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
-                        return p.MainWindowHandle;
+                        browserHandle = p.MainWindowHandle;
+                        break;
                     }
                 }
-                return null;
+                Debug.WriteLine("GetBrowserHandle()‚Ì–ß‚è’l: " + browserHandle);
+                return browserHandle;
             }
 
             private void HandleException(ProgressForm progressForm, Exception e) {
