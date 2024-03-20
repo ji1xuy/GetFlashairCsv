@@ -33,7 +33,7 @@ using AngleSharp.Text;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240318";
+        private const string WINDOW_TITLE = APPNAME + "_20240320";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"óv
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -1942,6 +1942,11 @@ namespace GetFlashairCsv {
                 //ç≈ëOñ Ç…
                 this.TopMost = true;
                 this.TopMost = false;
+
+                if (progressForm != null && progressForm.IsDisposed == false) {
+                    progressForm.TopMost = true;
+                    progressForm.TopMost = false;
+                }
             }
         }
 
