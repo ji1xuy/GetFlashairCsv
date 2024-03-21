@@ -33,7 +33,7 @@ using AngleSharp.Text;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240320";
+        private const string WINDOW_TITLE = APPNAME + "_20240321";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -206,7 +206,8 @@ namespace GetFlashairCsv {
                     return false;
                 }
                 if (response!.StatusCode != System.Net.HttpStatusCode.OK) {
-                    _mainForm.ShowErrorMessageBox(progressform, "CSVファイルをダウンロードでません");
+                    _mainForm.ShowErrorMessageBox(progressform, 
+                        "CSVファイルをダウンロードでません");
                     return false;
                 }
                 //保存
@@ -329,7 +330,8 @@ namespace GetFlashairCsv {
 
                     if (list.Count == 0) {
                         _mainForm.Invoke((MethodInvoker)(() => {
-                            _mainForm.ShowErrorMessageBox("CSVファイルが1つも見つかりませんでした\n" +
+                            _mainForm.ShowErrorMessageBox(progressForm, 
+                                "CSVファイルが1つも見つかりませんでした\n" +
                                 "指定したURLはFlashAirではない可能性があります");
                         }));
                         return false;
