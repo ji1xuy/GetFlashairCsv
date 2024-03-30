@@ -25,15 +25,11 @@ using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Office.CustomUI;
-using NPOI.SS.Formula.Functions;
-using System.Reflection.Metadata;
-using AngleSharp.Text;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240326";
+        private const string WINDOW_TITLE = APPNAME + "_20240330";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -161,9 +157,6 @@ namespace GetFlashairCsv {
             public void ReadUrlFromInifile() {
                 //iniファイルから設定を読み込む
                 int capacitySize = 256;
-                //StringBuilderクラス
-                //文字列の追加、置換、挿入を行うと、
-                //オブジェクトの内容が変更されるだけで新しいオブジェクトを作成しません
                 var sb = new StringBuilder(capacitySize);
                 var stringLength = GetPrivateProfileString(
                     APPNAME, INIFILE_KEY_URL, "", sb, Convert.ToUInt32(sb.Capacity),

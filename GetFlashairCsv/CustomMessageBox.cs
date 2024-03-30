@@ -1,6 +1,8 @@
+//引用元
 //メッセージボックスをオーナーフォームの中央に表示
 //https://qiita.com/Apeworks/items/263645a599f3ed73567e
-// メッセージボックスをオーナーウィンドウの中央位置に移動するコードを追加
+//修正
+//メッセージボックスをオーナーウィンドウの中央位置に移動するコードを追加
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -94,7 +96,7 @@ static class CustomMessageBox
             var y = rcOwner.Top + (rcOwner.Height - rcMsgBox.Height) / 2;
 
             // デスクトップに収まるように補正
-            Rectangle rcDeshtop = Screen.PrimaryScreen.WorkingArea;
+            var rcDeshtop = Screen.PrimaryScreen.WorkingArea;
             x = (x < rcDeshtop.Left) ? rcDeshtop.Left : x;
             y = (y < rcDeshtop.Top) ? rcDeshtop.Top : y;
             x = (x > (rcDeshtop.Right - rcMsgBox.Width))? (rcDeshtop.Right - rcMsgBox.Width) : x;
