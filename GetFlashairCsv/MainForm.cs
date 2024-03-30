@@ -33,7 +33,7 @@ using AngleSharp.Text;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240321";
+        private const string WINDOW_TITLE = APPNAME + "_20240326";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -244,23 +244,22 @@ namespace GetFlashairCsv {
                     var list = new List<string>();
                     IWebDriver? driver;
                     if (_mainForm.ChromeRadioButton.Checked) {
-                        // Webドライバーのインスタンス化
-                        ChromeDriverService? chromeService;
-                        ChromeOptions chromeOptions = new();
-                        chromeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
-                        //chromeService = ChromeDriverService.CreateDefaultService();
-                        //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
-                        //ドライバの起動場所に自動保存された場所を指定
-                        var driverVersion = new ChromeConfig().GetMatchingBrowserVersion();
-                        var driverPath = $"./Chrome/{driverVersion}/X64/";
-                        chromeService = ChromeDriverService.CreateDefaultService(driverPath);
-                        //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
-                        chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
-                        //chromeOptions.AddArgument("--headless");
-                        //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
-                        chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-
                         try {
+                            // Webドライバーのインスタンス化
+                            ChromeDriverService? chromeService;
+                            ChromeOptions chromeOptions = new();
+                            chromeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
+                            //chromeService = ChromeDriverService.CreateDefaultService();
+                            //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
+                            //ドライバの起動場所に自動保存された場所を指定
+                            var driverVersion = new ChromeConfig().GetMatchingBrowserVersion();
+                            var driverPath = $"./Chrome/{driverVersion}/X64/";
+                            chromeService = ChromeDriverService.CreateDefaultService(driverPath);
+                            //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
+                            chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
+                                                                          //chromeOptions.AddArgument("--headless");
+                                                                          //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
+                            chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
                             using (driver = new ChromeDriver(chromeService, chromeOptions)) {
                                 //Minimize()だとブラウザが一瞬表示されてしまう
                                 //driver.Manage().Window.Minimize();
@@ -284,29 +283,29 @@ namespace GetFlashairCsv {
                         }
                     }
                     if (_mainForm.EdgeRadioButton.Checked) {
-                        EdgeDriverService? edgeService;
-                        EdgeOptions edgeOptions = new();
-                        //edgeService = EdgeDriverService.CreateDefaultService();
-                        //ドライバの起動場所に自動保存された場所を指定
-                        var driverVersion = new EdgeConfig().GetMatchingBrowserVersion();
-                        var driverPath = $"./Edge/{driverVersion}/X64/";
-                        edgeService = EdgeDriverService.CreateDefaultService(driverPath);
-
-                        edgeService.HideCommandPromptWindow = true;
-                        //上の HideCommandPromptWindow = true でも
-                        //コマンドプロンプトが一瞬表示されるため
-                        //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
-                        //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
-                        edgeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
-                        //Microsoft Edge WebDriver を入れていなかったのが根本原因
-                        //Microsoft Edge WebDriver を入れて
-                        //HideCommandPromptWindow = true に戻した
-
-                        //edgeOptions.AddArgument("--headless");
-                        edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-                        //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
-                        //edgeOptions.AddArgument("--profile-directory=Default");
                         try {
+                            EdgeDriverService? edgeService;
+                            EdgeOptions edgeOptions = new();
+                            //edgeService = EdgeDriverService.CreateDefaultService();
+                            //ドライバの起動場所に自動保存された場所を指定
+                            var driverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                            var driverPath = $"./Edge/{driverVersion}/X64/";
+                            edgeService = EdgeDriverService.CreateDefaultService(driverPath);
+
+                            edgeService.HideCommandPromptWindow = true;
+                            //上の HideCommandPromptWindow = true でも
+                            //コマンドプロンプトが一瞬表示されるため
+                            //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
+                            //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
+                            edgeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
+                            //Microsoft Edge WebDriver を入れていなかったのが根本原因
+                            //Microsoft Edge WebDriver を入れて
+                            //HideCommandPromptWindow = true に戻した
+
+                            //edgeOptions.AddArgument("--headless");
+                            edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
+                            //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
+                            //edgeOptions.AddArgument("--profile-directory=Default");
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
                                 _mainForm.browserHandle = GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
