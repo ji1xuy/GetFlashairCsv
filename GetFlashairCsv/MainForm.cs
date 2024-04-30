@@ -29,7 +29,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240330";
+        private const string WINDOW_TITLE = APPNAME + "_20240430";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -447,6 +447,7 @@ namespace GetFlashairCsv {
             private void AbortButton_Click(object? sender, EventArgs e) {
                 //ブラウザを終了しGoToUrl()処理でエラーを発生させることで中断する
                 Debug.WriteLine("GoToUrl()処理中断中...");
+                this.abortButton.Enabled = false;
                 this.textLabel.Text = "中断中...";
                 /*
                 foreach (Process p in Process.GetProcesses()) {
