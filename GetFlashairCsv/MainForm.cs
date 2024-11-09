@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Application = System.Windows.Forms.Application;
 using System.Xml;
+using System.Net;
 
 //Nuget パッケージのインストール
 //Selenium.WebDriver
@@ -29,15 +30,6 @@ using DocumentFormat.OpenXml.Packaging;
 //using NPOI.SS.Formula.Functions;
 //using System.Reflection.Metadata;
 //using AngleSharp.Text;
-
-//引用元
-//[C#] ARP要求を送信してリモートPCのMACアドレスを取得する（SendARP関数）
-//https://hensa40.cutegirl.jp/archives/6689
-// using System.Runtime.InteropServices; が必要
-using System.Net;
-using System.Net.NetworkInformation;
-using DocumentFormat.OpenXml.ExtendedProperties;
-//using System.Runtime.InteropServices;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
@@ -2143,7 +2135,8 @@ namespace GetFlashairCsv {
             //IPアドレス検索処理
             //引用元
             //[C#] ARP要求を送信してリモートPCのMACアドレスを取得する（SendARP関数）
-            //https://hensa40.cutegirl.jp/archives/6689
+            //https://hensa40.cutegirl.jp/archives/6689//
+            //using System.Runtime.InteropServices; が必要
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
             findIpAddrForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
             findIpAddrForm.statusLabel.Text = "検索中...";
@@ -2182,7 +2175,6 @@ namespace GetFlashairCsv {
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
                     findIpAddrForm.MacAddrLabel.Text = dstPhyAddr;
-                    findIpAddrForm.Refresh();
                     if (dstPhyAddr == flashair.MacAddr) {
                         findIpAddrForm.statusLabel.Text = "FlashAirが見つかりました(^_^)";
                         findIpAddrForm.IpAddrLabel.ForeColor = System.Drawing.Color.White;
