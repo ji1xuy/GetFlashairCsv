@@ -126,7 +126,7 @@ namespace GetFlashairCsv {
         ・FlashAirのURL     キー: INIFILE_KEY_URLの値 / 値: http://xxx.xxx.xxx.xxx
         ・使用するブラウザ     キー: INIFILE_KEY_BROWSERの値 / 値: Chrome or Edge
         FlashAirの検索(iniファイルの直接編集のみ)
-        ・MACアドレス        キー:　INIFILE_KEY_MAC_ADDRの値 / 値: xx-xx-xx-xx-xx
+        ・MACアドレス        キー:　INIFILE_KEY_MAC_ADDRの値 / 値: xx-xx-xx-xx-xx-xx
         ・検索開始IPアドレス   キー:　INIFILE_KEY_START_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
         ・検索終了IPアドレス   キー:　INIFILE_KEY_END_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
         (検索開始IPアドレスと検索終了IPアドレスは同一セグメント内であること)
@@ -2185,7 +2185,7 @@ namespace GetFlashairCsv {
                 if (ret == 0) {
                     // ARP応答が返ってきた場合
                     string dstPhyAddr =
-                        string.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
+                        String.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
                     findFlashairForm.MacAddrLabel.Text = dstPhyAddr;
