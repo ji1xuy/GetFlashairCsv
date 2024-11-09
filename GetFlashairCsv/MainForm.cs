@@ -122,13 +122,13 @@ namespace GetFlashairCsv {
         /*
         GetFlashairCsv.iniによる設定方法
         各キーの名前は定数にて設定
-        FlashAirのCSVファイルダウンロード
-        ・FlashAirのURL     キー: INIFILE_KEY_URL             値: http://xxx.xxx.xxx.xxx
-        ・使用するブラウザ     キー: INIFILE_KEY_BROWSER         値: Chrome or Edge
-        FlashAirの検索条件設定方法
-        ・MACアドレス        キー:　INIFILE_KEY_MAC_ADDR        値: xx-xx-xx-xx-xx
-        ・検索開始IPアドレス   キー:　INIFILE_KEY_START_IP_ADDR   値: nnn.nnn.nnn.nnn
-        ・検索終了IPアドレス   キー:　INIFILE_KEY_END_IP_ADDR     値: nnn.nnn.nnn.nnn
+        FlashAirのCSVファイルのリスト更新(GUIで設定変更可能)
+        ・FlashAirのURL     キー: INIFILE_KEY_URLの値 / 値: http://xxx.xxx.xxx.xxx
+        ・使用するブラウザ     キー: INIFILE_KEY_BROWSERの値 / 値: Chrome or Edge
+        FlashAirの検索(iniファイルの直接編集のみ)
+        ・MACアドレス        キー:　INIFILE_KEY_MAC_ADDRの値 / 値: xx-xx-xx-xx-xx
+        ・検索開始IPアドレス   キー:　INIFILE_KEY_START_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
+        ・検索終了IPアドレス   キー:　INIFILE_KEY_END_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
         (検索開始IPアドレスと検索終了IPアドレスは同一セグメント内であること)
         */
 
