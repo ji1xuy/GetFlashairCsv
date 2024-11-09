@@ -10,8 +10,8 @@ using System.Windows.Forms;
 
 namespace GetFlashairCsv
 {
-    public partial class findFlashAirForm : Form {
-        public findFlashAirForm() {
+    public partial class FindFlashAirForm : Form {
+        public FindFlashAirForm() {
             InitializeComponent();
         }
     }

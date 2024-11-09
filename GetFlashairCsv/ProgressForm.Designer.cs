@@ -23,19 +23,19 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            progressBar = new ProgressBar();
+            ProgressBar = new ProgressBar();
             CsvLabel = new Label();
             ExcelLabel = new Label();
             textLabel = new Label();
-            abortButton = new Button();
+            AbortButton = new Button();
             SuspendLayout();
             // 
-            // progressBar
+            // ProgressBar
             // 
-            progressBar.Location = new Point(12, 82);
-            progressBar.Name = "progressBar";
-            progressBar.Size = new Size(272, 18);
-            progressBar.TabIndex = 2;
+            ProgressBar.Location = new Point(12, 82);
+            ProgressBar.Name = "ProgressBar";
+            ProgressBar.Size = new Size(272, 18);
+            ProgressBar.TabIndex = 2;
             // 
             // CsvLabel
             // 
@@ -61,27 +61,26 @@
             textLabel.TabIndex = 5;
             textLabel.Text = "処理中...";
             // 
-            // abortButton
+            // AbortButton
             // 
-            abortButton.Cursor = Cursors.Arrow;
-            abortButton.Enabled = false;
-            abortButton.Location = new Point(221, 23);
-            abortButton.Name = "abortButton";
-            abortButton.Size = new Size(63, 28);
-            abortButton.TabIndex = 6;
-            abortButton.Text = "中断";
-            abortButton.UseVisualStyleBackColor = true;
+            AbortButton.Enabled = false;
+            AbortButton.Location = new Point(221, 23);
+            AbortButton.Name = "AbortButton";
+            AbortButton.Size = new Size(63, 28);
+            AbortButton.TabIndex = 6;
+            AbortButton.Text = "中断";
+            AbortButton.UseVisualStyleBackColor = true;
             // 
             // ProgressForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(296, 112);
-            Controls.Add(abortButton);
+            Controls.Add(AbortButton);
             Controls.Add(textLabel);
             Controls.Add(ExcelLabel);
             Controls.Add(CsvLabel);
-            Controls.Add(progressBar);
+            Controls.Add(ProgressBar);
             Cursor = Cursors.WaitCursor;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
@@ -94,10 +93,10 @@
 
         #endregion
 
-        public ProgressBar progressBar;
+        public ProgressBar ProgressBar;
         public Label CsvLabel;
         public Label ExcelLabel;
         public Label textLabel;
-        public Button abortButton;
+        public Button AbortButton;
     }
 }

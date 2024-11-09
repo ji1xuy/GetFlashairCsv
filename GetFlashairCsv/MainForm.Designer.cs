@@ -49,7 +49,7 @@ namespace GetFlashairCsv
             label1 = new Label();
             groupBox3 = new GroupBox();
             groupBox4 = new GroupBox();
-            FindIpAddrButton = new Button();
+            FindIFlashAirButton = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -230,7 +230,7 @@ namespace GetFlashairCsv
             // 
             // groupBox4
             // 
-            groupBox4.Controls.Add(FindIpAddrButton);
+            groupBox4.Controls.Add(FindIFlashAirButton);
             groupBox4.Controls.Add(WriteInifileButton);
             groupBox4.Controls.Add(FlashairUrlTextBox);
             groupBox4.Location = new Point(9, 3);
@@ -240,15 +240,15 @@ namespace GetFlashairCsv
             groupBox4.TabStop = false;
             groupBox4.Text = "FlashAirのURL";
             // 
-            // FindIpAddrButton
+            // FindIFlashAirButton
             // 
-            FindIpAddrButton.Location = new Point(207, 11);
-            FindIpAddrButton.Name = "FindIpAddrButton";
-            FindIpAddrButton.Size = new Size(44, 43);
-            FindIpAddrButton.TabIndex = 2;
-            FindIpAddrButton.Text = "検索";
-            FindIpAddrButton.UseVisualStyleBackColor = true;
-            FindIpAddrButton.Click += FindFlashAirButton_Click;
+            FindIFlashAirButton.Location = new Point(207, 11);
+            FindIFlashAirButton.Name = "FindIFlashAirButton";
+            FindIFlashAirButton.Size = new Size(44, 43);
+            FindIFlashAirButton.TabIndex = 2;
+            FindIFlashAirButton.Text = "検索";
+            FindIFlashAirButton.UseVisualStyleBackColor = true;
+            FindIFlashAirButton.Click += FindFlashAirButton_Click;
             // 
             // MainForm
             // 
@@ -296,6 +296,6 @@ namespace GetFlashairCsv
         private RadioButton EdgeRadioButton;
         private RadioButton ChromeRadioButton;
         private Label label1;
-        private Button FindIpAddrButton;
+        private Button FindIFlashAirButton;
     }
 }

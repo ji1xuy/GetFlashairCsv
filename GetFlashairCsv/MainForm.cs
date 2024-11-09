@@ -69,7 +69,7 @@ namespace GetFlashairCsv {
         private ProgressForm? progressForm = null;
         private System.DateTime lastDateTime;
         private IntPtr? browserHandle = null;
-        private FindIpAddrForm? findIpAddrForm = null;
+        private FindFlashAirForm? findFlashAirForm = null;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault,
@@ -324,7 +324,7 @@ namespace GetFlashairCsv {
                                 //headlessモードではハンドルを取得できない
                                 _mainForm.browserHandle = GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
-                                    progressForm.abortButton.Enabled = true;
+                                    progressForm.AbortButton.Enabled = true;
                                 }));
                                 driver.Navigate().GoToUrl(_mainForm.flashair.Url);
                                 ReadOnlyCollection<IWebElement> elms =
@@ -367,7 +367,7 @@ namespace GetFlashairCsv {
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
                                 _mainForm.browserHandle = GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
-                                    progressForm.abortButton.Enabled = true;
+                                    progressForm.AbortButton.Enabled = true;
                                 }));
                                 driver.Navigate().GoToUrl(_mainForm.flashair.Url);
                                 ReadOnlyCollection<IWebElement> elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
@@ -486,14 +486,14 @@ namespace GetFlashairCsv {
                 RemoveMenu(systemMenu, 5, MF_BYPOSITION);
                 //閉じるボタンを無効化
                 RemoveMenu(systemMenu, SC_CLOSE, MF_BYCOMMAND);
-                this.abortButton.Click += AbortButton_Click;
+                this.AbortButton.Click += AbortButton_Click;
                 this.FormClosing += ProgressForm_FormClosing;
                 //表示位置の設定
                 Point point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
                 this.Text = caption;
-                this.progressBar.Style = progressBarStyle;
+                this.ProgressBar.Style = progressBarStyle;
                 //処理中フォームを表示
                 //.Show()でモードレス、.ShowDialog()でモーダル
                 this.Show();
@@ -549,13 +549,13 @@ namespace GetFlashairCsv {
                 } else {
                     value = (int)((position - StartPos) * 100 / (EndPos - StartPos));
                 }
-                if (value < this.progressBar.Minimum) {
+                if (value < this.ProgressBar.Minimum) {
                     return;
                 }
-                if (value > this.progressBar.Maximum) {
+                if (value > this.ProgressBar.Maximum) {
                     return;
                 }
-                this.progressBar.Value = value;
+                this.ProgressBar.Value = value;
                 this.CsvLabel.Text = "[CSV] " + EndPos + "バイト中、" + position + "バイト読込";
                 this.Update();
             }
@@ -2072,22 +2072,22 @@ namespace GetFlashairCsv {
             }
         }
 
-        private partial class FindIpAddrForm : GetFlashairCsv.findFlashAirForm {
+        private partial class FindFlashAirForm : GetFlashairCsv.FindFlashAirForm {
             private MainForm _mainForm;
-            private FindIpAddrForm _findIpAddrForm;
+            private FindFlashAirForm _findFlashAirForm;
 
-            public FindIpAddrForm(MainForm mainForm) {
+            public FindFlashAirForm(MainForm mainForm) {
                 _mainForm = mainForm;
-                _findIpAddrForm = this;
-                this.closeButton.Click += CloseButton_Click!;
-                this.applyButton.Click += ApplyButton_Click!;
+                _findFlashAirForm = this;
+                this.CloseButton.Click += CloseButton_Click!;
+                this.ApplyButton.Click += ApplyButton_Click!;
                 this.Show();
             }
 
             private void ApplyButton_Click(object sender, EventArgs e) {
                 //FlashAirのURLへ反映
                 _mainForm.Invoke((MethodInvoker)(() => {
-                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findIpAddrForm.ipAddrLabel.Text;
+                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findFlashAirForm.IpAddrLabel.Text;
                 }));
                 this.Close();
             }
@@ -2129,8 +2129,8 @@ namespace GetFlashairCsv {
             }
 
             //ダイアログボックス表示
-            findIpAddrForm = new FindIpAddrForm(this);
-            findIpAddrForm.applyButton.Enabled = false;
+            findFlashAirForm = new FindFlashAirForm(this);
+            findFlashAirForm.ApplyButton.Enabled = false;
 
             //IPアドレス検索処理
             //ソースコードの原型引用元
@@ -2138,8 +2138,8 @@ namespace GetFlashairCsv {
             //https://hensa40.cutegirl.jp/archives/6689//
             //using System.Runtime.InteropServices; が必要
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
-            findIpAddrForm.flashairMacAddrLabel.Text = flashair.MacAddr;
-            findIpAddrForm.statusLabel.Text = "検索中...";
+            findFlashAirForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
+            findFlashAirForm.StatusLabel.Text = "検索中...";
             for (int octet = Convert.ToInt32(startOctet[3]);
                 octet <= Convert.ToInt32(endOctet[3]); octet++) {
                 //待機中のイベントを処理する
@@ -2160,7 +2160,7 @@ namespace GetFlashairCsv {
                 int PhyAddrLen = pMacAddr.Length;
 
                 // ARPを送信
-                findIpAddrForm.ipAddrLabel.Text = dstIpAddr;
+                findFlashAirForm.IpAddrLabel.Text = dstIpAddr;
                 int ret;
                 try {
                     ret = SendARP(destAddr, 0, pMacAddr, ref PhyAddrLen);
@@ -2174,13 +2174,13 @@ namespace GetFlashairCsv {
                         string.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
-                    findIpAddrForm.macAddrLabel.Text = dstPhyAddr;
+                    findFlashAirForm.MacAddrLabel.Text = dstPhyAddr;
                     if (dstPhyAddr == flashair.MacAddr) {
-                        findIpAddrForm.statusLabel.Text = "FlashAirが見つかりました(^_^)";
-                        findIpAddrForm.ipAddrLabel.ForeColor = System.Drawing.Color.White;
-                        findIpAddrForm.ipAddrLabel.BackColor = System.Drawing.Color.Green;
-                        findIpAddrForm.applyButton.Enabled = true;
-                        findIpAddrForm.applyButton.Focus();
+                        findFlashAirForm.StatusLabel.Text = "FlashAirが見つかりました(^_^)";
+                        findFlashAirForm.IpAddrLabel.ForeColor = System.Drawing.Color.White;
+                        findFlashAirForm.IpAddrLabel.BackColor = System.Drawing.Color.Green;
+                        findFlashAirForm.ApplyButton.Enabled = true;
+                        findFlashAirForm.ApplyButton.Focus();
                         return;
                     }
                 } else {
@@ -2208,10 +2208,10 @@ namespace GetFlashairCsv {
                         sb,                                 //メッセージテキストが保存されるバッファへのポインタ
                         Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
                         0);
-                    findIpAddrForm.macAddrLabel.Text = sb.ToString();
+                    findFlashAirForm.MacAddrLabel.Text = sb.ToString();
                 }
             }
-            findIpAddrForm.statusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
+            findFlashAirForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
     }
 }
