@@ -27,26 +27,26 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            FlashairMacAddrLabel = new Label();
+            flashairMacAddrLabel = new Label();
             applyButton = new Button();
             closeButton = new Button();
-            IpAddrLabel = new Label();
+            ipAddrLabel = new Label();
             text2Label = new Label();
-            MacAddrLabel = new Label();
+            macAddrLabel = new Label();
             text3Label = new Label();
             statusLabel = new Label();
             text1Label = new Label();
             SuspendLayout();
             // 
-            // FlashairMacAddrLabel
+            // flashairMacAddrLabel
             // 
-            FlashairMacAddrLabel.AutoSize = true;
-            FlashairMacAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            FlashairMacAddrLabel.Location = new Point(150, 9);
-            FlashairMacAddrLabel.Name = "FlashairMacAddrLabel";
-            FlashairMacAddrLabel.Size = new Size(12, 15);
-            FlashairMacAddrLabel.TabIndex = 0;
-            FlashairMacAddrLabel.Text = "-";
+            flashairMacAddrLabel.AutoSize = true;
+            flashairMacAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            flashairMacAddrLabel.Location = new Point(150, 9);
+            flashairMacAddrLabel.Name = "flashairMacAddrLabel";
+            flashairMacAddrLabel.Size = new Size(12, 15);
+            flashairMacAddrLabel.TabIndex = 0;
+            flashairMacAddrLabel.Text = "-";
             // 
             // applyButton
             // 
@@ -66,15 +66,15 @@
             closeButton.Text = "閉じる";
             closeButton.UseVisualStyleBackColor = true;
             // 
-            // IpAddrLabel
+            // ipAddrLabel
             // 
-            IpAddrLabel.AutoSize = true;
-            IpAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            IpAddrLabel.Location = new Point(150, 24);
-            IpAddrLabel.Name = "IpAddrLabel";
-            IpAddrLabel.Size = new Size(12, 15);
-            IpAddrLabel.TabIndex = 3;
-            IpAddrLabel.Text = "-";
+            ipAddrLabel.AutoSize = true;
+            ipAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            ipAddrLabel.Location = new Point(150, 24);
+            ipAddrLabel.Name = "ipAddrLabel";
+            ipAddrLabel.Size = new Size(12, 15);
+            ipAddrLabel.TabIndex = 3;
+            ipAddrLabel.Text = "-";
             // 
             // text2Label
             // 
@@ -86,15 +86,15 @@
             text2Label.TabIndex = 4;
             text2Label.Text = "IPアドレス";
             // 
-            // MacAddrLabel
+            // macAddrLabel
             // 
-            MacAddrLabel.AutoSize = true;
-            MacAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            MacAddrLabel.Location = new Point(150, 39);
-            MacAddrLabel.Name = "MacAddrLabel";
-            MacAddrLabel.Size = new Size(12, 15);
-            MacAddrLabel.TabIndex = 4;
-            MacAddrLabel.Text = "-";
+            macAddrLabel.AutoSize = true;
+            macAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            macAddrLabel.Location = new Point(150, 39);
+            macAddrLabel.Name = "macAddrLabel";
+            macAddrLabel.Size = new Size(12, 15);
+            macAddrLabel.TabIndex = 4;
+            macAddrLabel.Text = "-";
             // 
             // text3Label
             // 
@@ -132,13 +132,13 @@
             ClientSize = new Size(368, 109);
             Controls.Add(text1Label);
             Controls.Add(statusLabel);
-            Controls.Add(MacAddrLabel);
+            Controls.Add(macAddrLabel);
             Controls.Add(text3Label);
             Controls.Add(text2Label);
-            Controls.Add(IpAddrLabel);
+            Controls.Add(ipAddrLabel);
             Controls.Add(closeButton);
             Controls.Add(applyButton);
-            Controls.Add(FlashairMacAddrLabel);
+            Controls.Add(flashairMacAddrLabel);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FindIpAddrForm";
@@ -149,12 +149,12 @@
 
         #endregion
 
-        public Label FlashairMacAddrLabel;
+        public Label flashairMacAddrLabel;
         public Button applyButton;
         public Button closeButton;
-        public Label IpAddrLabel;
+        public Label ipAddrLabel;
         private Label text2Label;
-        public Label MacAddrLabel;
+        public Label macAddrLabel;
         private Label text3Label;
         public Label statusLabel;
         private Label text1Label;

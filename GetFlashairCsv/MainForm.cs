@@ -2087,7 +2087,7 @@ namespace GetFlashairCsv {
             private void ApplyButton_Click(object sender, EventArgs e) {
                 //FlashAirのURLへ反映
                 _mainForm.Invoke((MethodInvoker)(() => {
-                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findIpAddrForm.IpAddrLabel.Text;
+                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findIpAddrForm.ipAddrLabel.Text;
                 }));
                 this.Close();
             }
@@ -2138,7 +2138,7 @@ namespace GetFlashairCsv {
             //https://hensa40.cutegirl.jp/archives/6689//
             //using System.Runtime.InteropServices; が必要
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
-            findIpAddrForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
+            findIpAddrForm.flashairMacAddrLabel.Text = flashair.MacAddr;
             findIpAddrForm.statusLabel.Text = "検索中...";
             for (int octet = Convert.ToInt32(startOctet[3]);
                 octet <= Convert.ToInt32(endOctet[3]); octet++) {
@@ -2160,7 +2160,7 @@ namespace GetFlashairCsv {
                 int PhyAddrLen = pMacAddr.Length;
 
                 // ARPを送信
-                findIpAddrForm.IpAddrLabel.Text = dstIpAddr;
+                findIpAddrForm.ipAddrLabel.Text = dstIpAddr;
                 int ret;
                 try {
                     ret = SendARP(destAddr, 0, pMacAddr, ref PhyAddrLen);
@@ -2174,11 +2174,11 @@ namespace GetFlashairCsv {
                         string.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
-                    findIpAddrForm.MacAddrLabel.Text = dstPhyAddr;
+                    findIpAddrForm.macAddrLabel.Text = dstPhyAddr;
                     if (dstPhyAddr == flashair.MacAddr) {
                         findIpAddrForm.statusLabel.Text = "FlashAirが見つかりました(^_^)";
-                        findIpAddrForm.IpAddrLabel.ForeColor = System.Drawing.Color.White;
-                        findIpAddrForm.IpAddrLabel.BackColor = System.Drawing.Color.Green;
+                        findIpAddrForm.ipAddrLabel.ForeColor = System.Drawing.Color.White;
+                        findIpAddrForm.ipAddrLabel.BackColor = System.Drawing.Color.Green;
                         findIpAddrForm.applyButton.Enabled = true;
                         findIpAddrForm.applyButton.Focus();
                         return;
@@ -2208,7 +2208,7 @@ namespace GetFlashairCsv {
                         sb,                                 //メッセージテキストが保存されるバッファへのポインタ
                         Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
                         0);
-                    findIpAddrForm.MacAddrLabel.Text = sb.ToString();
+                    findIpAddrForm.macAddrLabel.Text = sb.ToString();
                 }
             }
             findIpAddrForm.statusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
