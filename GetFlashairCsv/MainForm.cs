@@ -69,7 +69,7 @@ namespace GetFlashairCsv {
         private ProgressForm? progressForm = null;
         private System.DateTime lastDateTime;
         private IntPtr? browserHandle = null;
-        private FindFlashAirForm? findFlashAirForm = null;
+        private FindFlashairForm? findFlashairForm = null;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault,
@@ -118,6 +118,20 @@ namespace GetFlashairCsv {
         [DllImport("kernel32.dll", EntryPoint = "FormatMessageA")]
         private static extern int FormatMessage(uint dwFlags, long lpSource, int dwMessageId,
             int dwLanguageId, StringBuilder lpBuffer, uint nSize, long Arguments);
+
+        /*
+        GetFlashairCsv.iniによる設定方法
+        各キーの名前は定数にて設定
+        FlashAirのCSVファイルダウンロード
+        ・FlashAirのURL     キー: INIFILE_KEY_URL             値: http://xxx.xxx.xxx.xxx
+        ・使用するブラウザ     キー: INIFILE_KEY_BROWSER         値: Chrome or Edge
+        FlashAirの検索条件設定方法
+        ・MACアドレス        キー:　INIFILE_KEY_MAC_ADDR        値: xx-xx-xx-xx-xx
+        ・検索開始IPアドレス   キー:　INIFILE_KEY_START_IP_ADDR   値: nnn.nnn.nnn.nnn
+        ・検索終了IPアドレス   キー:　INIFILE_KEY_END_IP_ADDR     値: nnn.nnn.nnn.nnn
+        (検索開始IPアドレスと検索終了IPアドレスは同一セグメント内であること)
+        */
+
         public MainForm() {
             InitializeComponent();
             mainForm = this;
@@ -2072,13 +2086,13 @@ namespace GetFlashairCsv {
             }
         }
 
-        private partial class FindFlashAirForm : GetFlashairCsv.FindFlashAirForm {
+        private partial class FindFlashairForm : GetFlashairCsv.FindFlashairForm {
             private MainForm _mainForm;
-            private FindFlashAirForm _findFlashAirForm;
+            private FindFlashairForm _findFlashairForm;
 
-            public FindFlashAirForm(MainForm mainForm) {
+            public FindFlashairForm(MainForm mainForm) {
                 _mainForm = mainForm;
-                _findFlashAirForm = this;
+                _findFlashairForm = this;
                 this.CloseButton.Click += CloseButton_Click!;
                 this.ApplyButton.Click += ApplyButton_Click!;
                 this.Show();
@@ -2087,7 +2101,7 @@ namespace GetFlashairCsv {
             private void ApplyButton_Click(object sender, EventArgs e) {
                 //FlashAirのURLへ反映
                 _mainForm.Invoke((MethodInvoker)(() => {
-                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findFlashAirForm.IpAddrLabel.Text;
+                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findFlashairForm.IpAddrLabel.Text;
                 }));
                 this.Close();
             }
@@ -2097,7 +2111,7 @@ namespace GetFlashairCsv {
             }
         }
 
-        private void FindFlashAirButton_Click(object sender, EventArgs e) {
+        private void FindFlashairButton_Click(object sender, EventArgs e) {
             flashair.ReadMacAddrFromInifile();
             if (flashair.MacAddr == "") {
                 ShowErrorMessageBox("FlashAirのMACアドレスの指定が無効です");
@@ -2129,8 +2143,8 @@ namespace GetFlashairCsv {
             }
 
             //ダイアログボックス表示
-            findFlashAirForm = new FindFlashAirForm(this);
-            findFlashAirForm.ApplyButton.Enabled = false;
+            findFlashairForm = new FindFlashairForm(this);
+            findFlashairForm.ApplyButton.Enabled = false;
 
             //IPアドレス検索処理
             //ソースコードの原型引用元
@@ -2138,8 +2152,8 @@ namespace GetFlashairCsv {
             //https://hensa40.cutegirl.jp/archives/6689//
             //using System.Runtime.InteropServices; が必要
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
-            findFlashAirForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
-            findFlashAirForm.StatusLabel.Text = "検索中...";
+            findFlashairForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
+            findFlashairForm.StatusLabel.Text = "検索中...";
             for (int octet = Convert.ToInt32(startOctet[3]);
                 octet <= Convert.ToInt32(endOctet[3]); octet++) {
                 //待機中のイベントを処理する
@@ -2160,7 +2174,7 @@ namespace GetFlashairCsv {
                 int PhyAddrLen = pMacAddr.Length;
 
                 // ARPを送信
-                findFlashAirForm.IpAddrLabel.Text = dstIpAddr;
+                findFlashairForm.IpAddrLabel.Text = dstIpAddr;
                 int ret;
                 try {
                     ret = SendARP(destAddr, 0, pMacAddr, ref PhyAddrLen);
@@ -2174,13 +2188,13 @@ namespace GetFlashairCsv {
                         string.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
-                    findFlashAirForm.MacAddrLabel.Text = dstPhyAddr;
+                    findFlashairForm.MacAddrLabel.Text = dstPhyAddr;
                     if (dstPhyAddr == flashair.MacAddr) {
-                        findFlashAirForm.StatusLabel.Text = "FlashAirが見つかりました(^_^)";
-                        findFlashAirForm.IpAddrLabel.ForeColor = System.Drawing.Color.White;
-                        findFlashAirForm.IpAddrLabel.BackColor = System.Drawing.Color.Green;
-                        findFlashAirForm.ApplyButton.Enabled = true;
-                        findFlashAirForm.ApplyButton.Focus();
+                        findFlashairForm.StatusLabel.Text = "FlashAirが見つかりました(^_^)";
+                        findFlashairForm.IpAddrLabel.ForeColor = System.Drawing.Color.White;
+                        findFlashairForm.IpAddrLabel.BackColor = System.Drawing.Color.Green;
+                        findFlashairForm.ApplyButton.Enabled = true;
+                        findFlashairForm.ApplyButton.Focus();
                         return;
                     }
                 } else {
@@ -2208,10 +2222,10 @@ namespace GetFlashairCsv {
                         sb,                                 //メッセージテキストが保存されるバッファへのポインタ
                         Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
                         0);
-                    findFlashAirForm.MacAddrLabel.Text = sb.ToString();
+                    findFlashairForm.MacAddrLabel.Text = sb.ToString();
                 }
             }
-            findFlashAirForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
+            findFlashairForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
     }
 }
