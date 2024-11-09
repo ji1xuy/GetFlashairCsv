@@ -2133,7 +2133,7 @@ namespace GetFlashairCsv {
             findIpAddrForm.applyButton.Enabled = false;
 
             //IPアドレス検索処理
-            //引用元
+            //ソースコードの原型引用元
             //[C#] ARP要求を送信してリモートPCのMACアドレスを取得する（SendARP関数）
             //https://hensa40.cutegirl.jp/archives/6689//
             //using System.Runtime.InteropServices; が必要
