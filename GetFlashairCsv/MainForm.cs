@@ -2071,7 +2071,7 @@ namespace GetFlashairCsv {
                     EdgeRadioButton.Text, INIFILE_FILENAME);
             }
         }
-        
+
         private partial class FindIpAddrForm : GetFlashairCsv.FindIpAddrForm {
             private MainForm _mainForm;
             private FindIpAddrForm _findIpAddrForm;
@@ -2096,7 +2096,7 @@ namespace GetFlashairCsv {
                 this.Close();
             }
         }
-        
+
         private void FindIpAddrButton_Click(object sender, EventArgs e) {
             flashair.ReadMacAddrFromInifile();
             if (flashair.MacAddr == "") {
@@ -2140,13 +2140,13 @@ namespace GetFlashairCsv {
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
             findIpAddrForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
             findIpAddrForm.statusLabel.Text = "検索中...";
-            for (int octet = Convert.ToInt32(startOctet[3]); 
+            for (int octet = Convert.ToInt32(startOctet[3]);
                 octet <= Convert.ToInt32(endOctet[3]); octet++) {
                 //待機中のイベントを処理する
                 Application.DoEvents();
 
-                dstIpAddr = String.Format("{0}.{1}.{2}.{3}", 
-                    startOctet[0], startOctet[1], startOctet[2],octet.ToString());
+                dstIpAddr = String.Format("{0}.{1}.{2}.{3}",
+                    startOctet[0], startOctet[1], startOctet[2], octet.ToString());
 
                 // 文字列（IPアドレス）からIPAddressクラスに変換
                 IPAddress dest = IPAddress.Parse(dstIpAddr);
@@ -2164,13 +2164,13 @@ namespace GetFlashairCsv {
                 int ret;
                 try {
                     ret = SendARP(destAddr, 0, pMacAddr, ref PhyAddrLen);
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     ShowErrorMessageBox(ex);
                     return;
                 }
                 if (ret == 0) {
                     // ARP応答が返ってきた場合
-                    string dstPhyAddr = 
+                    string dstPhyAddr =
                         string.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
@@ -2183,33 +2183,32 @@ namespace GetFlashairCsv {
                         findIpAddrForm.applyButton.Focus();
                         return;
                     }
-                } else {
-                    // エラーコードを出力
-                    //const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
-                    //const uint FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x2000;
-                    //const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
-                    //const uint FORMAT_MESSAGE_FROM_STRING = 0x400;
-                    const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
-                    const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
-                    //const uint FORMAT_MESSAGE_MAX_WIDTH_MASK = 0xFF;
-                    const ushort LANG_NEUTRAL = 0;
-                    const ushort SUBLANG_DEFAULT = 1;
-
-                    int langId = (SUBLANG_DEFAULT << 10) | LANG_NEUTRAL;
-                    int capacitySize = 256;
-                    var sb = new StringBuilder(capacitySize);
-                    FormatMessage(
-                        //FORMAT_MESSAGE_ALLOCATE_BUFFER |  //テキストのメモリ割り当てを要求する
-                        FORMAT_MESSAGE_FROM_SYSTEM |        //エラーメッセージはWindowsが用意しているものを使用
-                        FORMAT_MESSAGE_IGNORE_INSERTS,      //次の引数を無視してエラーコードに対するエラーメッセージを作成する
-                        0, 
-                        ret,                                //エラーコード
-                        langId,                             //言語を指定
-                        sb,                                 //メッセージテキストが保存されるバッファへのポインタ
-                        Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
-                        0);
-                    findIpAddrForm.MacAddrLabel.Text = sb.ToString();
                 }
+                // エラーコードを出力
+                //const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
+                //const uint FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x2000;
+                //const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
+                //const uint FORMAT_MESSAGE_FROM_STRING = 0x400;
+                const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
+                const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
+                //const uint FORMAT_MESSAGE_MAX_WIDTH_MASK = 0xFF;
+                const ushort LANG_NEUTRAL = 0;
+                const ushort SUBLANG_DEFAULT = 1;
+
+                int langId = (SUBLANG_DEFAULT << 10) | LANG_NEUTRAL;
+                int capacitySize = 256;
+                var sb = new StringBuilder(capacitySize);
+                FormatMessage(
+                    //FORMAT_MESSAGE_ALLOCATE_BUFFER |  //テキストのメモリ割り当てを要求する
+                    FORMAT_MESSAGE_FROM_SYSTEM |        //エラーメッセージはWindowsが用意しているものを使用
+                    FORMAT_MESSAGE_IGNORE_INSERTS,      //次の引数を無視してエラーコードに対するエラーメッセージを作成する
+                    0,
+                    ret,                                //エラーコード
+                    langId,                             //言語を指定
+                    sb,                                 //メッセージテキストが保存されるバッファへのポインタ
+                    Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
+                    0);
+                findIpAddrForm.MacAddrLabel.Text = sb.ToString();
             }
             findIpAddrForm.statusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
