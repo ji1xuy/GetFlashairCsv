@@ -1,7 +1,9 @@
 ﻿using System.Text;
 
-namespace GetFlashairCsv {
-    partial class MainForm {
+namespace GetFlashairCsv
+{
+    partial class MainForm
+    {
         /// <summary>
         ///  Required designer variable.
         /// </summary>
@@ -11,8 +13,10 @@ namespace GetFlashairCsv {
         ///  Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -45,6 +49,7 @@ namespace GetFlashairCsv {
             label1 = new Label();
             groupBox3 = new GroupBox();
             groupBox4 = new GroupBox();
+            FindIpAddrButton = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -56,7 +61,7 @@ namespace GetFlashairCsv {
             FlashairUrlTextBox.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             FlashairUrlTextBox.Location = new Point(9, 22);
             FlashairUrlTextBox.Name = "FlashairUrlTextBox";
-            FlashairUrlTextBox.Size = new Size(230, 23);
+            FlashairUrlTextBox.Size = new Size(192, 23);
             FlashairUrlTextBox.TabIndex = 0;
             // 
             // WriteInifileButton
@@ -225,6 +230,7 @@ namespace GetFlashairCsv {
             // 
             // groupBox4
             // 
+            groupBox4.Controls.Add(FindIpAddrButton);
             groupBox4.Controls.Add(WriteInifileButton);
             groupBox4.Controls.Add(FlashairUrlTextBox);
             groupBox4.Location = new Point(9, 3);
@@ -233,6 +239,16 @@ namespace GetFlashairCsv {
             groupBox4.TabIndex = 4;
             groupBox4.TabStop = false;
             groupBox4.Text = "FlashAirのURL";
+            // 
+            // FindIpAddrButton
+            // 
+            FindIpAddrButton.Location = new Point(207, 11);
+            FindIpAddrButton.Name = "FindIpAddrButton";
+            FindIpAddrButton.Size = new Size(44, 43);
+            FindIpAddrButton.TabIndex = 2;
+            FindIpAddrButton.Text = "検索";
+            FindIpAddrButton.UseVisualStyleBackColor = true;
+            FindIpAddrButton.Click += FindIPaddressButton_Click;
             // 
             // MainForm
             // 
@@ -261,7 +277,7 @@ namespace GetFlashairCsv {
         }
 
         #endregion
-        private TextBox FlashairUrlTextBox;
+        public TextBox FlashairUrlTextBox;
         private Button WriteInifileButton;
         private Button UpdateCsvFileListButton;
         private Button WriteExcelButton;
@@ -280,5 +296,6 @@ namespace GetFlashairCsv {
         private RadioButton EdgeRadioButton;
         private RadioButton ChromeRadioButton;
         private Label label1;
+        private Button FindIpAddrButton;
     }
 }

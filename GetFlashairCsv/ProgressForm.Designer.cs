@@ -94,7 +94,6 @@
 
         #endregion
 
-        //public Label label1;
         public ProgressBar progressBar;
         public Label CsvLabel;
         public Label ExcelLabel;

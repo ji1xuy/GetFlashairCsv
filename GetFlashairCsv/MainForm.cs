@@ -25,14 +25,29 @@ using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Office.CustomUI;
+using NPOI.SS.Formula.Functions;
+using System.Reflection.Metadata;
+using AngleSharp.Text;
+
+//https://hensa40.cutegirl.jp/archives/6689
+// using System.Runtime.InteropServices; が必要
+using System.Net;
+using System.Net.NetworkInformation;
+using DocumentFormat.OpenXml.ExtendedProperties;
+//using System.Runtime.InteropServices;
 
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20240430";
+        private const string WINDOW_TITLE = APPNAME + "_20241109";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
+        private const string PROTOCOL = "http://";
+        private const string INIFILE_KEY_MAC_ADDR = "macAddr";
+        private const string INIFILE_KEY_START_IP_ADDR = "startIpAddr";
+        private const string INIFILE_KEY_END_IP_ADDR = "endIpAddr";
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
         private const string EXCEL_TABLENAME = "テーブル1";
@@ -60,6 +75,7 @@ namespace GetFlashairCsv {
         private ProgressForm? progressForm = null;
         private System.DateTime lastDateTime;
         private IntPtr? browserHandle = null;
+        private FindIpAddrForm? findIpAddrForm = null;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault,
@@ -102,6 +118,12 @@ namespace GetFlashairCsv {
         [DllImport("user32.dll", EntryPoint = "SendMessageA")]
         extern static int SendMessage(IntPtr hwnd, int msg, int wParam, int lParam);
 
+        [DllImport("iphlpapi.dll", ExactSpelling = true)]
+        private static extern int SendARP(int DestIP, int SrcIp, byte[] pMacAddr, ref int PhyAddrLen);
+
+        [DllImport("kernel32.dll", EntryPoint = "FormatMessageA")]
+        private static extern int FormatMessage(uint dwFlags, long lpSource, int dwMessageId,
+            int dwLanguageId, StringBuilder lpBuffer, uint nSize, long Arguments);
         public MainForm() {
             InitializeComponent();
             mainForm = this;
@@ -136,13 +158,19 @@ namespace GetFlashairCsv {
 
             public Flashair(MainForm mainForm) {
                 _mainForm = mainForm;
-                _mainForm.FlashairUrlTextBox.Text = "http://";
+                _mainForm.FlashairUrlTextBox.Text = PROTOCOL;
             }
 
             public string? Url {
                 get { return _mainForm.FlashairUrlTextBox.Text; }
                 private set { _mainForm.FlashairUrlTextBox.Text = value; }
             }
+
+            public string? MacAddr { get; private set; }
+
+            public string? StartIpAddr { get; private set; }
+
+            public string? EndIpAddr { get; private set; }
 
             public void WriteUrlToInifile() {
                 if (WritePrivateProfileString(APPNAME, INIFILE_KEY_URL,
@@ -154,14 +182,56 @@ namespace GetFlashairCsv {
                 }
             }
 
-            public void ReadUrlFromInifile() {
+            public void ReadMacAddrFromInifile() {
                 //iniファイルから設定を読み込む
+                int capacitySize = 256;
+                //StringBuilderクラス
+                //文字列の追加、置換、挿入を行うと、
+                //オブジェクトの内容が変更されるだけで新しいオブジェクトを作成しません
+                var sb = new StringBuilder(capacitySize);
+                var stringLength = GetPrivateProfileString(
+                    APPNAME, INIFILE_KEY_MAC_ADDR, "", sb, Convert.ToUInt32(sb.Capacity),
+                    INIFILE_FILENAME);
+                //FLashAirのURL をラベルに表示
+                if (stringLength > 0) {
+                    MacAddr = sb.ToString();
+                } else {
+                    MacAddr = "";
+                }
+            }
+
+            public void ReadStartIpAddrFromInifile() {
+                int capacitySize = 256;
+                var sb = new StringBuilder(capacitySize);
+                var stringLength = GetPrivateProfileString(
+                    APPNAME, INIFILE_KEY_START_IP_ADDR, "", sb, Convert.ToUInt32(sb.Capacity),
+                    INIFILE_FILENAME);
+                if (stringLength > 0) {
+                    StartIpAddr = sb.ToString();
+                } else {
+                    StartIpAddr = "";
+                }
+            }
+
+            public void ReadEndIpAddrFromInifile() {
+                int capacitySize = 256;
+                var sb = new StringBuilder(capacitySize);
+                var stringLength = GetPrivateProfileString(
+                    APPNAME, INIFILE_KEY_END_IP_ADDR, "", sb, Convert.ToUInt32(sb.Capacity),
+                    INIFILE_FILENAME);
+                if (stringLength > 0) {
+                    EndIpAddr = sb.ToString();
+                } else {
+                    EndIpAddr = "";
+                }
+            }
+
+            public void ReadUrlFromInifile() {
                 int capacitySize = 256;
                 var sb = new StringBuilder(capacitySize);
                 var stringLength = GetPrivateProfileString(
                     APPNAME, INIFILE_KEY_URL, "", sb, Convert.ToUInt32(sb.Capacity),
                     INIFILE_FILENAME);
-                //FLashAirのURL をラベルに表示
                 if (stringLength > 0) {
                     _mainForm.FlashairUrlTextBox.Text = sb.ToString();
                 }
@@ -199,7 +269,7 @@ namespace GetFlashairCsv {
                     return false;
                 }
                 if (response!.StatusCode != System.Net.HttpStatusCode.OK) {
-                    _mainForm.ShowErrorMessageBox(progressform, 
+                    _mainForm.ShowErrorMessageBox(progressform,
                         "CSVファイルをダウンロードでません");
                     return false;
                 }
@@ -237,22 +307,23 @@ namespace GetFlashairCsv {
                     var list = new List<string>();
                     IWebDriver? driver;
                     if (_mainForm.ChromeRadioButton.Checked) {
+                        // Webドライバーのインスタンス化
+                        ChromeDriverService? chromeService;
+                        ChromeOptions chromeOptions = new();
+                        chromeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
+                        //chromeService = ChromeDriverService.CreateDefaultService();
+                        //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
+                        //ドライバの起動場所に自動保存された場所を指定
+                        var driverVersion = new ChromeConfig().GetMatchingBrowserVersion();
+                        var driverPath = $"./Chrome/{driverVersion}/X64/";
+                        chromeService = ChromeDriverService.CreateDefaultService(driverPath);
+                        //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
+                        chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
+                        //chromeOptions.AddArgument("--headless");
+                        //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
+                        chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
+
                         try {
-                            // Webドライバーのインスタンス化
-                            ChromeDriverService? chromeService;
-                            ChromeOptions chromeOptions = new();
-                            chromeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
-                            //chromeService = ChromeDriverService.CreateDefaultService();
-                            //chromeService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
-                            //ドライバの起動場所に自動保存された場所を指定
-                            var driverVersion = new ChromeConfig().GetMatchingBrowserVersion();
-                            var driverPath = $"./Chrome/{driverVersion}/X64/";
-                            chromeService = ChromeDriverService.CreateDefaultService(driverPath);
-                            //chromeService.SuppressInitialDiagnosticInformation = true; //診断出力抑制
-                            chromeService.HideCommandPromptWindow = true; //コマンドプロンプト画面非表示
-                                                                          //chromeOptions.AddArgument("--headless");
-                                                                          //Normal: complete(すべてのリソースをダウンロードするのを待ちます)
-                            chromeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
                             using (driver = new ChromeDriver(chromeService, chromeOptions)) {
                                 //Minimize()だとブラウザが一瞬表示されてしまう
                                 //driver.Manage().Window.Minimize();
@@ -276,29 +347,29 @@ namespace GetFlashairCsv {
                         }
                     }
                     if (_mainForm.EdgeRadioButton.Checked) {
+                        EdgeDriverService? edgeService;
+                        EdgeOptions edgeOptions = new();
+                        //edgeService = EdgeDriverService.CreateDefaultService();
+                        //ドライバの起動場所に自動保存された場所を指定
+                        var driverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                        var driverPath = $"./Edge/{driverVersion}/X64/";
+                        edgeService = EdgeDriverService.CreateDefaultService(driverPath);
+
+                        edgeService.HideCommandPromptWindow = true;
+                        //上の HideCommandPromptWindow = true でも
+                        //コマンドプロンプトが一瞬表示されるため
+                        //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
+                        //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
+                        edgeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
+                        //Microsoft Edge WebDriver を入れていなかったのが根本原因
+                        //Microsoft Edge WebDriver を入れて
+                        //HideCommandPromptWindow = true に戻した
+
+                        //edgeOptions.AddArgument("--headless");
+                        edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
+                        //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
+                        //edgeOptions.AddArgument("--profile-directory=Default");
                         try {
-                            EdgeDriverService? edgeService;
-                            EdgeOptions edgeOptions = new();
-                            //edgeService = EdgeDriverService.CreateDefaultService();
-                            //ドライバの起動場所に自動保存された場所を指定
-                            var driverVersion = new EdgeConfig().GetMatchingBrowserVersion();
-                            var driverPath = $"./Edge/{driverVersion}/X64/";
-                            edgeService = EdgeDriverService.CreateDefaultService(driverPath);
-
-                            edgeService.HideCommandPromptWindow = true;
-                            //上の HideCommandPromptWindow = true でも
-                            //コマンドプロンプトが一瞬表示されるため
-                            //下の方法(2つ目のAnswer)に変えて無理やり画面外に表示させるようにした
-                            //https://stackoverflow.com/questions/35818436/hide-silence-chromedriver-window
-                            edgeOptions.AddArgument("--window-position=" + OUT_OF_SCREEN + "," + OUT_OF_SCREEN);
-                            //Microsoft Edge WebDriver を入れていなかったのが根本原因
-                            //Microsoft Edge WebDriver を入れて
-                            //HideCommandPromptWindow = true に戻した
-
-                            //edgeOptions.AddArgument("--headless");
-                            edgeOptions.PageLoadStrategy = PageLoadStrategy.Normal;
-                            //edgeOptions.AddArgument("--user-data-dir=C:\\Users\\aida0\\AppData\\Local\\Microsoft\\Edge\\User Data");
-                            //edgeOptions.AddArgument("--profile-directory=Default");
                             using (driver = new EdgeDriver(edgeService, edgeOptions)) {
                                 _mainForm.browserHandle = GetBrowserHandle();
                                 progressForm.Invoke((MethodInvoker)(() => {
@@ -322,7 +393,7 @@ namespace GetFlashairCsv {
 
                     if (list.Count == 0) {
                         _mainForm.Invoke((MethodInvoker)(() => {
-                            _mainForm.ShowErrorMessageBox(progressForm, 
+                            _mainForm.ShowErrorMessageBox(progressForm,
                                 "CSVファイルが1つも見つかりませんでした\n" +
                                 "指定したURLはFlashAirではない可能性があります");
                         }));
@@ -361,7 +432,7 @@ namespace GetFlashairCsv {
             private IntPtr? GetBrowserHandle() {
                 IntPtr? browserHandle = null;
                 foreach (Process p in Process.GetProcesses()) {
-                    if (p.MainWindowTitle.IndexOf("data:,") >= 0) {
+                    if (p.MainWindowTitle.Contains("data:,") == true) {
                         browserHandle = p.MainWindowHandle;
                         break;
                     }
@@ -374,10 +445,10 @@ namespace GetFlashairCsv {
                 switch (e) {
                     case InvalidOperationException:
                         _mainForm.Invoke((MethodInvoker)(() => {
-                        _mainForm.ShowErrorMessageBox(
-                            progressForm,
-                            "ブラウザを操作できませんでした\n" +
-                            "Selenium.WebDriverとブラウザのバージョンが一致しているか確認してください");
+                            _mainForm.ShowErrorMessageBox(
+                                progressForm,
+                                "ブラウザを操作できませんでした\n" +
+                                "Selenium.WebDriverとブラウザのバージョンが一致しているか確認してください");
                         }));
                         break;
                     case NoSuchWindowException:
@@ -447,7 +518,6 @@ namespace GetFlashairCsv {
             private void AbortButton_Click(object? sender, EventArgs e) {
                 //ブラウザを終了しGoToUrl()処理でエラーを発生させることで中断する
                 Debug.WriteLine("GoToUrl()処理中断中...");
-                this.abortButton.Enabled = false;
                 this.textLabel.Text = "中断中...";
                 /*
                 foreach (Process p in Process.GetProcesses()) {
@@ -941,7 +1011,7 @@ namespace GetFlashairCsv {
                 colLetters = colLetters.Where(s => !string.IsNullOrEmpty(s)).ToArray();
                 var Letters = new List<char>() { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
 
-                if (colLetters.Count() <= 2) {
+                if (colLetters.Length <= 2) {
                     int index = 0;
                     foreach (string col in colLetters) {
                         var col1 = colLetters.ElementAt(index).ToCharArray().ToList();
@@ -2006,6 +2076,145 @@ namespace GetFlashairCsv {
                 WritePrivateProfileString(APPNAME, INIFILE_KEY_BROWSER,
                     EdgeRadioButton.Text, INIFILE_FILENAME);
             }
+        }
+        
+        private partial class FindIpAddrForm : GetFlashairCsv.FindIpAddrForm {
+            private MainForm _mainForm;
+            private FindIpAddrForm _findIpAddrForm;
+
+            public FindIpAddrForm(MainForm mainForm) {
+                _mainForm = mainForm;
+                _findIpAddrForm = this;
+                this.closeButton.Click += CloseButton_Click!;
+                this.applyButton.Click += ApplyButton_Click!;
+                this.Show();
+            }
+
+            private void ApplyButton_Click(object sender, EventArgs e) {
+                //FlashAirのURLへ反映
+                _mainForm.Invoke((MethodInvoker)(() => {
+                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findIpAddrForm.IpAddrLabel.Text;
+                }));
+                this.Close();
+            }
+
+            private void CloseButton_Click(object sender, EventArgs e) {
+                this.Close();
+            }
+        }
+        
+        private void FindIPaddressButton_Click(object sender, EventArgs e) {
+            flashair.ReadMacAddrFromInifile();
+            if (flashair.MacAddr == "") {
+                ShowErrorMessageBox("FlashAirのMACアドレスの指定が無効です");
+                return;
+            }
+            flashair.ReadStartIpAddrFromInifile();
+            var startOctet = flashair.StartIpAddr!.Split(".");
+            flashair.ReadEndIpAddrFromInifile();
+            var endOctet = flashair.EndIpAddr!.Split(".");
+            if (startOctet.Length != 4) {
+                ShowErrorMessageBox("検索開始IPアドレスの指定が無効です");
+                return;
+            }
+            if (endOctet.Length != 4) {
+                ShowErrorMessageBox("検索終了IPアドレスの指定が無効です");
+                return;
+            }
+            if (startOctet[0] != endOctet[0]) {
+                ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
+                return;
+            }
+            if (startOctet[1] != endOctet[1]) {
+                ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
+                return;
+            }
+            if (startOctet[2] != endOctet[2]) {
+                ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
+                return;
+            }
+
+            //ダイアログボックス表示
+            findIpAddrForm = new FindIpAddrForm(this);
+            findIpAddrForm.applyButton.Enabled = false;
+            
+            //IPアドレス検索処理
+            string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
+            findIpAddrForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
+            findIpAddrForm.statusLabel.Text = "検索中...";
+            for (int octet = Convert.ToInt32(startOctet[3]); 
+                octet <= Convert.ToInt32(endOctet[3]); octet++) {
+                //待機中のイベントを処理する
+                Application.DoEvents();
+
+                dstIpAddr = String.Format("{0}.{1}.{2}.{3}", 
+                    startOctet[0], startOctet[1], startOctet[2],octet.ToString());
+
+                // 文字列（IPアドレス）からIPAddressクラスに変換
+                IPAddress dest = IPAddress.Parse(dstIpAddr);
+
+                // IPアドレスを数値として取得する
+                // ネットワークバイトオーダへの変換は要らない
+                int destAddr = BitConverter.ToInt32(dest.GetAddressBytes(), 0);
+
+                // MACアドレス用のバッファを確保
+                byte[] pMacAddr = new byte[6];
+                int PhyAddrLen = pMacAddr.Length;
+
+                // ARPを送信
+                findIpAddrForm.IpAddrLabel.Text = dstIpAddr;
+                int ret;
+                try {
+                    ret = SendARP(destAddr, 0, pMacAddr, ref PhyAddrLen);
+                } catch (Exception ex){
+                    ShowErrorMessageBox(ex);
+                    return;
+                }
+                if (ret == 0) {
+                    // ARP応答が返ってきた場合
+                    string dstPhyAddr = 
+                        string.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
+                        pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
+                    Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
+                    findIpAddrForm.MacAddrLabel.Text = dstPhyAddr;
+                    findIpAddrForm.Refresh();
+                    if (dstPhyAddr == flashair.MacAddr) {
+                        findIpAddrForm.statusLabel.Text = "FlashAirが見つかりました(^_^)";
+                        findIpAddrForm.IpAddrLabel.ForeColor = System.Drawing.Color.White;
+                        findIpAddrForm.IpAddrLabel.BackColor = System.Drawing.Color.Green;
+                        findIpAddrForm.applyButton.Enabled = true;
+                        findIpAddrForm.applyButton.Focus();
+                        return;
+                    }
+                } else {
+                    // エラーコードを出力
+                    //const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
+                    //const uint FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x2000;
+                    //const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
+                    //const uint FORMAT_MESSAGE_FROM_STRING = 0x400;
+                    const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
+                    const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
+                    //const uint FORMAT_MESSAGE_MAX_WIDTH_MASK = 0xFF;
+                    const ushort LANG_NEUTRAL = 0;
+                    const ushort SUBLANG_DEFAULT = 1;
+
+                    int langId = (SUBLANG_DEFAULT << 10) | LANG_NEUTRAL;
+                    int capacitySize = 256;
+                    var sb = new StringBuilder(capacitySize);
+                    FormatMessage(
+                        //FORMAT_MESSAGE_ALLOCATE_BUFFER |  //テキストのメモリ割り当てを要求する
+                        FORMAT_MESSAGE_FROM_SYSTEM |        //エラーメッセージはWindowsが用意しているものを使用
+                        FORMAT_MESSAGE_IGNORE_INSERTS,      //次の引数を無視してエラーコードに対するエラーメッセージを作成する
+                        0, 
+                        ret,                                //エラーコード
+                        langId,                             //言語を指定
+                        sb,                                 //メッセージテキストが保存されるバッファへのポインタ
+                        Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
+                        0);
+                    findIpAddrForm.MacAddrLabel.Text = sb.ToString();
+                }
+            }
+            findIpAddrForm.statusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
     }
 }
