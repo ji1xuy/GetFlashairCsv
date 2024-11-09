@@ -25,11 +25,13 @@ using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Office.CustomUI;
-using NPOI.SS.Formula.Functions;
-using System.Reflection.Metadata;
-using AngleSharp.Text;
+//using DocumentFormat.OpenXml.Office.CustomUI;
+//using NPOI.SS.Formula.Functions;
+//using System.Reflection.Metadata;
+//using AngleSharp.Text;
 
+//引用元
+//[C#] ARP要求を送信してリモートPCのMACアドレスを取得する（SendARP関数）
 //https://hensa40.cutegirl.jp/archives/6689
 // using System.Runtime.InteropServices; が必要
 using System.Net;
@@ -2103,7 +2105,7 @@ namespace GetFlashairCsv {
             }
         }
         
-        private void FindIPaddressButton_Click(object sender, EventArgs e) {
+        private void FindIpAddrButton_Click(object sender, EventArgs e) {
             flashair.ReadMacAddrFromInifile();
             if (flashair.MacAddr == "") {
                 ShowErrorMessageBox("FlashAirのMACアドレスの指定が無効です");
@@ -2137,8 +2139,11 @@ namespace GetFlashairCsv {
             //ダイアログボックス表示
             findIpAddrForm = new FindIpAddrForm(this);
             findIpAddrForm.applyButton.Enabled = false;
-            
+
             //IPアドレス検索処理
+            //引用元
+            //[C#] ARP要求を送信してリモートPCのMACアドレスを取得する（SendARP関数）
+            //https://hensa40.cutegirl.jp/archives/6689
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
             findIpAddrForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
             findIpAddrForm.statusLabel.Text = "検索中...";
