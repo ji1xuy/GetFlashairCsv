@@ -248,7 +248,7 @@ namespace GetFlashairCsv
             FindIpAddrButton.TabIndex = 2;
             FindIpAddrButton.Text = "検索";
             FindIpAddrButton.UseVisualStyleBackColor = true;
-            FindIpAddrButton.Click += FindIpAddrButton_Click;
+            FindIpAddrButton.Click += FindFlashAirButton_Click;
             // 
             // MainForm
             // 

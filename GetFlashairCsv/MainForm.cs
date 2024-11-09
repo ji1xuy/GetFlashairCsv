@@ -2072,7 +2072,7 @@ namespace GetFlashairCsv {
             }
         }
 
-        private partial class FindIpAddrForm : GetFlashairCsv.FindIpAddrForm {
+        private partial class FindIpAddrForm : GetFlashairCsv.findFlashAirForm {
             private MainForm _mainForm;
             private FindIpAddrForm _findIpAddrForm;
 
@@ -2097,7 +2097,7 @@ namespace GetFlashairCsv {
             }
         }
 
-        private void FindIpAddrButton_Click(object sender, EventArgs e) {
+        private void FindFlashAirButton_Click(object sender, EventArgs e) {
             flashair.ReadMacAddrFromInifile();
             if (flashair.MacAddr == "") {
                 ShowErrorMessageBox("FlashAirのMACアドレスの指定が無効です");

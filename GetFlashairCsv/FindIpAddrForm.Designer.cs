@@ -1,6 +1,6 @@
 ﻿namespace GetFlashairCsv
 {
-    partial class FindIpAddrForm
+    partial class findFlashAirForm
     {
         /// <summary>
         /// Required designer variable.
@@ -125,7 +125,7 @@
             text1Label.TabIndex = 5;
             text1Label.Text = "FlashAirのMACアドレス";
             // 
-            // FindIpAddrForm
+            // findFlashAirForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -141,8 +141,8 @@
             Controls.Add(flashairMacAddrLabel);
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "FindIpAddrForm";
-            Text = "IPアドレス検索";
+            Name = "findFlashAirForm";
+            Text = "FlashAir検索";
             ResumeLayout(false);
             PerformLayout();
         }

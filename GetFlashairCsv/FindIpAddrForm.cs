@@ -10,8 +10,8 @@ using System.Windows.Forms;
 
 namespace GetFlashairCsv
 {
-    public partial class FindIpAddrForm : Form {
-        public FindIpAddrForm() {
+    public partial class findFlashAirForm : Form {
+        public findFlashAirForm() {
             InitializeComponent();
         }
     }
