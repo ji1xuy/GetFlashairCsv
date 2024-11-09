@@ -2183,32 +2183,33 @@ namespace GetFlashairCsv {
                         findIpAddrForm.applyButton.Focus();
                         return;
                     }
-                }
-                // エラーコードを出力
-                //const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
-                //const uint FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x2000;
-                //const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
-                //const uint FORMAT_MESSAGE_FROM_STRING = 0x400;
-                const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
-                const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
-                //const uint FORMAT_MESSAGE_MAX_WIDTH_MASK = 0xFF;
-                const ushort LANG_NEUTRAL = 0;
-                const ushort SUBLANG_DEFAULT = 1;
+                } else {
+                    // エラーコードを出力
+                    //const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x100;
+                    //const uint FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x2000;
+                    //const uint FORMAT_MESSAGE_FROM_HMODULE = 0x800;
+                    //const uint FORMAT_MESSAGE_FROM_STRING = 0x400;
+                    const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
+                    const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x200;
+                    //const uint FORMAT_MESSAGE_MAX_WIDTH_MASK = 0xFF;
+                    const ushort LANG_NEUTRAL = 0;
+                    const ushort SUBLANG_DEFAULT = 1;
 
-                int langId = (SUBLANG_DEFAULT << 10) | LANG_NEUTRAL;
-                int capacitySize = 256;
-                var sb = new StringBuilder(capacitySize);
-                FormatMessage(
-                    //FORMAT_MESSAGE_ALLOCATE_BUFFER |  //テキストのメモリ割り当てを要求する
-                    FORMAT_MESSAGE_FROM_SYSTEM |        //エラーメッセージはWindowsが用意しているものを使用
-                    FORMAT_MESSAGE_IGNORE_INSERTS,      //次の引数を無視してエラーコードに対するエラーメッセージを作成する
-                    0,
-                    ret,                                //エラーコード
-                    langId,                             //言語を指定
-                    sb,                                 //メッセージテキストが保存されるバッファへのポインタ
-                    Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
-                    0);
-                findIpAddrForm.MacAddrLabel.Text = sb.ToString();
+                    int langId = (SUBLANG_DEFAULT << 10) | LANG_NEUTRAL;
+                    int capacitySize = 256;
+                    var sb = new StringBuilder(capacitySize);
+                    FormatMessage(
+                        //FORMAT_MESSAGE_ALLOCATE_BUFFER |  //テキストのメモリ割り当てを要求する
+                        FORMAT_MESSAGE_FROM_SYSTEM |        //エラーメッセージはWindowsが用意しているものを使用
+                        FORMAT_MESSAGE_IGNORE_INSERTS,      //次の引数を無視してエラーコードに対するエラーメッセージを作成する
+                        0,
+                        ret,                                //エラーコード
+                        langId,                             //言語を指定
+                        sb,                                 //メッセージテキストが保存されるバッファへのポインタ
+                        Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
+                        0);
+                    findIpAddrForm.MacAddrLabel.Text = sb.ToString();
+                }
             }
             findIpAddrForm.statusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
