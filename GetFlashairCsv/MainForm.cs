@@ -1980,8 +1980,7 @@ namespace GetFlashairCsv {
 
         private void OpenExcelButton_Click(object sender, EventArgs e) {
             //Excelファイルの存在を確認
-            string filePath;
-            filePath = Path.GetFullPath(EXCEL_FILENAME);
+            var filePath = Path.GetFullPath(EXCEL_FILENAME);
             Debug.WriteLine("filePath: " + filePath);
             if (File.Exists(filePath) == false) {
                 ShowOKMessageBox(
@@ -2029,7 +2028,7 @@ namespace GetFlashairCsv {
         private void MainForm_Shown(object sender, EventArgs e) {
             Refresh();
             try {
-                string chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
+                var chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
                 new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
             } catch (AggregateException) {
                 ShowErrorMessageBox("インターネットに接続されているか確認してください");
@@ -2041,7 +2040,7 @@ namespace GetFlashairCsv {
                 EdgeRadioButton.Checked = true;
             }
             try {
-                string edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                var edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
                 new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
             } catch (Exception) {
                 ShowErrorMessageBox("Edgeブラウザのバージョンが確認できないかインストールされていません");
@@ -2184,7 +2183,7 @@ namespace GetFlashairCsv {
                 }
                 if (ret == 0) {
                     // ARP応答が返ってきた場合
-                    string dstPhyAddr =
+                    var dstPhyAddr =
                         String.Format("{0:x2}-{1:x2}-{2:x2}-{3:x2}-{4:x2}-{5:x2}",
                         pMacAddr[0], pMacAddr[1], pMacAddr[2], pMacAddr[3], pMacAddr[4], pMacAddr[5]);
                     Debug.WriteLine(dstIpAddr + " -> " + dstPhyAddr);
@@ -2222,6 +2221,7 @@ namespace GetFlashairCsv {
                         sb,                                 //メッセージテキストが保存されるバッファへのポインタ
                         Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
                         0);
+                    Debug.WriteLine(dstIpAddr + " -> " + sb.ToString().Replace("\r", "").Replace("\n", ""));
                     findFlashairForm.MacAddrLabel.Text = sb.ToString();
                 }
             }
