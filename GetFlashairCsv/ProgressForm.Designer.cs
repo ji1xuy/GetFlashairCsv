@@ -26,7 +26,7 @@
             ProgressBar = new ProgressBar();
             CsvLabel = new Label();
             ExcelLabel = new Label();
-            textLabel = new Label();
+            StatusLabel = new Label();
             AbortButton = new Button();
             SuspendLayout();
             // 
@@ -51,15 +51,15 @@
             ExcelLabel.Size = new Size(215, 14);
             ExcelLabel.TabIndex = 4;
             // 
-            // textLabel
+            // StatusLabel
             // 
-            textLabel.AutoSize = true;
-            textLabel.Font = new Font("Yu Gothic UI", 11F, FontStyle.Bold, GraphicsUnit.Point);
-            textLabel.Location = new Point(12, 25);
-            textLabel.Name = "textLabel";
-            textLabel.Size = new Size(66, 20);
-            textLabel.TabIndex = 5;
-            textLabel.Text = "処理中...";
+            StatusLabel.AutoSize = true;
+            StatusLabel.Font = new Font("Yu Gothic UI", 11F, FontStyle.Bold, GraphicsUnit.Point);
+            StatusLabel.Location = new Point(12, 25);
+            StatusLabel.Name = "StatusLabel";
+            StatusLabel.Size = new Size(66, 20);
+            StatusLabel.TabIndex = 5;
+            StatusLabel.Text = "処理中...";
             // 
             // AbortButton
             // 
@@ -77,7 +77,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(296, 112);
             Controls.Add(AbortButton);
-            Controls.Add(textLabel);
+            Controls.Add(StatusLabel);
             Controls.Add(ExcelLabel);
             Controls.Add(CsvLabel);
             Controls.Add(ProgressBar);
@@ -96,7 +96,7 @@
         public ProgressBar ProgressBar;
         public Label CsvLabel;
         public Label ExcelLabel;
-        public Label textLabel;
+        public Label StatusLabel;
         public Button AbortButton;
     }
 }

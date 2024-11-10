@@ -414,7 +414,7 @@ namespace GetFlashairCsv {
                     //取得したlistの要素にはファイル日付が混在するようになる
                     //(例) "20230901\r\n202309.CSV"
                     //ファイル名とファイル日付を別要素に分割しておく
-                    string s = string.Join("\r\n", list);
+                    var s = String.Join("\r\n", list);
                     list = s.Split("\r\n", StringSplitOptions.None).ToList();
 
                     //list を条件で絞り込み
@@ -526,7 +526,7 @@ namespace GetFlashairCsv {
             private void AbortButton_Click(object? sender, EventArgs e) {
                 //ブラウザを終了しGoToUrl()処理でエラーを発生させることで中断する
                 Debug.WriteLine("GoToUrl()処理中断中...");
-                this.textLabel.Text = "中断中...";
+                this.StatusLabel.Text = "中断中...";
                 /*
                 foreach (Process p in Process.GetProcesses()) {
                     if (p.MainWindowTitle.IndexOf("data:,") >= 0) {

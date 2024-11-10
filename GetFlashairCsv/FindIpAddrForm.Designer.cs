@@ -31,11 +31,11 @@
             ApplyButton = new Button();
             CloseButton = new Button();
             IpAddrLabel = new Label();
-            textLabel2 = new Label();
+            TextLabel2 = new Label();
             MacAddrLabel = new Label();
-            textLabel3 = new Label();
+            TextLabel3 = new Label();
             StatusLabel = new Label();
-            textLabel1 = new Label();
+            TextLabel1 = new Label();
             SuspendLayout();
             // 
             // FlashairMacAddrLabel
@@ -76,15 +76,15 @@
             IpAddrLabel.TabIndex = 3;
             IpAddrLabel.Text = "-";
             // 
-            // textLabel2
+            // TextLabel2
             // 
-            textLabel2.AutoSize = true;
-            textLabel2.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            textLabel2.Location = new Point(24, 24);
-            textLabel2.Name = "textLabel2";
-            textLabel2.Size = new Size(52, 15);
-            textLabel2.TabIndex = 4;
-            textLabel2.Text = "IPアドレス";
+            TextLabel2.AutoSize = true;
+            TextLabel2.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            TextLabel2.Location = new Point(24, 24);
+            TextLabel2.Name = "TextLabel2";
+            TextLabel2.Size = new Size(52, 15);
+            TextLabel2.TabIndex = 4;
+            TextLabel2.Text = "IPアドレス";
             // 
             // MacAddrLabel
             // 
@@ -96,15 +96,15 @@
             MacAddrLabel.TabIndex = 4;
             MacAddrLabel.Text = "-";
             // 
-            // textLabel3
+            // TextLabel3
             // 
-            textLabel3.AutoSize = true;
-            textLabel3.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            textLabel3.Location = new Point(24, 39);
-            textLabel3.Name = "textLabel3";
-            textLabel3.Size = new Size(68, 15);
-            textLabel3.TabIndex = 4;
-            textLabel3.Text = "MACアドレス";
+            TextLabel3.AutoSize = true;
+            TextLabel3.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            TextLabel3.Location = new Point(24, 39);
+            TextLabel3.Name = "TextLabel3";
+            TextLabel3.Size = new Size(68, 15);
+            TextLabel3.TabIndex = 4;
+            TextLabel3.Text = "MACアドレス";
             // 
             // StatusLabel
             // 
@@ -116,25 +116,25 @@
             StatusLabel.TabIndex = 4;
             StatusLabel.Text = "検索開始";
             // 
-            // textLabel1
+            // TextLabel1
             // 
-            textLabel1.AutoSize = true;
-            textLabel1.Location = new Point(24, 9);
-            textLabel1.Name = "textLabel1";
-            textLabel1.Size = new Size(120, 15);
-            textLabel1.TabIndex = 5;
-            textLabel1.Text = "FlashAirのMACアドレス";
+            TextLabel1.AutoSize = true;
+            TextLabel1.Location = new Point(24, 9);
+            TextLabel1.Name = "TextLabel1";
+            TextLabel1.Size = new Size(120, 15);
+            TextLabel1.TabIndex = 5;
+            TextLabel1.Text = "FlashAirのMACアドレス";
             // 
             // FindFlashairForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(368, 109);
-            Controls.Add(textLabel1);
+            Controls.Add(TextLabel1);
             Controls.Add(StatusLabel);
             Controls.Add(MacAddrLabel);
-            Controls.Add(textLabel3);
-            Controls.Add(textLabel2);
+            Controls.Add(TextLabel3);
+            Controls.Add(TextLabel2);
             Controls.Add(IpAddrLabel);
             Controls.Add(CloseButton);
             Controls.Add(ApplyButton);
@@ -153,10 +153,10 @@
         public Button ApplyButton;
         public Button CloseButton;
         public Label IpAddrLabel;
-        private Label textLabel2;
+        private Label TextLabel2;
         public Label MacAddrLabel;
-        private Label textLabel3;
+        private Label TextLabel3;
         public Label StatusLabel;
-        private Label textLabel1;
+        private Label TextLabel1;
     }
 }
