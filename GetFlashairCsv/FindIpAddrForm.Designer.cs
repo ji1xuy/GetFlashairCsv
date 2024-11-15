@@ -143,6 +143,7 @@
             MinimizeBox = false;
             Name = "FindFlashairForm";
             Text = "FlashAir検索";
+            StartPosition = FormStartPosition.Manual;
             ResumeLayout(false);
             PerformLayout();
         }

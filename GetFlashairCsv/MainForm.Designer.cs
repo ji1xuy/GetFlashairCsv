@@ -49,7 +49,7 @@ namespace GetFlashairCsv
             label1 = new Label();
             groupBox3 = new GroupBox();
             groupBox4 = new GroupBox();
-            FindIFlashairButton = new Button();
+            FindFlashairButton = new Button();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -230,7 +230,7 @@ namespace GetFlashairCsv
             // 
             // groupBox4
             // 
-            groupBox4.Controls.Add(FindIFlashairButton);
+            groupBox4.Controls.Add(FindFlashairButton);
             groupBox4.Controls.Add(WriteInifileButton);
             groupBox4.Controls.Add(FlashairUrlTextBox);
             groupBox4.Location = new Point(9, 3);
@@ -240,15 +240,15 @@ namespace GetFlashairCsv
             groupBox4.TabStop = false;
             groupBox4.Text = "FlashAirのURL";
             // 
-            // FindIFlashairButton
+            // FindFlashairButton
             // 
-            FindIFlashairButton.Location = new Point(207, 11);
-            FindIFlashairButton.Name = "FindIFlashairButton";
-            FindIFlashairButton.Size = new Size(44, 43);
-            FindIFlashairButton.TabIndex = 2;
-            FindIFlashairButton.Text = "検索";
-            FindIFlashairButton.UseVisualStyleBackColor = true;
-            FindIFlashairButton.Click += FindFlashairButton_Click;
+            FindFlashairButton.Location = new Point(207, 11);
+            FindFlashairButton.Name = "FindFlashairButton";
+            FindFlashairButton.Size = new Size(44, 43);
+            FindFlashairButton.TabIndex = 2;
+            FindFlashairButton.Text = "検索";
+            FindFlashairButton.UseVisualStyleBackColor = true;
+            FindFlashairButton.Click += FindFlashairButton_Click;
             // 
             // MainForm
             // 
@@ -296,6 +296,6 @@ namespace GetFlashairCsv
         private RadioButton EdgeRadioButton;
         private RadioButton ChromeRadioButton;
         private Label label1;
-        private Button FindIFlashairButton;
+        private Button FindFlashairButton;
     }
 }

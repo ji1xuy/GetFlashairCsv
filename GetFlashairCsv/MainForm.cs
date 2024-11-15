@@ -2091,22 +2091,30 @@ namespace GetFlashairCsv {
 
             public FindFlashairForm(MainForm mainForm) {
                 _mainForm = mainForm;
+                _mainForm.FindFlashairButton.Enabled = false;
                 _findFlashairForm = this;
-                this.CloseButton.Click += CloseButton_Click!;
-                this.ApplyButton.Click += ApplyButton_Click!;
+                this.CloseButton.Click += CloseButton_Click;
+                this.ApplyButton.Click += ApplyButton_Click;
+                this.FormClosing += FindFlashairForm_FormClosing;
+                //表示位置の設定
+                Point point = _mainForm.Location;
+                this.Bounds = new System.Drawing.Rectangle(
+                    point.X + 50, point.Y + 80, this.Size.Width, this.Size.Height);
                 this.Show();
             }
 
-            private void ApplyButton_Click(object sender, EventArgs e) {
+            private void ApplyButton_Click(object? sender, EventArgs e) {
                 //FlashAirのURLへ反映
-                _mainForm.Invoke((MethodInvoker)(() => {
-                    _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findFlashairForm.IpAddrLabel.Text;
-                }));
+                _mainForm.FlashairUrlTextBox.Text = PROTOCOL + _findFlashairForm.IpAddrLabel.Text;
                 this.Close();
             }
 
-            private void CloseButton_Click(object sender, EventArgs e) {
+            private void CloseButton_Click(object? sender, EventArgs e) {
                 this.Close();
+            }
+
+            private void FindFlashairForm_FormClosing(object? sender, FormClosingEventArgs e) {
+                _mainForm.FindFlashairButton.Enabled = true;
             }
         }
 
@@ -2120,23 +2128,13 @@ namespace GetFlashairCsv {
             var startOctet = flashair.StartIpAddr!.Split(".");
             flashair.ReadEndIpAddrFromInifile();
             var endOctet = flashair.EndIpAddr!.Split(".");
-            if (startOctet.Length != 4) {
+            if ((startOctet.Length != 4) || (endOctet.Length != 4)) {
                 ShowErrorMessageBox("検索開始IPアドレスの指定が無効です");
                 return;
             }
-            if (endOctet.Length != 4) {
-                ShowErrorMessageBox("検索終了IPアドレスの指定が無効です");
-                return;
-            }
-            if (startOctet[0] != endOctet[0]) {
-                ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
-                return;
-            }
-            if (startOctet[1] != endOctet[1]) {
-                ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
-                return;
-            }
-            if (startOctet[2] != endOctet[2]) {
+            if ((startOctet[0] != endOctet[0]) ||
+                (startOctet[1] != endOctet[1]) ||
+                (startOctet[2] != endOctet[2])) { 
                 ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
                 return;
             }
