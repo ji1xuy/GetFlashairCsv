@@ -34,7 +34,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20241109";
+        private const string WINDOW_TITLE = APPNAME + "_20241115";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -2211,6 +2211,7 @@ namespace GetFlashairCsv {
                     int langId = (SUBLANG_DEFAULT << 10) | LANG_NEUTRAL;
                     int capacitySize = 256;
                     var sb = new StringBuilder(capacitySize);
+
                     FormatMessage(
                         //FORMAT_MESSAGE_ALLOCATE_BUFFER |  //テキストのメモリ割り当てを要求する
                         FORMAT_MESSAGE_FROM_SYSTEM |        //エラーメッセージはWindowsが用意しているものを使用
@@ -2221,8 +2222,9 @@ namespace GetFlashairCsv {
                         sb,                                 //メッセージテキストが保存されるバッファへのポインタ
                         Convert.ToUInt32(sb.Capacity),      //バッファのサイズ
                         0);
-                    Debug.WriteLine(dstIpAddr + " -> " + sb.ToString().Replace("\r", "").Replace("\n", ""));
-                    findFlashairForm.MacAddrLabel.Text = sb.ToString();
+                    var formattedMessage = sb.ToString().Replace("\r", "").Replace("\n", "");
+                    Debug.WriteLine(dstIpAddr + " -> " + formattedMessage);
+                    findFlashairForm.MacAddrLabel.Text = formattedMessage;
                 }
             }
             findFlashairForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";

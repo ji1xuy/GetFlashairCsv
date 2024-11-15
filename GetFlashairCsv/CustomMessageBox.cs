@@ -94,11 +94,11 @@ static class CustomMessageBox
             var y = rcOwner.Top + (rcOwner.Height - rcMsgBox.Height) / 2;
 
             // デスクトップに収まるように補正
-            Rectangle rcDeshtop = Screen.PrimaryScreen.WorkingArea;
-            x = (x < rcDeshtop.Left) ? rcDeshtop.Left : x;
-            y = (y < rcDeshtop.Top) ? rcDeshtop.Top : y;
-            x = (x > (rcDeshtop.Right - rcMsgBox.Width))? (rcDeshtop.Right - rcMsgBox.Width) : x;
-            y = (y > (rcDeshtop.Bottom - rcMsgBox.Height))? (rcDeshtop.Bottom - rcMsgBox.Height) : y;
+            Rectangle rcDesktop = Screen.PrimaryScreen.WorkingArea;
+            x = (x < rcDesktop.Left) ? rcDesktop.Left : x;
+            y = (y < rcDesktop.Top) ? rcDesktop.Top : y;
+            x = (x > (rcDesktop.Right - rcMsgBox.Width))? (rcDesktop.Right - rcMsgBox.Width) : x;
+            y = (y > (rcDesktop.Bottom - rcMsgBox.Height))? (rcDesktop.Bottom - rcMsgBox.Height) : y;
 
             Win32Native.SetWindowPos(wParam, x, y);
 
