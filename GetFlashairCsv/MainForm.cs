@@ -26,6 +26,8 @@ using OOXML = DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
+using NPOI.OpenXmlFormats.Dml;
+using System.ComponentModel;
 //using DocumentFormat.OpenXml.Office.CustomUI;
 //using NPOI.SS.Formula.Functions;
 //using System.Reflection.Metadata;
@@ -34,7 +36,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20241115";
+        private const string WINDOW_TITLE = APPNAME + "_20250321";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -340,7 +342,7 @@ namespace GetFlashairCsv {
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.AbortButton.Enabled = true;
                                 }));
-                                driver.Navigate().GoToUrl(_mainForm.flashair.Url);
+                                driver.Navigate().GoToUrl(_mainForm.flashair.Url!);
                                 ReadOnlyCollection<IWebElement> elms =
                                     driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 //30分値データのCSVファイル名のリストを取得
@@ -383,7 +385,7 @@ namespace GetFlashairCsv {
                                 progressForm.Invoke((MethodInvoker)(() => {
                                     progressForm.AbortButton.Enabled = true;
                                 }));
-                                driver.Navigate().GoToUrl(_mainForm.flashair.Url);
+                                driver.Navigate().GoToUrl(_mainForm.flashair.Url!);
                                 ReadOnlyCollection<IWebElement> elms = driver.FindElements(By.XPath(@"//*[@id='thumbnail']/div"));
                                 list = (new List<IWebElement>(elms)).ConvertAll(elm => elm.Text);
                             }
@@ -430,7 +432,7 @@ namespace GetFlashairCsv {
                         _mainForm.Invoke((MethodInvoker)(() => {
                             _mainForm.CsvFileListBox.Items.AddRange(list.ToArray());
                             _mainForm.CsvFileListBox.SelectedIndex = 0;
-                            _mainForm.CsvFileNameLabel.Text = _mainForm.CsvFileListBox.SelectedItem.ToString();
+                            _mainForm.CsvFileNameLabel.Text = _mainForm.CsvFileListBox.SelectedItem!.ToString();
                         }));
                     }
                     return true;
@@ -548,7 +550,10 @@ namespace GetFlashairCsv {
                 }
             }
 
+            [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
             public long StartPos { get; set; } = -1;
+
+            [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
             public long EndPos { private get; set; }
 
             public void SetExcelLabelText(long row) {
@@ -630,7 +635,7 @@ namespace GetFlashairCsv {
 
         private void CsvFileListBox_SelectedIndexChanged(object sender, System.EventArgs e) {
             // Get the currently selected item in the ListBox.
-            csvFileList.FileName = CsvFileListBox.SelectedItem.ToString()!;
+            csvFileList.FileName = CsvFileListBox.SelectedItem!.ToString()!;
         }
 
         private abstract class ExcelFile {
@@ -1623,6 +1628,7 @@ namespace GetFlashairCsv {
                     string[] cols = { "" };
                     string line = "";
                     string prevCsvDateTime = _excelDateTime!;
+                    Boolean dontShowAgain = false;
                     while (reader.Peek() >= 0) {
                         //時間がかかる処理での「応答なし」を回避するには？
                         //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
@@ -1644,23 +1650,24 @@ namespace GetFlashairCsv {
                         }
                         //前回のループで処理したデータの日時との差が30分より大きければ確認
                         if ((System.DateTime.Parse(_csvDateTime) - System.DateTime.Parse(prevCsvDateTime)).TotalMinutes > 30) {
+                            //MissingDataFoundForm missingDataFoundForm = new MissingDataFoundForm();
+                            //missingDataFoundForm.ShowDialog();
                             DialogResult dialogResult = DialogResult.None;
-                            _mainForm.Invoke((MethodInvoker)(() => {
-                                dialogResult = _mainForm.ShowOKCancelMessageBox(
-                                    owner: _mainForm.progressForm!,
-                                    text: string.Format(
-                                        "CSVファイルにデータ欠落の可能性があります\n" +
-                                        "[Excel] {0}行目: {1}\n" +
-                                        "[Excel] {2}行目: {3}\n\n" +
-                                        "書込を続行しますか？",
-                                        _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime),
-                                    button: MessageBoxDefaultButton.Button2);
-                            }));
-                            if (dialogResult == DialogResult.Cancel) {
-                                reader.Close();
-                                _document.Dispose();
-                                File.Delete(_tempFileName!);
-                                return ERROR_RETURN_VALUE;
+                            if (dontShowAgain == false) {
+                                MissingDataFoundForm missingDataFoundForm = new MissingDataFoundForm(_mainForm);
+                                var text = string.Format(
+                                            "CSVファイルにデータ欠落の可能性があります\n" +
+                                            "[Excel] {0}行目: {1}\n" +
+                                            "[Excel] {2}行目: {3}\n\n" +
+                                            "書込を続行しますか？",
+                                            _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime);
+                                dialogResult = missingDataFoundForm.ShowDialog(text, out dontShowAgain);
+                                if (dialogResult == DialogResult.No) {
+                                    reader.Close();
+                                    _document.Dispose();
+                                    File.Delete(_tempFileName!);
+                                    return ERROR_RETURN_VALUE;
+                                }
                             }
                         }
                         prevCsvDateTime = _csvDateTime;
@@ -1868,7 +1875,7 @@ namespace GetFlashairCsv {
                             "<対処方法> 手動で一時ファイル\n" +
                             "(" + _tempFileName + ")を\n" +
                             "Excelファイルに上書きしてから一時ファイルを削除してください");
-                        Clipboard.SetText(_tempFileName);
+                        Clipboard.SetText(_tempFileName!);
                         return false;
                     }
                 }
@@ -2134,7 +2141,7 @@ namespace GetFlashairCsv {
             }
             if ((startOctet[0] != endOctet[0]) ||
                 (startOctet[1] != endOctet[1]) ||
-                (startOctet[2] != endOctet[2])) { 
+                (startOctet[2] != endOctet[2])) {
                 ShowErrorMessageBox("IPアドレスの検索範囲は同一セグメント内です");
                 return;
             }
@@ -2226,6 +2233,63 @@ namespace GetFlashairCsv {
                 }
             }
             findFlashairForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
+        }
+
+        private partial class MissingDataFoundForm : GetFlashairCsv.MissingDataFoundForm {
+            private MainForm _mainForm;
+            private MissingDataFoundForm _missingDataFoundForm;
+            private string? _text = null;
+            private Boolean _dontShowAgain;
+
+            public MissingDataFoundForm(MainForm mainForm) {
+                _mainForm = mainForm;
+                _missingDataFoundForm = this;
+                DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
+                YesButton.Click += YesButton_Click!;
+                NoButton.Click += NoButton_Click!;
+                Load += MissingDataFoundForm_Load!;
+                Shown += MissingDataFoundForm_Shown!;
+                //this.Show();
+            }
+
+            public DialogResult ShowDialog(string text,out Boolean dontShowAgain) {
+                if (text == null) {
+                    text = "";
+                } else {
+                    _text = text;
+                }
+                DialogResult dialogResult = base.ShowDialog();
+                if (_dontShowAgain == true) {
+                    dontShowAgain = true;
+                } else {
+                    dontShowAgain = false;
+                }
+                return dialogResult;
+            }
+            private void MissingDataFoundForm_Load(object sender, EventArgs e) {
+                //表示位置の設定
+                Point point = _mainForm.Location;
+                _missingDataFoundForm.Bounds = new System.Drawing.Rectangle(
+                    point.X + 50, point.Y + 80, this.Size.Width, this.Size.Height);
+            }
+
+            private void MissingDataFoundForm_Shown(object sender, EventArgs e) {
+                _missingDataFoundForm.InformationLabel.Text = _text;
+            }
+
+            public void YesButton_Click(object sender, EventArgs e) {
+                _missingDataFoundForm.DialogResult = DialogResult.Yes;
+                _missingDataFoundForm.Dispose();
+            }
+
+            public void NoButton_Click(object sender, EventArgs e) {
+                _missingDataFoundForm.DialogResult = DialogResult.No;
+                _missingDataFoundForm.Dispose();
+            }
+
+            public void DontShowAgainCheckBox_CheckedChanged(object sender, EventArgs e) {
+                _dontShowAgain = _missingDataFoundForm.DontShowAgainCheckBox.Checked;
+            }
         }
     }
 }
