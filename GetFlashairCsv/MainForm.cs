@@ -36,7 +36,7 @@ using System.ComponentModel;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20250321";
+        private const string WINDOW_TITLE = APPNAME + "_20250322";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"—v
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -2249,7 +2249,6 @@ namespace GetFlashairCsv {
                 NoButton.Click += NoButton_Click!;
                 Load += MissingDataFoundForm_Load!;
                 Shown += MissingDataFoundForm_Shown!;
-                //this.Show();
             }
 
             public DialogResult ShowDialog(string text,out Boolean dontShowAgain) {
@@ -2259,11 +2258,7 @@ namespace GetFlashairCsv {
                     _text = text;
                 }
                 DialogResult dialogResult = base.ShowDialog();
-                if (_dontShowAgain == true) {
-                    dontShowAgain = true;
-                } else {
-                    dontShowAgain = false;
-                }
+                dontShowAgain = _dontShowAgain;
                 return dialogResult;
             }
             private void MissingDataFoundForm_Load(object sender, EventArgs e) {
