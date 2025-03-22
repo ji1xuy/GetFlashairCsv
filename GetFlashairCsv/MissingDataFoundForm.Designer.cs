@@ -29,8 +29,8 @@
         private void InitializeComponent() {
             InformationLabel = new Label();
             DontShowAgainCheckBox = new CheckBox();
-            YesButton = new Button();
-            NoButton = new Button();
+            OKButton = new Button();
+            CancelButton = new Button();
             SuspendLayout();
             // 
             // InformationLabel
@@ -38,9 +38,9 @@
             InformationLabel.AutoSize = true;
             InformationLabel.Location = new Point(32, 9);
             InformationLabel.Name = "InformationLabel";
-            InformationLabel.Size = new Size(213, 15);
+            InformationLabel.Size = new Size(97, 15);
             InformationLabel.TabIndex = 0;
-            InformationLabel.Text = "CSVファイルにデータ欠落の可能性があります";
+            InformationLabel.Text = "InformationLabel";
             // 
             // DontShowAgainCheckBox
             // 
@@ -48,37 +48,39 @@
             DontShowAgainCheckBox.Location = new Point(32, 88);
             DontShowAgainCheckBox.Name = "DontShowAgainCheckBox";
             DontShowAgainCheckBox.Size = new Size(102, 19);
-            DontShowAgainCheckBox.TabIndex = 1;
+            DontShowAgainCheckBox.TabIndex = 3;
             DontShowAgainCheckBox.Text = "今後確認しない";
             DontShowAgainCheckBox.UseVisualStyleBackColor = true;
             // 
-            // YesButton
+            // OKButton
             // 
-            YesButton.Location = new Point(182, 84);
-            YesButton.Name = "YesButton";
-            YesButton.Size = new Size(76, 25);
-            YesButton.TabIndex = 2;
-            YesButton.Text = "はい";
-            YesButton.UseVisualStyleBackColor = true;
+            OKButton.Location = new Point(182, 84);
+            OKButton.Name = "OKButton";
+            OKButton.Size = new Size(76, 25);
+            OKButton.TabIndex = 1;
+            OKButton.Text = "OK";
+            OKButton.UseVisualStyleBackColor = true;
             // 
-            // NoButton
+            // CancelButton
             // 
-            NoButton.Location = new Point(283, 84);
-            NoButton.Name = "NoButton";
-            NoButton.Size = new Size(73, 26);
-            NoButton.TabIndex = 3;
-            NoButton.Text = "いいえ";
-            NoButton.UseVisualStyleBackColor = true;
+            CancelButton.Location = new Point(283, 84);
+            CancelButton.Name = "CancelButton";
+            CancelButton.Size = new Size(73, 26);
+            CancelButton.TabIndex = 2;
+            CancelButton.Text = "キャンセル";
+            CancelButton.UseVisualStyleBackColor = true;
             // 
             // MissingDataFoundForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(368, 114);
-            Controls.Add(NoButton);
-            Controls.Add(YesButton);
+            Controls.Add(CancelButton);
+            Controls.Add(OKButton);
             Controls.Add(DontShowAgainCheckBox);
             Controls.Add(InformationLabel);
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "MissingDataFoundForm";
             Text = "確認";
             ResumeLayout(false);
@@ -89,7 +91,7 @@
 
         public Label InformationLabel;
         public CheckBox DontShowAgainCheckBox;
-        public Button YesButton;
-        public Button NoButton;
+        public Button OKButton;
+        public Button CancelButton;
     }
 }

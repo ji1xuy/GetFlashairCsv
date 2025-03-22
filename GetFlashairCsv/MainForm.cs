@@ -505,7 +505,7 @@ namespace GetFlashairCsv {
                 this.AbortButton.Click += AbortButton_Click;
                 this.FormClosing += ProgressForm_FormClosing;
                 //表示位置の設定
-                Point point = _mainForm.Location;
+                var point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 100, point.Y + 150, this.Size.Width, this.Size.Height);
                 this.Text = caption;
@@ -1662,7 +1662,7 @@ namespace GetFlashairCsv {
                                             "書込を続行しますか？",
                                             _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime);
                                 dialogResult = missingDataFoundForm.ShowDialog(text, out dontShowAgain);
-                                if (dialogResult == DialogResult.No) {
+                                if (dialogResult == DialogResult.Cancel) {
                                     reader.Close();
                                     _document.Dispose();
                                     File.Delete(_tempFileName!);
@@ -2104,7 +2104,7 @@ namespace GetFlashairCsv {
                 this.ApplyButton.Click += ApplyButton_Click;
                 this.FormClosing += FindFlashairForm_FormClosing;
                 //表示位置の設定
-                Point point = _mainForm.Location;
+                var point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 50, point.Y + 80, this.Size.Width, this.Size.Height);
                 this.Show();
@@ -2245,25 +2245,25 @@ namespace GetFlashairCsv {
                 _mainForm = mainForm;
                 _missingDataFoundForm = this;
                 DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
-                YesButton.Click += YesButton_Click!;
-                NoButton.Click += NoButton_Click!;
+                OKButton.Click += OKButton_Click!;
+                CancelButton.Click += CancelButton_Click!;
                 Load += MissingDataFoundForm_Load!;
                 Shown += MissingDataFoundForm_Shown!;
             }
 
             public DialogResult ShowDialog(string text,out Boolean dontShowAgain) {
                 if (text == null) {
-                    text = "";
+                    _text = "";
                 } else {
                     _text = text;
                 }
-                DialogResult dialogResult = base.ShowDialog();
+                var dialogResult = base.ShowDialog();
                 dontShowAgain = _dontShowAgain;
                 return dialogResult;
             }
             private void MissingDataFoundForm_Load(object sender, EventArgs e) {
                 //表示位置の設定
-                Point point = _mainForm.Location;
+                var point = _mainForm.Location;
                 _missingDataFoundForm.Bounds = new System.Drawing.Rectangle(
                     point.X + 50, point.Y + 80, this.Size.Width, this.Size.Height);
             }
@@ -2272,13 +2272,13 @@ namespace GetFlashairCsv {
                 _missingDataFoundForm.InformationLabel.Text = _text;
             }
 
-            public void YesButton_Click(object sender, EventArgs e) {
-                _missingDataFoundForm.DialogResult = DialogResult.Yes;
+            public void OKButton_Click(object sender, EventArgs e) {
+                _missingDataFoundForm.DialogResult = DialogResult.OK;
                 _missingDataFoundForm.Dispose();
             }
 
-            public void NoButton_Click(object sender, EventArgs e) {
-                _missingDataFoundForm.DialogResult = DialogResult.No;
+            public void CancelButton_Click(object sender, EventArgs e) {
+                _missingDataFoundForm.DialogResult = DialogResult.Cancel;
                 _missingDataFoundForm.Dispose();
             }
 
