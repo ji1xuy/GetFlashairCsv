@@ -2237,13 +2237,11 @@ namespace GetFlashairCsv {
 
         private partial class MissingDataFoundForm : GetFlashairCsv.MissingDataFoundForm {
             private MainForm _mainForm;
-            private MissingDataFoundForm _missingDataFoundForm;
             private string? _text = null;
             private Boolean _dontShowAgain;
 
             public MissingDataFoundForm(MainForm mainForm) {
                 _mainForm = mainForm;
-                _missingDataFoundForm = this;
                 this.DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
                 this.OKButton.Click += OKButton_Click!;
                 this.CancelButton.Click += CancelButton_Click!;
@@ -2264,26 +2262,26 @@ namespace GetFlashairCsv {
             private void MissingDataFoundForm_Load(object sender, EventArgs e) {
                 //ï\é¶à íuÇÃê›íË
                 var point = _mainForm.Location;
-                _missingDataFoundForm.Bounds = new System.Drawing.Rectangle(
+                this.Bounds = new System.Drawing.Rectangle(
                     point.X + 50, point.Y + 80, this.Size.Width, this.Size.Height);
             }
 
             private void MissingDataFoundForm_Shown(object sender, EventArgs e) {
-                _missingDataFoundForm.InformationLabel.Text = _text;
+                this.InformationLabel.Text = _text;
             }
 
             public void OKButton_Click(object sender, EventArgs e) {
-                _missingDataFoundForm.DialogResult = DialogResult.OK;
-                _missingDataFoundForm.Dispose();
+                this.DialogResult = DialogResult.OK;
+                this.Dispose();
             }
 
             public void CancelButton_Click(object sender, EventArgs e) {
-                _missingDataFoundForm.DialogResult = DialogResult.Cancel;
-                _missingDataFoundForm.Dispose();
+                this.DialogResult = DialogResult.Cancel;
+                this.Dispose();
             }
 
             public void DontShowAgainCheckBox_CheckedChanged(object sender, EventArgs e) {
-                _dontShowAgain = _missingDataFoundForm.DontShowAgainCheckBox.Checked;
+                _dontShowAgain = this.DontShowAgainCheckBox.Checked;
             }
         }
     }
