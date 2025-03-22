@@ -1650,18 +1650,16 @@ namespace GetFlashairCsv {
                         }
                         //前回のループで処理したデータの日時との差が30分より大きければ確認
                         if ((System.DateTime.Parse(_csvDateTime) - System.DateTime.Parse(prevCsvDateTime)).TotalMinutes > 30) {
-                            //MissingDataFoundForm missingDataFoundForm = new MissingDataFoundForm();
-                            //missingDataFoundForm.ShowDialog();
                             DialogResult dialogResult = DialogResult.None;
                             if (dontShowAgain == false) {
-                                MissingDataFoundForm missingDataFoundForm = new MissingDataFoundForm(_mainForm);
+                                HandleMissingDataForm handleMissingDataForm = new HandleMissingDataForm(_mainForm);
                                 var text = string.Format(
                                             "CSVファイルにデータ欠落の可能性があります\n" +
                                             "[Excel] {0}行目: {1}\n" +
                                             "[Excel] {2}行目: {3}\n\n" +
                                             "書込を続行しますか？",
                                             _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime);
-                                dialogResult = missingDataFoundForm.ShowDialog(text, out dontShowAgain);
+                                dialogResult = handleMissingDataForm.ShowDialog(text, out dontShowAgain);
                                 if (dialogResult == DialogResult.Cancel) {
                                     reader.Close();
                                     _document.Dispose();
@@ -2235,18 +2233,17 @@ namespace GetFlashairCsv {
             findFlashairForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
 
-        private partial class MissingDataFoundForm : GetFlashairCsv.MissingDataFoundForm {
+        private partial class HandleMissingDataForm : GetFlashairCsv.HandleMissingDataForm {
             private MainForm _mainForm;
             private string? _text = null;
             private Boolean _dontShowAgain;
 
-            public MissingDataFoundForm(MainForm mainForm) {
+            public HandleMissingDataForm(MainForm mainForm) {
                 _mainForm = mainForm;
                 this.DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
                 this.OKButton.Click += OKButton_Click!;
                 this.CancelButton.Click += CancelButton_Click!;
-                this.Load += MissingDataFoundForm_Load!;
-                this.Shown += MissingDataFoundForm_Shown!;
+                this.Load += HandleMissingDataForm_Load!;
             }
 
             public DialogResult ShowDialog(string text,out Boolean dontShowAgain) {
@@ -2259,14 +2256,12 @@ namespace GetFlashairCsv {
                 dontShowAgain = _dontShowAgain;
                 return dialogResult;
             }
-            private void MissingDataFoundForm_Load(object sender, EventArgs e) {
+
+            private void HandleMissingDataForm_Load(object sender, EventArgs e) {
                 //表示位置の設定
                 var point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
                     point.X + 50, point.Y + 80, this.Size.Width, this.Size.Height);
-            }
-
-            private void MissingDataFoundForm_Shown(object sender, EventArgs e) {
                 this.InformationLabel.Text = _text;
             }
 

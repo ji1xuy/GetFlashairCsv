@@ -10,8 +10,8 @@ using System.Windows.Forms;
 
 namespace GetFlashairCsv
 {
-    public partial class MissingDataFoundForm : Form {
-        public MissingDataFoundForm() {
+    public partial class HandleMissingDataForm : Form {
+        public HandleMissingDataForm() {
             InitializeComponent();
         }
 

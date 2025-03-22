@@ -1,6 +1,6 @@
 ﻿namespace GetFlashairCsv
 {
-    partial class MissingDataFoundForm
+    partial class HandleMissingDataForm
     {
         /// <summary>
         /// Required designer variable.
@@ -70,7 +70,7 @@
             CancelButton.Text = "キャンセル";
             CancelButton.UseVisualStyleBackColor = true;
             // 
-            // MissingDataFoundForm
+            // HandleMissingDataForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -81,7 +81,7 @@
             Controls.Add(InformationLabel);
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "MissingDataFoundForm";
+            Name = "HandleMissingDataForm";
             Text = "確認";
             ResumeLayout(false);
             PerformLayout();
