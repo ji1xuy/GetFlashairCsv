@@ -2244,11 +2244,11 @@ namespace GetFlashairCsv {
             public MissingDataFoundForm(MainForm mainForm) {
                 _mainForm = mainForm;
                 _missingDataFoundForm = this;
-                DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
-                OKButton.Click += OKButton_Click!;
-                CancelButton.Click += CancelButton_Click!;
-                Load += MissingDataFoundForm_Load!;
-                Shown += MissingDataFoundForm_Shown!;
+                this.DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
+                this.OKButton.Click += OKButton_Click!;
+                this.CancelButton.Click += CancelButton_Click!;
+                this.Load += MissingDataFoundForm_Load!;
+                this.Shown += MissingDataFoundForm_Shown!;
             }
 
             public DialogResult ShowDialog(string text,out Boolean dontShowAgain) {
