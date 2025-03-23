@@ -58,7 +58,7 @@ namespace GetFlashairCsv
             // 
             // FlashairUrlTextBox
             // 
-            FlashairUrlTextBox.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            FlashairUrlTextBox.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold);
             FlashairUrlTextBox.Location = new Point(9, 22);
             FlashairUrlTextBox.Name = "FlashairUrlTextBox";
             FlashairUrlTextBox.Size = new Size(192, 23);
@@ -76,7 +76,7 @@ namespace GetFlashairCsv
             // 
             // CsvFileListBox
             // 
-            CsvFileListBox.Font = new Font("ＭＳ ゴシック", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            CsvFileListBox.Font = new Font("ＭＳ ゴシック", 9.75F, FontStyle.Bold);
             CsvFileListBox.FormattingEnabled = true;
             CsvFileListBox.Location = new Point(82, 27);
             CsvFileListBox.Name = "CsvFileListBox";
@@ -109,12 +109,12 @@ namespace GetFlashairCsv
             // 
             ExcelFileNameLabel.Location = new Point(11, 17);
             ExcelFileNameLabel.Name = "ExcelFileNameLabel";
-            ExcelFileNameLabel.Size = new Size(285, 49);
+            ExcelFileNameLabel.Size = new Size(285, 70);
             ExcelFileNameLabel.TabIndex = 0;
             // 
             // OpenExcelButton
             // 
-            OpenExcelButton.Location = new Point(19, 365);
+            OpenExcelButton.Location = new Point(19, 393);
             OpenExcelButton.Name = "OpenExcelButton";
             OpenExcelButton.Size = new Size(152, 34);
             OpenExcelButton.TabIndex = 1;
@@ -124,7 +124,7 @@ namespace GetFlashairCsv
             // 
             // CloseButton
             // 
-            CloseButton.Location = new Point(247, 365);
+            CloseButton.Location = new Point(247, 393);
             CloseButton.Name = "CloseButton";
             CloseButton.Size = new Size(66, 34);
             CloseButton.TabIndex = 2;
@@ -134,16 +134,16 @@ namespace GetFlashairCsv
             // 
             // ExcelLastDataLabel
             // 
-            ExcelLastDataLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            ExcelLastDataLabel.Location = new Point(59, 66);
+            ExcelLastDataLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold);
+            ExcelLastDataLabel.Location = new Point(59, 89);
             ExcelLastDataLabel.Name = "ExcelLastDataLabel";
             ExcelLastDataLabel.Size = new Size(237, 15);
             ExcelLastDataLabel.TabIndex = 2;
             // 
             // ClockLabel
             // 
-            ClockLabel.Font = new Font("Yu Gothic UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            ClockLabel.Location = new Point(19, 402);
+            ClockLabel.Font = new Font("Yu Gothic UI", 12F, FontStyle.Bold);
+            ClockLabel.Location = new Point(11, 430);
             ClockLabel.Name = "ClockLabel";
             ClockLabel.Size = new Size(208, 23);
             ClockLabel.TabIndex = 3;
@@ -201,7 +201,7 @@ namespace GetFlashairCsv
             groupBox2.Controls.Add(ExcelLastDataLabel);
             groupBox2.Location = new Point(11, 275);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(309, 84);
+            groupBox2.Size = new Size(309, 112);
             groupBox2.TabIndex = 0;
             groupBox2.TabStop = false;
             groupBox2.Text = "Excelファイル";
@@ -209,7 +209,7 @@ namespace GetFlashairCsv
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(7, 66);
+            label1.Location = new Point(7, 89);
             label1.Name = "label1";
             label1.Size = new Size(46, 15);
             label1.TabIndex = 3;
@@ -254,7 +254,7 @@ namespace GetFlashairCsv
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(330, 425);
+            ClientSize = new Size(330, 456);
             Controls.Add(groupBox4);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);

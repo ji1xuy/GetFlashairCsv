@@ -36,7 +36,7 @@ using System.ComponentModel;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20250322";
+        private const string WINDOW_TITLE = APPNAME + "_20250323";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -2151,7 +2151,7 @@ namespace GetFlashairCsv {
             //IPアドレス検索処理
             //ソースコードの原型引用元
             //[C#] ARP要求を送信してリモートPCのMACアドレスを取得する（SendARP関数）
-            //https://hensa40.cutegirl.jp/archives/6689//
+            //https://hensa40.cutegirl.jp/archives/6689/
             //using System.Runtime.InteropServices; が必要
             string dstIpAddr; // MACアドレスを取得するリモートPCのIPアドレス
             findFlashairForm.FlashairMacAddrLabel.Text = flashair.MacAddr;
@@ -2236,7 +2236,7 @@ namespace GetFlashairCsv {
         private partial class HandleMissingDataForm : GetFlashairCsv.HandleMissingDataForm {
             private MainForm _mainForm;
             private string? _text = null;
-            private Boolean _dontShowAgain;
+            private Boolean _dontShowAgain = false;
 
             public HandleMissingDataForm(MainForm mainForm) {
                 _mainForm = mainForm;
