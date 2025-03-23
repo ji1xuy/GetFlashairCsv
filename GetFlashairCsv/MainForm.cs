@@ -1628,7 +1628,7 @@ namespace GetFlashairCsv {
                     string[] cols = { "" };
                     string line = "";
                     string prevCsvDateTime = _excelDateTime!;
-                    Boolean dontShowAgain = false;
+                    bool dontShowAgain = false;
                     while (reader.Peek() >= 0) {
                         //ŠÔ‚ª‚©‚©‚éˆ—‚Å‚Ìu‰“š‚È‚µv‚ğ‰ñ”ğ‚·‚é‚É‚ÍH
                         //https://atmarkit.itmedia.co.jp/ait/articles/0403/19/news088.html
@@ -2236,7 +2236,7 @@ namespace GetFlashairCsv {
         private partial class HandleMissingDataForm : GetFlashairCsv.HandleMissingDataForm {
             private MainForm _mainForm;
             private string? _text = null;
-            private Boolean _dontShowAgain = false;
+            private bool _dontShowAgain = false;
 
             public HandleMissingDataForm(MainForm mainForm) {
                 _mainForm = mainForm;
@@ -2246,7 +2246,7 @@ namespace GetFlashairCsv {
                 this.Load += HandleMissingDataForm_Load!;
             }
 
-            public DialogResult ShowDialog(string text,out Boolean dontShowAgain) {
+            public DialogResult ShowDialog(string text,out bool dontShowAgain) {
                 if (text == null) {
                     _text = "";
                 } else {
