@@ -2235,7 +2235,7 @@ namespace GetFlashairCsv {
 
         private partial class HandleMissingDataForm : GetFlashairCsv.HandleMissingDataForm {
             private MainForm _mainForm;
-            private string? _text = null;
+            private string _text = "";
             private bool _dontShowAgain = false;
 
             public HandleMissingDataForm(MainForm mainForm) {
@@ -2247,9 +2247,7 @@ namespace GetFlashairCsv {
             }
 
             public DialogResult ShowDialog(string text,out bool dontShowAgain) {
-                if (text == null) {
-                    _text = "";
-                } else {
+                if (text != null) {
                     _text = text;
                 }
                 var dialogResult = base.ShowDialog();
