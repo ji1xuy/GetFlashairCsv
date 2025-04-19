@@ -36,7 +36,7 @@ using System.ComponentModel;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20250323";
+        private const string WINDOW_TITLE = APPNAME + "_20250419";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"óv
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -93,6 +93,10 @@ namespace GetFlashairCsv {
         [DllImport("user32.dll")]
         private static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
+        const uint MF_BYPOSITION = 0x400;
+        const uint MF_BYCOMMAND = 0x0;
+        const uint SC_CLOSE = 0xF060;
+
         [DllImport("user32.dll")]
         private static extern bool IsIconic(IntPtr hwnd);
 
@@ -113,6 +117,8 @@ namespace GetFlashairCsv {
 
         [DllImport("user32.dll", EntryPoint = "SendMessageA")]
         extern static int SendMessage(IntPtr hwnd, int msg, int wParam, int lParam);
+
+        const int WM_CLOSE = 0x0010;
 
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         private static extern int SendARP(int DestIP, int SrcIp, byte[] pMacAddr, ref int PhyAddrLen);
@@ -489,13 +495,9 @@ namespace GetFlashairCsv {
         private partial class ProgressForm : GetFlashairCsv.ProgressForm {
             MainForm _mainForm;
             string _caption;
-            const uint MF_BYPOSITION = 0x400;
-            const uint MF_BYCOMMAND = 0x0;
-            const uint SC_CLOSE = 0xF060;
-            const int WM_CLOSE = 0x0010;
 
             public ProgressForm(MainForm mainForm, string caption, ProgressBarStyle progressBarStyle = ProgressBarStyle.Marquee) {
-                IntPtr systemMenu = GetSystemMenu(this.Handle, false);
+                var systemMenu = GetSystemMenu(this.Handle, false);
                 _mainForm = mainForm;
                 _caption = caption;
 
@@ -630,6 +632,10 @@ namespace GetFlashairCsv {
         }
 
         private void CloseButton_Click(object sender, EventArgs e) {
+            if (browserHandle != null) {
+                Debug.WriteLine("SendMessage()é¿çs");
+                SendMessage((IntPtr)browserHandle, WM_CLOSE, 0, 0);
+            }
             this.Close();
         }
 

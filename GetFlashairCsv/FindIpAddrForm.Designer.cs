@@ -41,7 +41,7 @@
             // FlashairMacAddrLabel
             // 
             FlashairMacAddrLabel.AutoSize = true;
-            FlashairMacAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            FlashairMacAddrLabel.Font = new Font("Yu Gothic UI", 9F);
             FlashairMacAddrLabel.Location = new Point(150, 9);
             FlashairMacAddrLabel.Name = "FlashairMacAddrLabel";
             FlashairMacAddrLabel.Size = new Size(12, 15);
@@ -50,7 +50,7 @@
             // 
             // ApplyButton
             // 
-            ApplyButton.Location = new Point(140, 76);
+            ApplyButton.Location = new Point(142, 85);
             ApplyButton.Name = "ApplyButton";
             ApplyButton.Size = new Size(133, 23);
             ApplyButton.TabIndex = 1;
@@ -59,7 +59,7 @@
             // 
             // CloseButton
             // 
-            CloseButton.Location = new Point(281, 76);
+            CloseButton.Location = new Point(281, 85);
             CloseButton.Name = "CloseButton";
             CloseButton.Size = new Size(75, 23);
             CloseButton.TabIndex = 2;
@@ -69,8 +69,8 @@
             // IpAddrLabel
             // 
             IpAddrLabel.AutoSize = true;
-            IpAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            IpAddrLabel.Location = new Point(150, 24);
+            IpAddrLabel.Font = new Font("Yu Gothic UI", 9F);
+            IpAddrLabel.Location = new Point(150, 45);
             IpAddrLabel.Name = "IpAddrLabel";
             IpAddrLabel.Size = new Size(12, 15);
             IpAddrLabel.TabIndex = 3;
@@ -79,8 +79,8 @@
             // TextLabel2
             // 
             TextLabel2.AutoSize = true;
-            TextLabel2.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            TextLabel2.Location = new Point(24, 24);
+            TextLabel2.Font = new Font("Yu Gothic UI", 9F);
+            TextLabel2.Location = new Point(24, 45);
             TextLabel2.Name = "TextLabel2";
             TextLabel2.Size = new Size(52, 15);
             TextLabel2.TabIndex = 4;
@@ -89,8 +89,8 @@
             // MacAddrLabel
             // 
             MacAddrLabel.AutoSize = true;
-            MacAddrLabel.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            MacAddrLabel.Location = new Point(150, 39);
+            MacAddrLabel.Font = new Font("Yu Gothic UI", 9F);
+            MacAddrLabel.Location = new Point(150, 60);
             MacAddrLabel.Name = "MacAddrLabel";
             MacAddrLabel.Size = new Size(12, 15);
             MacAddrLabel.TabIndex = 4;
@@ -99,8 +99,8 @@
             // TextLabel3
             // 
             TextLabel3.AutoSize = true;
-            TextLabel3.Font = new Font("Yu Gothic UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            TextLabel3.Location = new Point(24, 39);
+            TextLabel3.Font = new Font("Yu Gothic UI", 9F);
+            TextLabel3.Location = new Point(24, 60);
             TextLabel3.Name = "TextLabel3";
             TextLabel3.Size = new Size(68, 15);
             TextLabel3.TabIndex = 4;
@@ -109,8 +109,8 @@
             // StatusLabel
             // 
             StatusLabel.AutoSize = true;
-            StatusLabel.Font = new Font("Yu Gothic UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            StatusLabel.Location = new Point(24, 54);
+            StatusLabel.Font = new Font("Yu Gothic UI", 10F, FontStyle.Bold);
+            StatusLabel.Location = new Point(24, 24);
             StatusLabel.Name = "StatusLabel";
             StatusLabel.Size = new Size(65, 19);
             StatusLabel.TabIndex = 4;
@@ -129,7 +129,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(368, 109);
+            ClientSize = new Size(368, 120);
             Controls.Add(TextLabel1);
             Controls.Add(StatusLabel);
             Controls.Add(MacAddrLabel);
@@ -142,8 +142,8 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FindFlashairForm";
-            Text = "FlashAir検索";
             StartPosition = FormStartPosition.Manual;
+            Text = "FlashAir検索";
             ResumeLayout(false);
             PerformLayout();
         }
