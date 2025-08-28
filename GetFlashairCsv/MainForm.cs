@@ -27,6 +27,9 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using OOXMLS = DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using System.ComponentModel;
+using System.Threading;
+using Irony.Parsing;
+using Newtonsoft.Json.Linq;
 //using DocumentFormat.OpenXml.Office.CustomUI;
 //using NPOI.OpenXmlFormats.Dml;
 //using NPOI.SS.Formula.Functions;
@@ -36,7 +39,7 @@ using System.ComponentModel;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20250814";
+        private const string WINDOW_TITLE = APPNAME + "_20250828";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -2107,6 +2110,7 @@ namespace GetFlashairCsv {
                 this.CloseButton.Click += CloseButton_Click;
                 this.ApplyButton.Click += ApplyButton_Click;
                 this.FormClosing += FindFlashairForm_FormClosing;
+
                 //表示位置の設定
                 var point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
@@ -2164,6 +2168,10 @@ namespace GetFlashairCsv {
             findFlashairForm.StatusLabel.Text = "検索中...";
             for (int octet = Convert.ToInt32(startOctet[3]);
                 octet <= Convert.ToInt32(endOctet[3]); octet++) {
+                if (findFlashairForm.IsDisposed == true) {
+                    return;
+                }
+                
                 //待機中のイベントを処理する
                 Application.DoEvents();
 
