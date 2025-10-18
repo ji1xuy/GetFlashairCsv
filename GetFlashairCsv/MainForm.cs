@@ -39,7 +39,7 @@ using Newtonsoft.Json.Linq;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20250828";
+        private const string WINDOW_TITLE = APPNAME + "_20251018";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"—v
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
