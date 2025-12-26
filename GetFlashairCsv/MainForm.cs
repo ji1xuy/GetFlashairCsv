@@ -39,7 +39,7 @@ using Newtonsoft.Json.Linq;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20251018";
+        private const string WINDOW_TITLE = APPNAME + "_20251226";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "url";
         private const string INIFILE_KEY_BROWSER = "browser";
@@ -615,6 +615,26 @@ namespace GetFlashairCsv {
             var dialogResult = CustomMessageBox.Show(owner, text, caption,
                 MessageBoxButtons.OKCancel, icon, button);
             return dialogResult;
+        }
+
+        static bool IsFileLocked(string path) {
+            if (!File.Exists(path)) {
+                return false;
+            }
+
+            FileStream? stream = null;
+            try {
+                // ファイルを開いてロック状態を確認
+                stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            } catch (IOException) {
+                // IOExceptionが発生した場合、他のプロセスが使用中
+                return true;
+            } finally {
+                // ファイルストリームを閉じる
+                stream?.Close();
+            }
+
+            return false;
         }
 
         private void WriteInifileButton_Click(object sender, EventArgs e) {
@@ -1925,6 +1945,11 @@ namespace GetFlashairCsv {
         private async void WriteExcelButton_Click(object sender, EventArgs e) {
             bool result;
 
+            if (IsFileLocked(EXCEL_FILENAME) == true) {
+                ShowErrorMessageBox("Excelファイルが開かれています");
+                return;
+            }
+
             WriteExcelButton.Enabled = false;
             if (WriteExcelButton.BackColor == System.Drawing.Color.LightGreen) {
                 var dialogResult = ShowOKCancelMessageBox(
@@ -1939,6 +1964,7 @@ namespace GetFlashairCsv {
 
             //CSVファイルリストが空ならリスト更新
             if (UpdateCsvFileListButton.Enabled == false) {
+                WriteExcelButton.Enabled = true;
                 return;
             }
             if (CsvFileListBox.Items.Count == 0) {
@@ -1962,11 +1988,16 @@ namespace GetFlashairCsv {
                 return;
             }
 
-            WriteExcelButton.Enabled = false;
             progressForm = new ProgressForm(this, "Excelファイル書込", ProgressBarStyle.Blocks);
             progressForm.Update();
             int count;
             //Excelファイルに書き込む
+            if (IsFileLocked(EXCEL_FILENAME) == true) {
+                ShowErrorMessageBox("Excelファイルが開かれています");
+                progressForm!.Close();
+                WriteExcelButton.Enabled = true;
+                return;
+            }
             count = await WriteExcelUsingOpenXML(this);
             progressForm.Close();
             WriteExcelButton.Enabled = true;

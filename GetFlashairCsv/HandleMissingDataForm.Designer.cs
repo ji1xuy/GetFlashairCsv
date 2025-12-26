@@ -47,14 +47,14 @@
             DontShowAgainCheckBox.AutoSize = true;
             DontShowAgainCheckBox.Location = new Point(32, 88);
             DontShowAgainCheckBox.Name = "DontShowAgainCheckBox";
-            DontShowAgainCheckBox.Size = new Size(102, 19);
+            DontShowAgainCheckBox.Size = new Size(173, 19);
             DontShowAgainCheckBox.TabIndex = 3;
-            DontShowAgainCheckBox.Text = "今後確認しない";
+            DontShowAgainCheckBox.Text = "今後このメッセージを表示しない";
             DontShowAgainCheckBox.UseVisualStyleBackColor = true;
             // 
             // OKButton
             // 
-            OKButton.Location = new Point(182, 84);
+            OKButton.Location = new Point(213, 84);
             OKButton.Name = "OKButton";
             OKButton.Size = new Size(76, 25);
             OKButton.TabIndex = 1;
@@ -63,7 +63,7 @@
             // 
             // CancelButton
             // 
-            CancelButton.Location = new Point(283, 84);
+            CancelButton.Location = new Point(300, 84);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(73, 26);
             CancelButton.TabIndex = 2;
@@ -74,7 +74,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(368, 114);
+            ClientSize = new Size(391, 114);
             Controls.Add(CancelButton);
             Controls.Add(OKButton);
             Controls.Add(DontShowAgainCheckBox);
