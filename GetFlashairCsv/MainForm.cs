@@ -39,14 +39,15 @@ using Newtonsoft.Json.Linq;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20251226";
+        private const string WINDOW_TITLE = APPNAME + "_20260415";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
-        private const string INIFILE_KEY_URL = "url";
-        private const string INIFILE_KEY_BROWSER = "browser";
+        private const string INIFILE_KEY_URL = "Url";
+        private const string INIFILE_KEY_BROWSER = "Browser";
+        private const string INIFILE_KEY_DEFAULT_BROWSER = "DefaultBrowser";
         private const string PROTOCOL = "http://";
-        private const string INIFILE_KEY_MAC_ADDR = "macAddr";
-        private const string INIFILE_KEY_START_IP_ADDR = "startIpAddr";
-        private const string INIFILE_KEY_END_IP_ADDR = "endIpAddr";
+        private const string INIFILE_KEY_MAC_ADDR = "MacAddr";
+        private const string INIFILE_KEY_START_IP_ADDR = "StartIpAddr";
+        private const string INIFILE_KEY_END_IP_ADDR = "EndIpAddr";
         private const string EXCEL_FILENAME = @"whm_30min.xlsx";
         private const string EXCEL_SHEETNAME = "30分データ";
         private const string EXCEL_TABLENAME = "テーブル1";
@@ -135,7 +136,7 @@ namespace GetFlashairCsv {
         各キーの名前は定数にて設定
         FlashAirのCSVファイルのリスト更新(GUIで設定変更可能)
         ・FlashAirのURL     キー: INIFILE_KEY_URLの値 / 値: http://xxx.xxx.xxx.xxx
-        ・使用するブラウザ     キー: INIFILE_KEY_BROWSERの値 / 値: Chrome or Edge
+        ・使用するブラウザ     キー: INIFILE_KEY_DEFAULT_BROWSERの値 / 値: Chrome or Edge
         FlashAirの検索(iniファイルの直接編集のみ)
         ・MACアドレス        キー:　INIFILE_KEY_MAC_ADDRの値 / 値: xx-xx-xx-xx-xx-xx
         ・検索開始IPアドレス   キー:　INIFILE_KEY_START_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
@@ -203,11 +204,10 @@ namespace GetFlashairCsv {
 
             public void ReadMacAddrFromInifile() {
                 //iniファイルから設定を読み込む
-                int capacitySize = 256;
                 //StringBuilderクラス
                 //文字列の追加、置換、挿入を行うと、
                 //オブジェクトの内容が変更されるだけで新しいオブジェクトを作成しません
-                var sb = new StringBuilder(capacitySize);
+                var sb = new StringBuilder(256);
                 var stringLength = GetPrivateProfileString(
                     APPNAME, INIFILE_KEY_MAC_ADDR, "", sb, Convert.ToUInt32(sb.Capacity),
                     INIFILE_FILENAME);
@@ -220,8 +220,7 @@ namespace GetFlashairCsv {
             }
 
             public void ReadStartIpAddrFromInifile() {
-                int capacitySize = 256;
-                var sb = new StringBuilder(capacitySize);
+                var sb = new StringBuilder(256);
                 var stringLength = GetPrivateProfileString(
                     APPNAME, INIFILE_KEY_START_IP_ADDR, "", sb, Convert.ToUInt32(sb.Capacity),
                     INIFILE_FILENAME);
@@ -233,8 +232,7 @@ namespace GetFlashairCsv {
             }
 
             public void ReadEndIpAddrFromInifile() {
-                int capacitySize = 256;
-                var sb = new StringBuilder(capacitySize);
+                var sb = new StringBuilder(256);
                 var stringLength = GetPrivateProfileString(
                     APPNAME, INIFILE_KEY_END_IP_ADDR, "", sb, Convert.ToUInt32(sb.Capacity),
                     INIFILE_FILENAME);
@@ -246,8 +244,7 @@ namespace GetFlashairCsv {
             }
 
             public void ReadUrlFromInifile() {
-                int capacitySize = 256;
-                var sb = new StringBuilder(capacitySize);
+                var sb = new StringBuilder(256);
                 var stringLength = GetPrivateProfileString(
                     APPNAME, INIFILE_KEY_URL, "", sb, Convert.ToUInt32(sb.Capacity),
                     INIFILE_FILENAME);
@@ -477,12 +474,21 @@ namespace GetFlashairCsv {
                         }));
                         break;
                     //case WebDriverArgumentException:
+                    //case UnknownErrorException:
                     case WebDriverException:
                         _mainForm.Invoke((MethodInvoker)(() => {
                             _mainForm.ShowErrorMessageBox(
                                 progressForm,
                                 "FlashAirと通信できませんでした\n" +
                                 "FlashAirのURLが正しいか確認してください");
+                        }));
+                        break;
+                    case Win32Exception:
+                        _mainForm.Invoke((MethodInvoker)(() => {
+                            _mainForm.ShowErrorMessageBox(
+                                progressForm,
+                                "Selenium.WebDriverが見つかりませんでした\n" +
+                                "再度実行してみてください");
                         }));
                         break;
                     default:
@@ -2071,45 +2077,64 @@ namespace GetFlashairCsv {
         }
 
         private void MainForm_Shown(object sender, EventArgs e) {
+            const string BROWSER_CHROME = "Chrome";
+            const string BROWSER_EDGE = "Edge";
+
             Refresh();
-            try {
-                var chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
-                new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
-            } catch (AggregateException) {
-                ShowErrorMessageBox("インターネットに接続されているか確認してください");
-                this.Load += (s, e) => Close();
-                return;
-            } catch (Exception) {
-                ShowErrorMessageBox("Chromeブラウザのバージョンが確認できないかインストールされていません");
+            var sb = new StringBuilder(256);
+            var stringLength = GetPrivateProfileString(
+                APPNAME, INIFILE_KEY_BROWSER, "", sb, Convert.ToUInt32(sb.Capacity),
+                INIFILE_FILENAME);
+            if (stringLength == 0) {
+                sb.Append(BROWSER_CHROME + "," + BROWSER_EDGE);
+            }
+            if (sb.ToString().IndexOf(BROWSER_CHROME) == -1) {
                 ChromeRadioButton.Enabled = false;
-                EdgeRadioButton.Checked = true;
+            } else {
+                try {
+                    var chrormeDriverVersion = new ChromeConfig().GetMatchingBrowserVersion();
+                    new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+                } catch (AggregateException) {
+                    ShowErrorMessageBox("インターネットに接続されているか確認してください");
+                    this.Load += (s, e) => Close();
+                    return;
+                } catch (Exception) {
+                    ShowErrorMessageBox("Chromeブラウザのバージョンが確認できないかインストールされていません");
+                    ChromeRadioButton.Enabled = false;
+                }
+                if (ChromeRadioButton.Enabled == true) {
+                    Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
+                }
             }
-            try {
-                var edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
-                new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
-            } catch (Exception) {
-                ShowErrorMessageBox("Edgeブラウザのバージョンが確認できないかインストールされていません");
+            if (sb.ToString().IndexOf(BROWSER_EDGE) == -1) {
                 EdgeRadioButton.Enabled = false;
+            } else { 
+                try {
+                    var edgeDriverVersion = new EdgeConfig().GetMatchingBrowserVersion();
+                    new DriverManager().SetUpDriver(new EdgeConfig(), VersionResolveStrategy.MatchingBrowser);
+                } catch (Exception) {
+                    ShowErrorMessageBox("Edgeブラウザのバージョンが確認できないかインストールされていません");
+                    EdgeRadioButton.Enabled = false;
+                }
+                if (EdgeRadioButton.Enabled == true) {
+                    Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
+                }
             }
-            if (ChromeRadioButton.Enabled == true) {
-                Debug.WriteLine("ChromeDriverVersion: " + (new ChromeConfig().GetMatchingBrowserVersion()));
-            }
-            if (EdgeRadioButton.Enabled == true) {
-                Debug.WriteLine("EdgeDriverVersion: " + (new EdgeConfig().GetMatchingBrowserVersion()));
-            }
-            if ((ChromeRadioButton.Enabled == false) && (EdgeRadioButton.Enabled == false)) {
-                ChromeRadioButton.Checked = false;
-                EdgeRadioButton.Checked = false;
-                UpdateCsvFileListButton.Enabled = false;
-                WriteExcelButton.Enabled = false;
+
+            if (ChromeRadioButton.Enabled == false) {
+                if (EdgeRadioButton.Enabled == true) {
+                    EdgeRadioButton.Checked = true;
+                } else { 
+                    UpdateCsvFileListButton.Enabled = false;
+                    WriteExcelButton.Enabled = false;
+                }
             }
         }
 
         public void ReadBrowserFromInifile() {
-            int capacitySize = 256;
-            var sb = new StringBuilder(capacitySize);
+            var sb = new StringBuilder(256);
             var stringLength = GetPrivateProfileString(
-                APPNAME, INIFILE_KEY_BROWSER, "", sb, Convert.ToUInt32(sb.Capacity),
+                APPNAME, INIFILE_KEY_DEFAULT_BROWSER, "", sb, Convert.ToUInt32(sb.Capacity),
                 INIFILE_FILENAME);
             if (sb.ToString() == ChromeRadioButton.Text) {
                 ChromeRadioButton.Checked = true;
@@ -2121,11 +2146,11 @@ namespace GetFlashairCsv {
 
         public void WriteBrowserToInifile() {
             if (ChromeRadioButton.Checked == true) {
-                WritePrivateProfileString(APPNAME, INIFILE_KEY_BROWSER,
+                WritePrivateProfileString(APPNAME, INIFILE_KEY_DEFAULT_BROWSER,
                     ChromeRadioButton.Text, INIFILE_FILENAME);
             }
             if (EdgeRadioButton.Checked == true) {
-                WritePrivateProfileString(APPNAME, INIFILE_KEY_BROWSER,
+                WritePrivateProfileString(APPNAME, INIFILE_KEY_DEFAULT_BROWSER,
                     EdgeRadioButton.Text, INIFILE_FILENAME);
             }
         }
