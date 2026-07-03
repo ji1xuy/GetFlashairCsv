@@ -39,7 +39,7 @@ using Newtonsoft.Json.Linq;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20260415";
+        private const string WINDOW_TITLE = APPNAME + "_20260629";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"—v
         private const string INIFILE_KEY_URL = "Url";
         private const string INIFILE_KEY_BROWSER = "Browser";
@@ -2303,7 +2303,7 @@ namespace GetFlashairCsv {
             findFlashairForm.StatusLabel.Text = "FlashAir‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½m(_ _)m";
         }
 
-        private partial class HandleMissingDataForm : GetFlashairCsv.HandleMissingDataForm {
+        private partial class HandleMissingDataForm : GetFlashairCsv.MissingDataHandlerForm {
             private MainForm _mainForm;
             private string _text = "";
             private bool _dontShowAgain = false;
