@@ -39,7 +39,7 @@ using Newtonsoft.Json.Linq;
 namespace GetFlashairCsv {
     public partial class MainForm : Form {
         private const string APPNAME = "GetFlashairCsv";
-        private const string WINDOW_TITLE = APPNAME + "_20260629";
+        private const string WINDOW_TITLE = APPNAME + "_20260707";
         private const string INIFILE_FILENAME = @"./" + APPNAME + ".ini"; // "./"要
         private const string INIFILE_KEY_URL = "Url";
         private const string INIFILE_KEY_BROWSER = "Browser";
@@ -142,6 +142,16 @@ namespace GetFlashairCsv {
         ・検索開始IPアドレス   キー:　INIFILE_KEY_START_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
         ・検索終了IPアドレス   キー:　INIFILE_KEY_END_IP_ADDRの値 / 値: nnn.nnn.nnn.nnn
         (検索開始IPアドレスと検索終了IPアドレスは同一セグメント内であること)
+        
+        <GetFlashairCsv.iniの設定例> 
+         [GetFlashairCsv]
+        Url=http://192.168.0.xxx
+        Browser=
+        DefaultBrowser=Edge
+        MacAddr=xx-xx-xx-xx-xx-xx
+        StartIpAddr=192.168.0.100
+        EndIpAddr=192.168.0.200
+          
         */
 
         public MainForm() {
@@ -1687,14 +1697,14 @@ namespace GetFlashairCsv {
                         if ((System.DateTime.Parse(_csvDateTime) - System.DateTime.Parse(prevCsvDateTime)).TotalMinutes > 30) {
                             DialogResult dialogResult = DialogResult.None;
                             if (dontShowAgain == false) {
-                                HandleMissingDataForm handleMissingDataForm = new HandleMissingDataForm(_mainForm);
+                                MissingDataHandlerForm missingDataHandlerForm = new MissingDataHandlerForm(_mainForm);
                                 var text = string.Format(
                                             "CSVファイルにデータ欠落の可能性があります\n" +
                                             "[Excel] {0}行目: {1}\n" +
                                             "[Excel] {2}行目: {3}\n\n" +
                                             "書込を続行しますか？",
                                             _excelRownum, prevCsvDateTime, _excelRownum + 1, _csvDateTime);
-                                dialogResult = handleMissingDataForm.ShowDialog(text, out dontShowAgain);
+                                dialogResult = missingDataHandlerForm.ShowDialog(text, out dontShowAgain);
                                 if (dialogResult == DialogResult.Cancel) {
                                     reader.Close();
                                     _document.Dispose();
@@ -2303,17 +2313,17 @@ namespace GetFlashairCsv {
             findFlashairForm.StatusLabel.Text = "FlashAirが見つかりませんでしたm(_ _)m";
         }
 
-        private partial class HandleMissingDataForm : GetFlashairCsv.MissingDataHandlerForm {
+        private partial class MissingDataHandlerForm : GetFlashairCsv.MissingDataHandlerForm {
             private MainForm _mainForm;
             private string _text = "";
             private bool _dontShowAgain = false;
 
-            public HandleMissingDataForm(MainForm mainForm) {
+            public MissingDataHandlerForm(MainForm mainForm) {
                 _mainForm = mainForm;
                 this.DontShowAgainCheckBox.CheckedChanged += DontShowAgainCheckBox_CheckedChanged!;
                 this.OKButton.Click += OKButton_Click!;
                 this.CancelButton.Click += CancelButton_Click!;
-                this.Load += HandleMissingDataForm_Load!;
+                this.Load += MissingDataHandlerForm_Load!;
             }
 
             public DialogResult ShowDialog(string text,out bool dontShowAgain) {
@@ -2325,7 +2335,7 @@ namespace GetFlashairCsv {
                 return dialogResult;
             }
 
-            private void HandleMissingDataForm_Load(object sender, EventArgs e) {
+            private void MissingDataHandlerForm_Load(object sender, EventArgs e) {
                 //表示位置の設定
                 var point = _mainForm.Location;
                 this.Bounds = new System.Drawing.Rectangle(
